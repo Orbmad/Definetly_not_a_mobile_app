@@ -1,4 +1,4 @@
-package com.example.petaly
+package com.example.eyeflush
 
 import org.junit.Test
 

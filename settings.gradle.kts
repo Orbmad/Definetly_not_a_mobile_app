@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Petaly"
+rootProject.name = "EyeFlush"
 include(":app")
  

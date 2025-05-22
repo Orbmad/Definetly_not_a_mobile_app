@@ -5,13 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.petaly"
-    compileSdk = 34
+    namespace = "com.example.eyeflush"
+    compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.petaly"
+        applicationId = "com.example.eyeflush"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 

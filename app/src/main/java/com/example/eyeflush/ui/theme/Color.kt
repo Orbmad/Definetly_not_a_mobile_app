@@ -1,4 +1,4 @@
-package com.example.petaly.ui.theme
+package com.example.eyeflush.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

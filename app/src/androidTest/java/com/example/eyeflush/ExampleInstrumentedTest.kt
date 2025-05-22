@@ -1,4 +1,4 @@
-package com.example.petaly
+package com.example.eyeflush
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
