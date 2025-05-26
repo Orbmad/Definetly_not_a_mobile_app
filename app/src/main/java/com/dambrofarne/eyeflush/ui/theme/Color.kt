@@ -1,4 +1,4 @@
-package com.example.eyeflush.ui.theme
+package com.dambrofarne.eyeflush.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

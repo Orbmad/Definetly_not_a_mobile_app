@@ -1,4 +1,4 @@
-package com.example.eyeflush
+package com.dambrofarne.eyeflush
 
 import android.app.Application
 import org.koin.android.ext.koin.androidContext

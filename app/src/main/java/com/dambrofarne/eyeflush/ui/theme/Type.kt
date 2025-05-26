@@ -1,4 +1,4 @@
-package com.example.eyeflush.ui.theme
+package com.dambrofarne.eyeflush.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

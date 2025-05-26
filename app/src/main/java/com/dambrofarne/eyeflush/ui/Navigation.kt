@@ -1,13 +1,15 @@
-package com.example.eyeflush.ui
+package com.dambrofarne.eyeflush.ui
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.eyeflush.ui.screens.splashscreen.SplashScreen
+import com.dambrofarne.eyeflush.ui.screens.signin.SignInScreen
+import com.dambrofarne.eyeflush.ui.screens.splash.SplashScreen
 import kotlinx.serialization.Serializable
 
 sealed interface EyeFlushRoute {
+
     //Navigation with kotlin serialization
     @Serializable data object Splash : EyeFlushRoute
     @Serializable data object SignIn : EyeFlushRoute
@@ -23,6 +25,9 @@ fun EyeFlushNavGraph(navController: NavHostController) {
     ){
         composable<EyeFlushRoute.Splash> {
             SplashScreen(navController)
+        }
+        composable<EyeFlushRoute.SignIn> {
+            SignInScreen(navController)
         }
     }
 

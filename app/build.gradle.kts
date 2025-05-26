@@ -3,14 +3,15 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.serialization)
+    id("com.google.gms.google-services")
 }
 
 android {
-    namespace = "com.example.eyeflush"
+    namespace = "com.dambrofarne.eyeflush"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.eyeflush"
+        applicationId = "com.dambrofarne.eyeflush"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
@@ -41,7 +42,7 @@ android {
 }
 
 dependencies {
-
+    implementation("androidx.compose.material3:material3:1.2.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -53,6 +54,9 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.androidx.navigation.compose.android)
     implementation(libs.koin.androidx.compose)
+    implementation(libs.firebase.auth.ktx)
+    implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
+    implementation("com.google.firebase:firebase-auth")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

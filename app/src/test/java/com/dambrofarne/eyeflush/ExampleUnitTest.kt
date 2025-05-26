@@ -1,4 +1,4 @@
-package com.example.eyeflush
+package com.dambrofarne.eyeflush
 
 import org.junit.Test
 
