@@ -12,7 +12,7 @@ class EyeFlushApplication : Application() {
         startKoin {
             androidLogger()
             androidContext(this@EyeFlushApplication)
-            //modules(appModule)
+            modules(appModule)
         }
     }
 }

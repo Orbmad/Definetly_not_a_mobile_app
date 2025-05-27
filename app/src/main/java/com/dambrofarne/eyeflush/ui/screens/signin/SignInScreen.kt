@@ -17,11 +17,12 @@ import com.dambrofarne.eyeflush.ui.composables.EyeFlushTextField
 import com.dambrofarne.eyeflush.ui.composables.GoogleButton
 import com.dambrofarne.eyeflush.ui.composables.SignUpText
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SignInScreen(
     navController: NavHostController,
-    viewModel: SignInViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: SignInViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -66,16 +67,7 @@ fun SignInScreen(
             }
         }
 
-        Spacer(Modifier.height(16.dp))
-
-        CustomStandardButton("Accedi") {
-            viewModel.signIn {
-                navController.navigate(EyeFlushRoute.Home) {
-                }
-            }
-        }
-
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(8.dp))
 
         GoogleButton("Accedi con Google", {
             coroutineScope.launch {
@@ -88,6 +80,17 @@ fun SignInScreen(
                 }
             }
         })
+
+        Spacer(Modifier.height(16.dp))
+
+        CustomStandardButton("Accedi") {
+            viewModel.signIn {
+                navController.navigate(EyeFlushRoute.Home) {
+                }
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
 
         SignUpText {
             navController.navigate(EyeFlushRoute.SignUp)

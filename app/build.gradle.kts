@@ -62,6 +62,7 @@ dependencies {
     // Import the BoM for the Firebase platform
     implementation(platform(libs.firebase.bom))
     // Also add the dependencies for the Credential Manager libraries and specify their versions
+    implementation(libs.koin.androidx.compose.v340) //Dpendenza per richiamare Koin da composable
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)

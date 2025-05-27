@@ -19,13 +19,13 @@ import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.CustomStandardButton
 import com.dambrofarne.eyeflush.ui.composables.EyeFlushTextField
 import com.dambrofarne.eyeflush.ui.composables.SignInText
-import com.dambrofarne.eyeflush.ui.composables.SignUpText
+import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
 fun SignUpScreen(
     navController: NavHostController,
-    viewModel: SignUpViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: SignUpViewModel = koinViewModel<SignUpViewModel>()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     Column(

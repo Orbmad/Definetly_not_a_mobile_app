@@ -2,8 +2,6 @@ package com.dambrofarne.eyeflush.ui.screens.signin
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
@@ -15,6 +13,7 @@ import androidx.credentials.GetCredentialRequest
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
+import com.dambrofarne.eyeflush.data.repositories.AuthRepository
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
 
@@ -28,9 +27,9 @@ data class SignInUiState(
     val isSignedIn: Boolean = false
 )
 
-class SignInViewModel : ViewModel() {
 
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+class SignInViewModel(private val repository: AuthRepository) : ViewModel() {
+
     private val _uiState = MutableStateFlow(SignInUiState())
     val uiState: StateFlow<SignInUiState> = _uiState
 
@@ -57,40 +56,33 @@ class SignInViewModel : ViewModel() {
 
         _uiState.value = _uiState.value.copy(isLoading = true)
 
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    _uiState.value = _uiState.value.copy(isLoading = false, isSignedIn = true)
-                    navToHome()
-                } else {
-                    val exception = task.exception
-                    _uiState.value = _uiState.value.copy(isLoading = false)
-                    when (exception) {
-                        is FirebaseAuthInvalidUserException -> {
-                            _uiState.value = _uiState.value.copy(emailError = "Email non esiste.")
-                        }
-                        is FirebaseAuthInvalidCredentialsException -> {
-                            _uiState.value = _uiState.value.copy(passwordError = "Password errata.")
-                        }
-                        is FirebaseNetworkException -> {
-                            _uiState.value = _uiState.value.copy(connectionError = "Problemi di rete, ritenta.")
-                        }
-                        else -> {
-                            _uiState.value = _uiState.value.copy(connectionError = "Errore sconosciuto, riprova.")
-                        }
-                    }
+        viewModelScope.launch {
+            val result = repository.signInWithEmail(email, password)
+            if (result.isSuccess) {
+                _uiState.value = _uiState.value.copy(isLoading = false, isSignedIn = true)
+                navToHome()
+            } else {
+                val exception = result.exceptionOrNull()
+                _uiState.value = _uiState.value.copy(isLoading = false)
+                when (exception) {
+                    is FirebaseAuthInvalidUserException -> _uiState.value = _uiState.value.copy(emailError = "Email non esiste.")
+                    is FirebaseAuthInvalidCredentialsException -> _uiState.value = _uiState.value.copy(passwordError = "Password errata.")
+                    is FirebaseNetworkException -> _uiState.value = _uiState.value.copy(connectionError = "Problemi di rete, ritenta.")
+                    else -> _uiState.value = _uiState.value.copy(connectionError = "Errore sconosciuto, riprova.")
                 }
             }
+        }
     }
 
     fun signInWithGoogle(context: Context, idToken: String, navToHome: () -> Unit) {
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-        auth.signInWithCredential(credential).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                _uiState.value = _uiState.value.copy(isSignedIn = true)
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            val result = repository.signInWithGoogle(idToken)
+            if (result.isSuccess) {
+                _uiState.value = _uiState.value.copy(isLoading = false, isSignedIn = true)
                 navToHome()
             } else {
-                _uiState.value = _uiState.value.copy(connectionError = "Login Google fallito.")
+                _uiState.value = _uiState.value.copy(isLoading = false, connectionError = "Login Google fallito.")
             }
         }
     }
