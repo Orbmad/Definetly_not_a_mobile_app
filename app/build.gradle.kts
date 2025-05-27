@@ -57,7 +57,14 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(platform(libs.firebase.bom)) //Firebase
     implementation(libs.firebase.auth) //Firebase authentication
-    implementation(libs.androidx.material.icons.extended) //Icone aggiuntive per material
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.googleid) //Icone aggiuntive per material
+    // Import the BoM for the Firebase platform
+    implementation(platform(libs.firebase.bom))
+    // Also add the dependencies for the Credential Manager libraries and specify their versions
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
