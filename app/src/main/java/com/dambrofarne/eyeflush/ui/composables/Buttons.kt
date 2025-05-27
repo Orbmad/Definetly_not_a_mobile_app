@@ -1,9 +1,11 @@
 package com.dambrofarne.eyeflush.ui.composables
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,7 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.dambrofarne.eyeflush.R
+import com.dambrofarne.eyeflush.ui.theme.Purple80
 
 @Composable
 fun CustomStandardButton(
@@ -53,3 +57,16 @@ fun GoogleButton(
         Text(text, color = Color.Black)
     }
 }
+
+@Composable
+fun SignUpText(onClick: () -> Unit) {
+    Text(
+        text = "Non hai un account? Registrati",
+        color = Purple80 ,
+        fontSize = 14.sp,
+        modifier = Modifier
+            .padding(top = 16.dp)
+            .clickable(onClick = onClick)
+    )
+}
+

@@ -119,7 +119,6 @@ class SignInViewModel : ViewModel() {
             } else {
                 null
             }
-
         } catch (e: Exception) {
             null
         }

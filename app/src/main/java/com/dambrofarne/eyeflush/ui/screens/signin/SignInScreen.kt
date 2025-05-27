@@ -15,6 +15,7 @@ import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.CustomStandardButton
 import com.dambrofarne.eyeflush.ui.composables.EyeFlushTextField
 import com.dambrofarne.eyeflush.ui.composables.GoogleButton
+import com.dambrofarne.eyeflush.ui.composables.SignUpText
 import kotlinx.coroutines.launch
 
 @Composable
@@ -56,7 +57,7 @@ fun SignInScreen(
             onValueChange = viewModel::onPasswordChange,
             label = "Password",
             isPassword = true,
-            keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Password),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             //visualTransformation = PasswordVisualTransformation()
         )
         uiState.passwordError?.let {
@@ -86,11 +87,13 @@ fun SignInScreen(
                             popUpTo(EyeFlushRoute.Splash) { inclusive = true }
                         }
                     }
-                } else {
-                    // Gestisci errore Google login se vuoi
                 }
             }
         })
+
+        SignUpText {
+            navController.navigate(EyeFlushRoute.SignUp)
+        }
 
         uiState.connectionError?.let {
             if (it.isNotEmpty()) {
