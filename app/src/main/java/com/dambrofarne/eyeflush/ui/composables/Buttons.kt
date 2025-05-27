@@ -70,3 +70,16 @@ fun SignUpText(onClick: () -> Unit) {
     )
 }
 
+@Composable
+fun SignInText(onClick: () -> Unit) {
+    Text(
+        text = "Hai già un account? Accedi",
+        color = Purple80 ,
+        fontSize = 14.sp,
+        modifier = Modifier
+            .padding(top = 16.dp)
+            .clickable(onClick = onClick)
+    )
+}
+
+

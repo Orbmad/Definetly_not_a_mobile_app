@@ -71,7 +71,6 @@ fun SignInScreen(
         CustomStandardButton("Accedi") {
             viewModel.signIn {
                 navController.navigate(EyeFlushRoute.Home) {
-                    popUpTo(EyeFlushRoute.Splash) { inclusive = true }
                 }
             }
         }
@@ -84,7 +83,6 @@ fun SignInScreen(
                 if (idToken != null) {
                     viewModel.signInWithGoogle(context, idToken) {
                         navController.navigate(EyeFlushRoute.Home) {
-                            popUpTo(EyeFlushRoute.Splash) { inclusive = true }
                         }
                     }
                 }

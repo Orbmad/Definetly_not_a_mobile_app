@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.dambrofarne.eyeflush.ui.screens.signin.SignInScreen
+import com.dambrofarne.eyeflush.ui.screens.signup.SignUpScreen
 import com.dambrofarne.eyeflush.ui.screens.splash.SplashScreen
 import kotlinx.serialization.Serializable
 
@@ -28,6 +29,10 @@ fun EyeFlushNavGraph(navController: NavHostController) {
         }
         composable<EyeFlushRoute.SignIn> {
             SignInScreen(navController)
+        }
+
+        composable<EyeFlushRoute.SignUp> {
+            SignUpScreen(navController)
         }
     }
 
