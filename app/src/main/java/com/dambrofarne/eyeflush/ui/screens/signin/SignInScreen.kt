@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -26,10 +27,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.R
+import com.dambrofarne.eyeflush.ui.composables.CustomStandardButton
+import com.dambrofarne.eyeflush.ui.composables.EyeFlushTextField
+import com.dambrofarne.eyeflush.ui.composables.GoogleButton
+import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 
 @Composable
 fun SignInScreen(navController: NavHostController) {
@@ -47,47 +56,56 @@ fun SignInScreen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(
+        EyeFlushTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
-            singleLine = true
+            label = "Email",
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
+        EyeFlushTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
-            singleLine = true,
-            visualTransformation = PasswordVisualTransformation()
+            label = "Password",
+            isPassword = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = {}) {
-            Text("Accedi")
-        }
-        // Pulsante Google Sign-In
-        Button(
-            onClick = {},
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-            border = BorderStroke(1.dp, Color.Gray),
-            shape = RoundedCornerShape(4.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-        ) {
-            androidx.compose.material3.Icon(
-                painter = painterResource(id = R.drawable.ic_google_logo),
-                contentDescription = "Google Logo",
-                modifier = Modifier.size(48.dp),
-                tint = Color.Unspecified
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Accedi con Google", color = Color.Black)
-        }
+        CustomStandardButton("Accedi",{
+            FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val user = FirebaseAuth.getInstance().currentUser
+                        // Aggiorna UI, fai redirect, ecc.
+                    } else {
+                        val exception = task.exception
+                        when (exception) {
+                            is FirebaseAuthInvalidUserException -> {
+                                // Utente non trovato o disabilitato
+                            }
+                            is FirebaseAuthInvalidCredentialsException -> {
+                                // Password errata o credenziali invalide
+                            }
+                            is FirebaseNetworkException -> {
+                                // Problemi di rete
+                            }
+                            else -> {
+                                // Altri errori
+                            }
+                        }
+
+                    }
+                }
+        })
+
+        GoogleButton("Accedi con Google",{
+            FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+
+        })
 
     }
 }

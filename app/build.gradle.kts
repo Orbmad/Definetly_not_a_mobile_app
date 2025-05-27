@@ -42,7 +42,7 @@ android {
 }
 
 dependencies {
-    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation(libs.material3) //Material
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -55,8 +55,9 @@ dependencies {
     implementation(libs.androidx.navigation.compose.android)
     implementation(libs.koin.androidx.compose)
     implementation(libs.firebase.auth.ktx)
-    implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
-    implementation("com.google.firebase:firebase-auth")
+    implementation(platform(libs.firebase.bom)) //Firebase
+    implementation(libs.firebase.auth) //Firebase authentication
+    implementation(libs.androidx.material.icons.extended) //Icone aggiuntive per material
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
