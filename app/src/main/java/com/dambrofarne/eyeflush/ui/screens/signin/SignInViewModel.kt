@@ -13,7 +13,7 @@ import androidx.credentials.GetCredentialRequest
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
-import com.dambrofarne.eyeflush.data.repositories.AuthRepository
+import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
 

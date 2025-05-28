@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(platform(libs.firebase.bom)) //Firebase
     implementation(libs.firebase.auth) //Firebase authentication
+    implementation(libs.firebase.firestore) //Firebase Firestore
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.googleid) //Icone aggiuntive per material
     // Import the BoM for the Firebase platform

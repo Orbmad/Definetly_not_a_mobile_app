@@ -9,7 +9,7 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import com.dambrofarne.eyeflush.data.repositories.AuthRepository
+import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
 
 data class SignUpUiState(
     val email: String = "",

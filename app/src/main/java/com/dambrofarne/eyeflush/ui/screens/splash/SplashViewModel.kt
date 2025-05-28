@@ -2,7 +2,7 @@ package com.dambrofarne.eyeflush.ui.screens.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dambrofarne.eyeflush.data.repositories.AuthRepository
+import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow

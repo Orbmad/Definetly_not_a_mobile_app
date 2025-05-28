@@ -1,4 +1,4 @@
-package com.dambrofarne.eyeflush.data.repositories
+package com.dambrofarne.eyeflush.data.repositories.auth
 
 interface AuthRepository {
     suspend fun signInWithEmail(email: String, password: String): Result<Unit>

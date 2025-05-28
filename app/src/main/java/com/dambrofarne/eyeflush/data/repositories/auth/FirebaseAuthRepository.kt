@@ -1,4 +1,4 @@
-package com.dambrofarne.eyeflush.data.repositories
+package com.dambrofarne.eyeflush.data.repositories.auth
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
