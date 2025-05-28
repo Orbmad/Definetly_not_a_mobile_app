@@ -34,4 +34,12 @@ class FirebaseAuthRepository(private val auth: FirebaseAuth) : AuthRepository {
                     else cont.resume(Result.failure(task.exception ?: Exception("Unknown error")))
                 }
         }
+
+    override fun signOut() {
+        auth.signOut()
+    }
+
+    override fun isUserLoggedIn(): Boolean {
+        return auth.currentUser != null
+    }
 }

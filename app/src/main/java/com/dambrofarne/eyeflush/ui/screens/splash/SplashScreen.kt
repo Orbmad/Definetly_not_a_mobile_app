@@ -10,27 +10,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.delay
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SplashScreen(navController: NavHostController) {
-    // Effetto lanciato una sola volta al primo composition
-    LaunchedEffect(Unit) {
-        delay(2000)
+    val viewModel: SplashViewModel = koinViewModel<SplashViewModel>()
 
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser != null) {
-            navController.navigate(EyeFlushRoute.Home) {
-                popUpTo(EyeFlushRoute.Splash) { inclusive = true }
-            }
-        } else {
-            navController.navigate(EyeFlushRoute.SignIn) {
+    //Necessario perchè il viewModel non può navigare direttamente,
+    //Però con collect mi faccio dire dove navigare.
+    LaunchedEffect(Unit) {
+        viewModel.navigation.collect { route ->
+            navController.navigate(route) {
                 popUpTo(EyeFlushRoute.Splash) { inclusive = true }
             }
         }
     }
-    // Grafica della splash screen
+
+    // UI della splash screen
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
