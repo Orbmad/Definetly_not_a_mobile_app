@@ -42,4 +42,8 @@ class FirebaseAuthRepository(private val auth: FirebaseAuth) : AuthRepository {
     override fun isUserLoggedIn(): Boolean {
         return auth.currentUser != null
     }
+
+    override fun getCurrentUserId(): String? {
+        return auth.currentUser?.uid
+    }
 }

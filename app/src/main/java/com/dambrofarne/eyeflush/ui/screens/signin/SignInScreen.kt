@@ -82,10 +82,20 @@ fun SignInScreen(
             coroutineScope.launch {
                 val idToken = viewModel.requestGoogleCredential(context)
                 if (idToken != null) {
-                    viewModel.signInWithGoogle(context, idToken) {
-                        navController.navigate(EyeFlushRoute.Home) {
+                    viewModel.signInWithGoogle(
+                        context = context,
+                        idToken = idToken,
+                        navToHome = {
+                            navController.navigate(EyeFlushRoute.Home) {
+                                popUpTo(EyeFlushRoute.SignIn) { inclusive = true }
+                            }
+                        },
+                        navToProfileConfig = {
+                            navController.navigate(EyeFlushRoute.ProfileConfig) {
+                                popUpTo(EyeFlushRoute.SignIn) { inclusive = true }
+                            }
                         }
-                    }
+                    )
                 }
             }
         })

@@ -39,7 +39,7 @@ class SignUpViewModel(private val repository: AuthRepository) : ViewModel() {
         _uiState.value = _uiState.value.copy(passwordConfirmation = passwordConfirmation, passwordError = null)
     }
 
-    fun signUp(navToHome: () -> Unit) {
+    fun signUp(navToConfig: () -> Unit) {
         val email = _uiState.value.email
         val password = _uiState.value.password
         val passwordConfirmation = _uiState.value.passwordConfirmation
@@ -65,7 +65,7 @@ class SignUpViewModel(private val repository: AuthRepository) : ViewModel() {
             val result = repository.signUpWithEmail(email, password)
             if (result.isSuccess) {
                 _uiState.value = _uiState.value.copy(isLoading = false, isSignedUp = true)
-                navToHome()
+                navToConfig()
             } else {
                 val exception = result.exceptionOrNull()
                 _uiState.value = _uiState.value.copy(isLoading = false)

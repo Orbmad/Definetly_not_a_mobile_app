@@ -3,6 +3,7 @@ package com.dambrofarne.eyeflush.ui.screens.splash
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
+import com.dambrofarne.eyeflush.data.repositories.database.DatabaseRepository
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -10,7 +11,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class SplashViewModel(
-    private val auth: AuthRepository
+    private val auth: AuthRepository,
+    private val db: DatabaseRepository
 ) : ViewModel() {
 
     private val _navigation = MutableSharedFlow<EyeFlushRoute>(replay = 0)
@@ -20,14 +22,27 @@ class SplashViewModel(
         navigateAfterDelay()
     }
 
+    /* i due secondi d'attesa, se lutente è già autenticato ed il suo account è presente nel db
+    * viene reindirizzato dierttamente alla home, se è autenticato ma ancora non ha uno username configurato
+    * va alla configurazione del profilo, se invece non è nessuno dei deu va al signi*/
     private fun navigateAfterDelay() {
         viewModelScope.launch {
-            delay(2000) //Caricamento di 2 secondi per la SplashScreen
-            if (auth.isUserLoggedIn()) {
-                _navigation.emit(EyeFlushRoute.Home)
-            } else {
-                _navigation.emit(EyeFlushRoute.SignIn)
+            delay(2000) // Caricamento SplashScreen
+
+            val userId = auth.getCurrentUserId()
+            val route = when {
+                userId != null && auth.isUserLoggedIn() && db.isUser(userId) -> {
+                    EyeFlushRoute.Home
+                }
+                userId != null && auth.isUserLoggedIn() -> {
+                    EyeFlushRoute.ProfileConfig
+                }
+                else -> {
+                    EyeFlushRoute.SignIn
+                }
             }
+            _navigation.emit(route)
         }
     }
+
 }

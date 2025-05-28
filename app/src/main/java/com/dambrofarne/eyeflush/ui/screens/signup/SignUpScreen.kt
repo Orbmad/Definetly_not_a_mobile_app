@@ -68,7 +68,7 @@ fun SignUpScreen(
 
         CustomStandardButton("Registrati") {
             viewModel.signUp {
-                navController.navigate(EyeFlushRoute.Home) {
+                navController.navigate(EyeFlushRoute.ProfileConfig) {
                     //Fai qualcosa prima di accedere
                 }
             }

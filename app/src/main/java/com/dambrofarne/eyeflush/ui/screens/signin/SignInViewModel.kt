@@ -14,6 +14,7 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
+import com.dambrofarne.eyeflush.data.repositories.database.DatabaseRepository
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
 
@@ -28,7 +29,10 @@ data class SignInUiState(
 )
 
 
-class SignInViewModel(private val repository: AuthRepository) : ViewModel() {
+class SignInViewModel(
+    private val auth: AuthRepository,
+    private val db: DatabaseRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SignInUiState())
     val uiState: StateFlow<SignInUiState> = _uiState
@@ -57,7 +61,7 @@ class SignInViewModel(private val repository: AuthRepository) : ViewModel() {
         _uiState.value = _uiState.value.copy(isLoading = true)
 
         viewModelScope.launch {
-            val result = repository.signInWithEmail(email, password)
+            val result = auth.signInWithEmail(email, password)
             if (result.isSuccess) {
                 _uiState.value = _uiState.value.copy(isLoading = false, isSignedIn = true)
                 navToHome()
@@ -74,15 +78,27 @@ class SignInViewModel(private val repository: AuthRepository) : ViewModel() {
         }
     }
 
-    fun signInWithGoogle(context: Context, idToken: String, navToHome: () -> Unit) {
+    fun signInWithGoogle(context: Context, idToken: String, navToHome: () -> Unit, navToProfileConfig: () -> Unit) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
-            val result = repository.signInWithGoogle(idToken)
+            val result = auth.signInWithGoogle(idToken)
+
             if (result.isSuccess) {
+                val userId = auth.getCurrentUserId()
+                val isRegistered = userId != null && db.isUser(userId)
+
                 _uiState.value = _uiState.value.copy(isLoading = false, isSignedIn = true)
-                navToHome()
+
+                if (isRegistered) {
+                    navToHome()
+                } else {
+                    navToProfileConfig()
+                }
             } else {
-                _uiState.value = _uiState.value.copy(isLoading = false, connectionError = "Login Google fallito.")
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    connectionError = "Login Google fallito."
+                )
             }
         }
     }

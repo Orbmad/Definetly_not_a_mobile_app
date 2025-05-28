@@ -3,6 +3,7 @@ package com.dambrofarne.eyeflush.data.repositories.database
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
 
 class FirestoreDatabaseRepository(
     private val db: FirebaseFirestore = Firebase.firestore
@@ -24,13 +25,12 @@ class FirestoreDatabaseRepository(
             }
     }
 
-    override fun isUser(uId: String) {
-        db.collection("users").document(uId).get()
-            .addOnSuccessListener {
-                //Utente esiste
-            }
-            .addOnFailureListener {
-                //Utente non esiste
-            }
+    override suspend fun isUser(uId: String): Boolean {
+        return try {
+            val doc = db.collection("users").document(uId).get().await()
+            doc.exists()
+        } catch (e: Exception) {
+            false
+        }
     }
 }
