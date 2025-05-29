@@ -46,7 +46,8 @@ fun ProfileImage(
 @Composable
 fun IconImage(
     url: String,
-    size: Dp = 64.dp,
+    modifier: Modifier = Modifier,
+    size: Dp = 50.dp,
     borderSize: Dp = 1.dp,
     borderShape: Shape = RoundedCornerShape(8.dp),
     borderColor: Color = Color.Gray
@@ -55,17 +56,48 @@ fun IconImage(
     val request = ImageRequest.Builder(context)
         .data(url)
         .crossfade(true)
-        //.placeholder(R.drawable.ic_icon_placeholder)
-        //.error(R.drawable.ic_icon_error)
         .build()
 
     AsyncImage(
         model = request,
         contentDescription = "Icon image",
         contentScale = ContentScale.Fit,
-        modifier = Modifier
+        modifier = modifier
             .size(size)
             .clip(borderShape)
             .border(borderSize, borderColor, borderShape)
+    )
+}
+
+
+@Composable
+fun ChoicheProfileImage(
+    url: String,
+    borderSize: Dp = 2.dp,
+    borderShape: Shape = CircleShape,
+    borderColor: Color = Color.Gray
+) {
+    ProfileImage(
+        url = url,
+        size =  240.dp,
+        borderSize = borderSize,
+        borderShape = borderShape,
+        borderColor = borderColor
+    )
+}
+
+@Composable
+fun ChoicheSmallProfileImage(
+    url: String,
+    borderSize: Dp = 2.dp,
+    borderShape: Shape = CircleShape,
+    borderColor: Color = Color.Gray
+) {
+    ProfileImage(
+        url = url,
+        size = 50.dp,
+        borderSize = borderSize,
+        borderShape = borderShape,
+        borderColor = borderColor
     )
 }

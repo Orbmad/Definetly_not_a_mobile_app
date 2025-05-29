@@ -39,7 +39,8 @@ fun EyeFlushNavGraph(navController: NavHostController) {
         }
 
         composable<EyeFlushRoute.Home> {
-            HomeScreen(navController)
+            ProfileConfigScreen(navController)
+            //HomeScreen(navController)
         }
 
         composable<EyeFlushRoute.ProfileConfig> {

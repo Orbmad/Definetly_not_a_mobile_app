@@ -10,16 +10,19 @@ import com.dambrofarne.eyeflush.ui.screens.signin.SignInViewModel
 import com.dambrofarne.eyeflush.ui.screens.signup.SignUpViewModel
 import com.dambrofarne.eyeflush.ui.screens.splash.SplashViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
 
     single { FirebaseAuth.getInstance()}
+    single { FirebaseFirestore.getInstance()}
     single<AuthRepository> { FirebaseAuthRepository(get()) }
     single<DatabaseRepository> { FirestoreDatabaseRepository(get())}
-    viewModel { SignInViewModel(get()) }
+
+    viewModel { SignInViewModel(get(),get()) }
     viewModel { SignUpViewModel(get()) }
-    viewModel { SplashViewModel(get()) }
+    viewModel { SplashViewModel(get(),get()) }
     viewModel { ProfileConfigViewModel()}
 }
