@@ -60,10 +60,9 @@ dependencies {
     implementation(libs.firebase.firestore) //Firebase Firestore
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.googleid) //Icone aggiuntive per material
-    // Import the BoM for the Firebase platform
-    implementation(platform(libs.firebase.bom))
-    // Also add the dependencies for the Credential Manager libraries and specify their versions
-    implementation(libs.koin.androidx.compose.v340) //Dpendenza per richiamare Koin da composable
+    implementation(platform(libs.firebase.bom))  // Import the BoM for the Firebase platform
+    implementation(libs.koin.androidx.compose.v340) //Dipendenza per richiamare Koin da composable
+    implementation(libs.coil.compose) //Coil per la visualizzazione di immagini
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
