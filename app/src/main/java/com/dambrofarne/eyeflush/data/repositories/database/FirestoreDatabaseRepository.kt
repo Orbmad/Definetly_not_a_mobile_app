@@ -1,5 +1,6 @@
 package com.dambrofarne.eyeflush.data.repositories.database
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -31,6 +32,19 @@ class FirestoreDatabaseRepository(
             doc.exists()
         } catch (e: Exception) {
             false
+        }
+    }
+
+    override suspend fun changeProfileImage(uId: String, imagePath: String): Result<String> {
+        try {
+            db.collection("users")
+                .document(uId)
+                .update("profileImagePath", imagePath)
+                .await()
+            return Result.success("");
+        } catch (e: Exception) {
+            Log.e("UserRepo", "Errore aggiornando immagine profilo per $uId", e)
+            return Result.success(e.message ?: "");
         }
     }
 }

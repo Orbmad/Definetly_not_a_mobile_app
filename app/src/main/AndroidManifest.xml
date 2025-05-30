@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- Accesso a internet per upload di immagini su imgur -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/> <!-- Accesso alla galleria -->
     <application
         android:name=".EyeFlushApplication"
         android:allowBackup="true"
