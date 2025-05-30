@@ -92,6 +92,7 @@ class SignInViewModel(
                 if (isRegistered) {
                     navToHome()
                 } else {
+                    auth.getCurrentUserId()?.let { db.addUser(it) }
                     navToProfileConfig()
                 }
             } else {

@@ -5,12 +5,15 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
+import android.util.Log
 import com.dambrofarne.eyeflush.BuildConfig
+import com.google.api.LogProto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.net.URL
+import java.net.URLEncoder
 import javax.net.ssl.HttpsURLConnection
 
 class ImgurImageStoringRepository(private val context: Context) : ImageStoringRepository {
@@ -42,7 +45,6 @@ class ImgurImageStoringRepository(private val context: Context) : ImageStoringRe
         return withContext(Dispatchers.IO) {
             try {
                 val url = URL("https://api.imgur.com/3/image")
-                val boundary = "Boundary-${System.currentTimeMillis()}"
                 val connection = url.openConnection() as HttpsURLConnection
 
                 connection.apply {
@@ -50,20 +52,21 @@ class ImgurImageStoringRepository(private val context: Context) : ImageStoringRe
                     doInput = true
                     doOutput = true
                     setRequestProperty("Authorization", "Client-ID $CLIENT_ID")
-                    setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
+                    setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
                 }
 
-                val body = buildString {
-                    append("--$boundary\r\n")
-                    append("Content-Disposition: form-data; name=\"image\"\r\n\r\n")
-                    append(base64Image)
-                    append("\r\n--$boundary--\r\n")
-                }
+                val body = "image=${URLEncoder.encode(base64Image, "UTF-8")}&type=base64"
 
                 connection.outputStream.use { it.write(body.toByteArray()) }
 
                 val responseCode = connection.responseCode
-                val responseText = connection.inputStream.bufferedReader().use { it.readText() }
+                val stream = if (responseCode in 200..299) {
+                    connection.inputStream
+                } else {
+                    connection.errorStream ?: throw Exception("Errore sconosciuto. Nessun body di errore disponibile.")
+                }
+
+                val responseText = stream.bufferedReader().use { it.readText() }
 
                 if (responseCode in 200..299) {
                     val json = JSONObject(responseText)
@@ -78,4 +81,5 @@ class ImgurImageStoringRepository(private val context: Context) : ImageStoringRe
             }
         }
     }
+
 }

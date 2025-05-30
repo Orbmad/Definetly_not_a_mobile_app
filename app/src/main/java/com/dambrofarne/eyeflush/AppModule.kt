@@ -25,7 +25,7 @@ val appModule = module {
     single<ImageStoringRepository> { ImgurImageStoringRepository(get()) }
 
     viewModel { SignInViewModel(get(),get()) }
-    viewModel { SignUpViewModel(get()) }
+    viewModel { SignUpViewModel(get(), get()) }
     viewModel { SplashViewModel(get(),get()) }
     viewModel { ProfileConfigViewModel(get(),get(),get())}
 }

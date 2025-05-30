@@ -26,6 +26,20 @@ class FirestoreDatabaseRepository(
             }
     }
 
+    override fun addUser(uId: String) {
+        db.collection("users")
+            .document(uId)
+            .set(emptyMap<String, Any>())
+            .addOnSuccessListener {
+                //Aggiunto con successo
+                // Log.d(TAG, "DocumentSnapshot added with ID: $uId")
+            }
+            .addOnFailureListener { e ->
+                //Fallimento
+                // Log.w(TAG, "Error adding document", e)
+            }
+    }
+
     override suspend fun isUser(uId: String): Boolean {
         return try {
             val doc = db.collection("users").document(uId).get().await()

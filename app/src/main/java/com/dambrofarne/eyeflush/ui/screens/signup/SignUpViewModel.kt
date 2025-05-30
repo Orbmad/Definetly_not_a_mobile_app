@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
+import com.dambrofarne.eyeflush.data.repositories.database.DatabaseRepository
 
 data class SignUpUiState(
     val email: String = "",
@@ -22,7 +23,10 @@ data class SignUpUiState(
     val isSignedUp: Boolean = false
 )
 
-class SignUpViewModel(private val repository: AuthRepository) : ViewModel() {
+class SignUpViewModel(
+    private val auth: AuthRepository,
+    private val db: DatabaseRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SignUpUiState())
     val uiState: StateFlow<SignUpUiState> = _uiState
@@ -62,9 +66,10 @@ class SignUpViewModel(private val repository: AuthRepository) : ViewModel() {
         _uiState.value = _uiState.value.copy(isLoading = true)
 
         viewModelScope.launch {
-            val result = repository.signUpWithEmail(email, password)
+            val result = auth.signUpWithEmail(email, password)
             if (result.isSuccess) {
                 _uiState.value = _uiState.value.copy(isLoading = false, isSignedUp = true)
+                auth.getCurrentUserId()?.let { db.addUser(it) }
                 navToConfig()
             } else {
                 val exception = result.exceptionOrNull()

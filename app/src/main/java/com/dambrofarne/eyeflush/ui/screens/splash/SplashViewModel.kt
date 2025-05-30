@@ -19,6 +19,7 @@ class SplashViewModel(
     val navigation = _navigation.asSharedFlow()
 
     init {
+        //auth.signOut();
         navigateAfterDelay()
     }
 

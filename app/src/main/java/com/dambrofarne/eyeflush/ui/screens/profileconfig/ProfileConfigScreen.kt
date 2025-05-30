@@ -18,7 +18,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +31,7 @@ import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.ui.composables.ChoicheProfileImage
 import com.dambrofarne.eyeflush.ui.composables.EyeFlushTextField
 import com.dambrofarne.eyeflush.ui.composables.IconImage
+import com.dambrofarne.eyeflush.ui.composables.ImagePickerDialog
 import com.dambrofarne.eyeflush.ui.composables.StandardHeadline
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -39,23 +43,30 @@ fun ProfileConfigScreen(
 ){
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+    var showDialog by remember { mutableStateOf(false) }
 
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let {
-            coroutineScope.launch {
-                viewModel.onImageSelected(it)
-            }
-        }
-    }
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
                 UiEvent.OpenGallery -> {
-                    launcher.launch("image/*")
+                    showDialog = true
                 }
             }
         }
     }
+
+    ImagePickerDialog(
+        showDialog = showDialog,
+        onDismiss = { showDialog = false },
+        onConfirm = { uri ->
+            showDialog = false
+            uri?.let {
+                coroutineScope.launch {
+                    viewModel.onImageSelected(it)
+                }
+            }
+        }
+    )
 
 
     val imageSize = 240.dp
