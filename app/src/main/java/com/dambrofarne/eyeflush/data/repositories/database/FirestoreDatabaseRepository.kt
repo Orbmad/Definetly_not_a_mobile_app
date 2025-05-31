@@ -61,4 +61,18 @@ class FirestoreDatabaseRepository(
             return Result.success(e.message ?: "");
         }
     }
+
+    override suspend fun getUserImagePath(uId: String): String {
+        return try {
+            val snapshot = db.collection("users")
+                .document(uId)
+                .get()
+                .await()
+
+            snapshot.getString("profileImagePath") ?: ""
+        } catch (e: Exception) {
+            Log.e("UserRepo", "Errore recuperando immagine profilo per $uId", e)
+            ""
+        }
+    }
 }

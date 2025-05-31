@@ -14,7 +14,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 data class ProfileConfigUiState(
-    val username : String = ""
+    val username : String = "",
+    val profileImageUrl: String = ""
 )
 
 sealed class UiEvent {
@@ -51,6 +52,7 @@ class ProfileConfigViewModel(
                 Log.d("ImgurUpload", "Immagine caricata: $newImageAddress")
                 auth.getCurrentUserId()?.let { userId ->
                     db.changeProfileImage(userId, newImageAddress)
+                    _uiState.value = _uiState.value.copy(profileImageUrl = newImageAddress)
                 } ?: run {
                     Log.e("ProfileUpdate", "Utente non autenticato, non posso aggiunger l'immagine ")
                 }
@@ -60,6 +62,19 @@ class ProfileConfigViewModel(
                 // TODO: mostra messaggio d’errore all’utente
             }
         )
+    }
+
+    fun loadUserProfileImage() {
+        viewModelScope.launch {
+            val userId = auth.getCurrentUserId() ?: return@launch
+            try {
+                val imagePath = db.getUserImagePath(userId)
+                _uiState.value = _uiState.value.copy(profileImageUrl = imagePath)
+            } catch (e: Exception) {
+                Log.e("ProfileConfigVM", "Errore caricando immagine", e)
+                _uiState.value = _uiState.value.copy(profileImageUrl = "")
+            }
+        }
     }
 
 }

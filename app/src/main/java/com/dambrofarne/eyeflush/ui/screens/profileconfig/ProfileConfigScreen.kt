@@ -55,6 +55,10 @@ fun ProfileConfigScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.loadUserProfileImage()
+    }
+
     ImagePickerDialog(
         showDialog = showDialog,
         onDismiss = { showDialog = false },
@@ -88,7 +92,7 @@ fun ProfileConfigScreen(
                 .size(imageSize + boxPadding * 2)
         ) {
             ChoicheProfileImage(
-                url = "profileUrl",
+                url = uiState.profileImageUrl,
                 borderSize = 2.dp,
                 borderColor = Color.Gray,
                 borderShape = CircleShape

@@ -1,5 +1,6 @@
 package com.dambrofarne.eyeflush.data.repositories.auth
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -30,10 +31,17 @@ class FirebaseAuthRepository(private val auth: FirebaseAuth) : AuthRepository {
         suspendCancellableCoroutine { cont ->
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
-                    if (task.isSuccessful) cont.resume(Result.success(Unit))
-                    else cont.resume(Result.failure(task.exception ?: Exception("Unknown error")))
+                    if (task.isSuccessful) {
+                        Log.d("FirebaseAuth", "SUCCESS: User created")
+                        Log.d("FirebaseAuth", "UID: ${auth.currentUser?.uid}")
+                        cont.resume(Result.success(Unit))
+                    } else {
+                        Log.e("FirebaseAuth", "ERROR: ${task.exception?.message}")
+                        cont.resume(Result.failure(task.exception ?: Exception("Unknown error")))
+                    }
                 }
         }
+
 
     override fun signOut() {
         auth.signOut()

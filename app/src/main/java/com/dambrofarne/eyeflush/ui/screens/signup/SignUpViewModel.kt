@@ -1,5 +1,6 @@
 package com.dambrofarne.eyeflush.ui.screens.signup
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.FirebaseNetworkException
@@ -44,21 +45,25 @@ class SignUpViewModel(
     }
 
     fun signUp(navToConfig: () -> Unit) {
+        Log.d("SignUp", "Avvio procedura di SingUP")
         val email = _uiState.value.email
         val password = _uiState.value.password
         val passwordConfirmation = _uiState.value.passwordConfirmation
 
         if (email.isBlank()) {
+            //Log.d("SignUp", "Email Vuota")
             _uiState.value = _uiState.value.copy(emailError = "Email non può essere vuota")
             return
         }
 
         if (password.isBlank()) {
+            //Log.d("SignUp", "Password Vuota")
             _uiState.value = _uiState.value.copy(passwordError = "Password non può essere vuota")
             return
         }
 
         if (password != passwordConfirmation) {
+            //Log.d("SignUp", "Le password non coincidono")
             _uiState.value = _uiState.value.copy(passwordError = "Le password non corrispondono")
             return
         }
@@ -73,6 +78,9 @@ class SignUpViewModel(
                 navToConfig()
             } else {
                 val exception = result.exceptionOrNull()
+                if (exception != null) {
+                    Log.d("Log",exception.message.toString())
+                };
                 _uiState.value = _uiState.value.copy(isLoading = false)
                 when (exception) {
                     is FirebaseAuthUserCollisionException -> {
