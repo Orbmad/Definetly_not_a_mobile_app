@@ -15,12 +15,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.AutofillNode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
+import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
 import com.dambrofarne.eyeflush.ui.composables.CustomStandardButton
 import com.dambrofarne.eyeflush.ui.composables.EyeFlushTextField
 import com.dambrofarne.eyeflush.ui.composables.GoogleButton
@@ -44,6 +46,11 @@ fun SignInScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        if (uiState.isLoading) {
+            AuthenticationError("Sto caricando...")
+        }
+
         Text("Bentornato...", style = MaterialTheme.typography.headlineMedium)
 
         Spacer(Modifier.height(16.dp))
@@ -56,7 +63,7 @@ fun SignInScreen(
         )
         uiState.emailError?.let {
             if (it.isNotEmpty()) {
-                Text(it, color = Color.Red, fontSize = MaterialTheme.typography.bodySmall.fontSize)
+                AuthenticationError(it)
             }
         }
 
@@ -72,7 +79,7 @@ fun SignInScreen(
         )
         uiState.passwordError?.let {
             if (it.isNotEmpty()) {
-                Text(it, color = Color.Red, fontSize = MaterialTheme.typography.bodySmall.fontSize)
+                AuthenticationError(it)
             }
         }
 
@@ -117,8 +124,7 @@ fun SignInScreen(
 
         uiState.connectionError?.let {
             if (it.isNotEmpty()) {
-                Spacer(Modifier.height(8.dp))
-                Text(it, color = Color.Red, fontSize = MaterialTheme.typography.bodySmall.fontSize)
+                AuthenticationError(it)
             }
         }
     }

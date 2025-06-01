@@ -75,4 +75,19 @@ class FirestoreDatabaseRepository(
             ""
         }
     }
+
+    override suspend fun isUsernameTaken(username: String): Boolean {
+        return try {
+            val querySnapshot = db.collection("users")
+                .whereEqualTo("username", username)
+                .get()
+                .await()
+
+            !querySnapshot.isEmpty
+        } catch (e: Exception) {
+            Log.e("UserRepo", "Errore controllando se username è già preso: $username", e)
+            false // oppure true se vuoi bloccare in caso di errore
+        }
+    }
+
 }

@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
+import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
 import com.dambrofarne.eyeflush.ui.composables.CustomStandardButton
 import com.dambrofarne.eyeflush.ui.composables.EyeFlushTextField
 import com.dambrofarne.eyeflush.ui.composables.SignInText
@@ -35,6 +36,10 @@ fun SignUpScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
+        if (uiState.isLoading) {
+            AuthenticationError("Sto caricando...")
+        }
+
         Text("Registrati...", style = MaterialTheme.typography.headlineMedium)
 
         Spacer(Modifier.height(16.dp))
@@ -46,6 +51,12 @@ fun SignUpScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
 
+        uiState.emailError?.let {
+            if (it.isNotEmpty()) {
+                AuthenticationError(it)
+            }
+        }
+
         EyeFlushTextField(
             value = uiState.password,
             onValueChange = viewModel::onPasswordChange,
@@ -54,6 +65,12 @@ fun SignUpScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             //visualTransformation = PasswordVisualTransformation()
         )
+
+        uiState.passwordError?.let {
+            if (it.isNotEmpty()) {
+                AuthenticationError(it)
+            }
+        }
 
         EyeFlushTextField(
             value = uiState.passwordConfirmation,
@@ -64,7 +81,14 @@ fun SignUpScreen(
             //visualTransformation = PasswordVisualTransformation()
         )
 
+
         Spacer(Modifier.height(16.dp))
+
+        uiState.connectionError?.let {
+            if (it.isNotEmpty()) {
+                AuthenticationError(it)
+            }
+        }
 
         CustomStandardButton("Registrati") {
             viewModel.signUp {

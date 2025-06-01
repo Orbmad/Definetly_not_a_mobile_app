@@ -28,7 +28,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.dambrofarne.eyeflush.ui.EyeFlushRoute
+import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
 import com.dambrofarne.eyeflush.ui.composables.ChoicheProfileImage
+import com.dambrofarne.eyeflush.ui.composables.CustomStandardButton
 import com.dambrofarne.eyeflush.ui.composables.EyeFlushTextField
 import com.dambrofarne.eyeflush.ui.composables.IconImage
 import com.dambrofarne.eyeflush.ui.composables.ImagePickerDialog
@@ -83,6 +86,10 @@ fun ProfileConfigScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        if (uiState.isLoading) {
+            AuthenticationError("Sto caricando...")
+        }
+
         StandardHeadline("Configurazione Profilo")
         Spacer(Modifier.height(16.dp))
         val boxPadding = 8.dp
@@ -113,5 +120,25 @@ fun ProfileConfigScreen(
             label = "Username",
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )
+
+        uiState.connectionError?.let {
+            if (it.isNotEmpty()) {
+                AuthenticationError(it)
+            }
+        }
+
+        uiState.usernameError?.let {
+            if (it.isNotEmpty()) {
+                AuthenticationError(it)
+            }
+        }
+
+        CustomStandardButton("Conferma") {
+            viewModel.setUsername {
+                navController.navigate(EyeFlushRoute.Home) {
+                    //Fai qualcosa prima di accedere
+                }
+            }
+        }
     }
 }
