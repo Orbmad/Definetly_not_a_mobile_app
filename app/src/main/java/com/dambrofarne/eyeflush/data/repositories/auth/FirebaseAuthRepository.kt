@@ -17,16 +17,6 @@ class FirebaseAuthRepository(private val auth: FirebaseAuth) : AuthRepository {
         }
     }
 
-    override suspend fun signInWithGoogle(idToken: String): Result<Unit> {
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-        return suspendCancellableCoroutine { cont ->
-            auth.signInWithCredential(credential).addOnCompleteListener { task ->
-                if (task.isSuccessful) cont.resume(Result.success(Unit))
-                else cont.resume(Result.failure(task.exception ?: Exception("Unknown error")))
-            }
-        }
-    }
-
     override suspend fun signUpWithEmail(email: String, password: String): Result<Unit> =
         suspendCancellableCoroutine { cont ->
             auth.createUserWithEmailAndPassword(email, password)

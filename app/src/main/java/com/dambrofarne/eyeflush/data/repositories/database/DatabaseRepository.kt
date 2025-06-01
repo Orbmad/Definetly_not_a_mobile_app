@@ -7,4 +7,5 @@ interface DatabaseRepository {
     suspend fun changeProfileImage(uId : String, imagePath: String) : Result<String>
     suspend fun getUserImagePath(uId: String) : String
     suspend fun isUsernameTaken(username: String) : Boolean
+    suspend fun getUsername(uId: String) : String
 }

@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.dambrofarne.eyeflush.data.constants.IconPaths.GALLERY_CHOICE_ICON
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
 import com.dambrofarne.eyeflush.ui.composables.ChoicheProfileImage
@@ -106,7 +107,7 @@ fun ProfileConfigScreen(
             )
 
             IconImage(
-                url = "iconUrl",
+                image = GALLERY_CHOICE_ICON,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .offset(x = (-20).dp, y = (-20).dp)

@@ -82,4 +82,17 @@ fun SignInText(onClick: () -> Unit) {
     )
 }
 
+@Composable
+fun SignOutText(onClick: () -> Unit) {
+    Text(
+        text = "Esci dall'account...",
+        color = Purple80 ,
+        fontSize = 14.sp,
+        modifier = Modifier
+            .padding(top = 16.dp)
+            .clickable(onClick = onClick)
+    )
+}
+
+
 

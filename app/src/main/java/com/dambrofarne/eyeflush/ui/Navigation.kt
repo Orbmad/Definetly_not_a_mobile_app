@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.dambrofarne.eyeflush.ui.screens.home.HomeScreen
+import com.dambrofarne.eyeflush.ui.screens.profile.ProfileScreen
 import com.dambrofarne.eyeflush.ui.screens.profileconfig.ProfileConfigScreen
 import com.dambrofarne.eyeflush.ui.screens.signin.SignInScreen
 import com.dambrofarne.eyeflush.ui.screens.signup.SignUpScreen
@@ -19,6 +20,7 @@ sealed interface EyeFlushRoute {
     @Serializable data object SignUp : EyeFlushRoute
     @Serializable data object Home : EyeFlushRoute
     @Serializable data object ProfileConfig : EyeFlushRoute
+    @Serializable data object Profile : EyeFlushRoute
 }
 
 @Composable
@@ -44,7 +46,11 @@ fun EyeFlushNavGraph(navController: NavHostController) {
         }
 
         composable<EyeFlushRoute.ProfileConfig> {
-            ProfileConfigScreen(navController);
+            ProfileConfigScreen(navController)
+        }
+
+        composable<EyeFlushRoute.Profile> {
+            ProfileScreen(navController)
         }
     }
 

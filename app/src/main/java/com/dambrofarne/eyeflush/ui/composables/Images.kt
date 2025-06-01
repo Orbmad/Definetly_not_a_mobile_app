@@ -45,7 +45,7 @@ fun ProfileImage(
 
 @Composable
 fun IconImage(
-    url: String,
+    image: Any,  // può essere String o Int
     modifier: Modifier = Modifier,
     size: Dp = 50.dp,
     borderSize: Dp = 1.dp,
@@ -53,10 +53,16 @@ fun IconImage(
     borderColor: Color = Color.Gray
 ) {
     val context = LocalContext.current
-    val request = ImageRequest.Builder(context)
-        .data(url)
-        .crossfade(true)
-        .build()
+    val request = when (image) {
+        is String -> ImageRequest.Builder(context)
+            .data(image)
+            .crossfade(true)
+            .build()
+        is Int -> ImageRequest.Builder(context)
+            .data(image)
+            .build()
+        else -> throw IllegalArgumentException("Unsupported image type")
+    }
 
     AsyncImage(
         model = request,
@@ -68,6 +74,7 @@ fun IconImage(
             .border(borderSize, borderColor, borderShape)
     )
 }
+
 
 
 @Composable

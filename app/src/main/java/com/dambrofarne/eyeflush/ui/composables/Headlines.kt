@@ -8,3 +8,8 @@ import androidx.compose.runtime.Composable
 fun StandardHeadline(text : String){
     Text(text, style = MaterialTheme.typography.headlineMedium)
 }
+
+@Composable
+fun StandardText(text: String){
+    Text(text, style = MaterialTheme.typography.headlineSmall)
+}

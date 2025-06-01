@@ -91,4 +91,17 @@ class FirestoreDatabaseRepository(
         }
     }
 
+    override suspend fun getUsername(uId: String): String {
+        return try {
+            val snapshot = db.collection("users")
+                .document(uId)
+                .get()
+                .await()
+
+            snapshot.getString("username") ?: ""
+        } catch (e: Exception) {
+            Log.e("UserRepo", "Errore recuperando username del profilo per $uId", e)
+            ""
+        }
+    }
 }
