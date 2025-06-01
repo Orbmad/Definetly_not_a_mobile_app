@@ -2,6 +2,7 @@ package com.dambrofarne.eyeflush.data.repositories.database
 
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
@@ -14,8 +15,8 @@ class FirestoreDatabaseRepository(
             "username" to username
         )
         db.collection("users")
-            .document(uId)       // usa l'UID come ID documento
-            .set(user)          // salva i dati nel documento con quell'ID
+            .document(uId)
+            .set(user, SetOptions.merge())
             .addOnSuccessListener {
                 //Aggiunto con successo
                 // Log.d(TAG, "DocumentSnapshot added with ID: $uId")
