@@ -1,12 +1,7 @@
 package com.dambrofarne.eyeflush.ui.screens.signin
 
-import android.content.Context
-import androidx.credentials.CredentialManager
-import androidx.credentials.CustomCredential
-import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dambrofarne.eyeflush.R
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
@@ -15,8 +10,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
 import com.dambrofarne.eyeflush.data.repositories.database.DatabaseRepository
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 
 data class SignInUiState(
     val email: String = "",
@@ -45,7 +38,10 @@ class SignInViewModel(
         _uiState.value = _uiState.value.copy(password = password, passwordError = null, connectionError = null)
     }
 
-    fun signIn(navToHome: () -> Unit) {
+    fun signIn(
+        navToHome: () -> Unit,
+        navToProfileConfig : () -> Unit
+    ) {
         val email = _uiState.value.email
         val password = _uiState.value.password
 
@@ -64,7 +60,13 @@ class SignInViewModel(
             val result = auth.signInWithEmail(email, password)
             if (result.isSuccess) {
                 _uiState.value = _uiState.value.copy(isLoading = false, isSignedIn = true)
-                navToHome()
+                auth.getCurrentUserId()?.let {
+                    if(db.isUser(it)){
+                        navToHome()
+                    }else{
+                        navToProfileConfig()
+                    }
+                }
             } else {
                 val exception = result.exceptionOrNull()
                 _uiState.value = _uiState.value.copy(isLoading = false)
@@ -77,60 +79,4 @@ class SignInViewModel(
             }
         }
     }
-
-    suspend fun requestGoogleCredential(context: Context): String? {
-        val credentialManager = CredentialManager.create(context)
-        val googleIdOption = GetGoogleIdOption.Builder()
-            .setServerClientId(context.getString(R.string.default_web_client_id))
-            .setFilterByAuthorizedAccounts(false)  // false per permettere primo accesso
-            .build()
-
-        val request = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
-            .build()
-
-        return try {
-            val result = credentialManager.getCredential(context, request)
-            val credential = result.credential
-            if (credential is CustomCredential &&
-                credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                googleIdTokenCredential.idToken
-            } else null
-        } catch (e: Exception) {
-            _uiState.value = _uiState.value.copy(connectionError = "Errore login Google: ${e.localizedMessage}")
-            null
-        }
-    }
-
-    fun signInWithGoogle(
-        idToken: String,
-        navToHome: () -> Unit,
-        navToProfileConfig: () -> Unit
-    ) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-            val result = auth.signInWithGoogle(idToken)
-
-            if (result.isSuccess) {
-                val userId = auth.getCurrentUserId()
-                val isRegistered = userId != null && db.isUser(userId)
-
-                _uiState.value = _uiState.value.copy(isLoading = false, isSignedIn = true)
-
-                if (isRegistered) {
-                    navToHome()
-                } else {
-                    auth.getCurrentUserId()?.let { db.addUser(it) }
-                    navToProfileConfig()
-                }
-            } else {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    connectionError = "Login Google fallito."
-                )
-            }
-        }
-    }
-
 }

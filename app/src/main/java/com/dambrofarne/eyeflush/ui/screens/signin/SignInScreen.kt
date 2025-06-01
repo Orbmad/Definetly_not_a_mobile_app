@@ -81,36 +81,14 @@ fun SignInScreen(
             }
         }
 
-        Spacer(Modifier.height(8.dp))
-
-        GoogleButton("Accedi con Google", {
-            coroutineScope.launch {
-                val idToken = viewModel.requestGoogleCredential(context)
-                if (idToken != null) {
-                    viewModel.signInWithGoogle(
-                        idToken = idToken,
-                        navToHome = {
-                            navController.navigate(EyeFlushRoute.Home) {
-                                popUpTo(EyeFlushRoute.SignIn) { inclusive = true }
-                            }
-                        },
-                        navToProfileConfig = {
-                            navController.navigate(EyeFlushRoute.ProfileConfig) {
-                                popUpTo(EyeFlushRoute.SignIn) { inclusive = true }
-                            }
-                        }
-                    )
-                }
-            }
-        })
 
         Spacer(Modifier.height(16.dp))
 
         CustomStandardButton("Accedi") {
-            viewModel.signIn {
-                navController.navigate(EyeFlushRoute.Home) {
-                }
-            }
+            viewModel.signIn(
+                navToHome =  {navController.navigate(EyeFlushRoute.Home) },
+                navToProfileConfig = {navController.navigate((EyeFlushRoute.ProfileConfig))}
+            )
         }
 
         Spacer(Modifier.height(16.dp))
