@@ -10,36 +10,36 @@ import kotlinx.coroutines.tasks.await
 class FirestoreDatabaseRepository(
     private val db: FirebaseFirestore = Firebase.firestore
 ) : DatabaseRepository {
-    override fun addUser(uId: String, username: String) {
+    override suspend fun addUser(uId: String, username: String): Result<String> {
         val user = hashMapOf(
             "username" to username
         )
-        db.collection("users")
-            .document(uId)
-            .set(user, SetOptions.merge())
-            .addOnSuccessListener {
-                //Aggiunto con successo
-                // Log.d(TAG, "DocumentSnapshot added with ID: $uId")
-            }
-            .addOnFailureListener { e ->
-                //Fallimento
-                // Log.w(TAG, "Error adding document", e)
-            }
+        return try {
+            db.collection("users")
+                .document(uId)
+                .set(user, SetOptions.merge())
+                .await()
+            Result.success("Username aggiornato correttamente.")
+        } catch (e: Exception) {
+            Log.e("Firestore", "Errore aggiornando username per $uId", e)
+            Result.failure(e)
+        }
     }
 
-    override fun addUser(uId: String) {
-        db.collection("users")
-            .document(uId)
-            .set(emptyMap<String, Any>())
-            .addOnSuccessListener {
-                //Aggiunto con successo
-                // Log.d(TAG, "DocumentSnapshot added with ID: $uId")
-            }
-            .addOnFailureListener { e ->
-                //Fallimento
-                // Log.w(TAG, "Error adding document", e)
-            }
+
+    override suspend fun addUser(uId: String): Result<String> {
+        return try {
+            db.collection("users")
+                .document(uId)
+                .set(emptyMap<String, Any>())
+                .await()
+            Result.success("Utente creato correttamente.")
+        } catch (e: Exception) {
+            Log.e("Firestore", "Errore creando documento utente per $uId", e)
+            Result.failure(e)
+        }
     }
+
 
     override suspend fun isUser(uId: String): Boolean {
         return try {

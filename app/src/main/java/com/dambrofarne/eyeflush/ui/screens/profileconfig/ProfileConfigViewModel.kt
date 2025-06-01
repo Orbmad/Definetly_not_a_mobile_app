@@ -49,6 +49,9 @@ class ProfileConfigViewModel(
 
     suspend fun onImageSelected(uri: Uri) {
         val result = imageStoring.uploadImage(uri)
+        _uiState.value = _uiState.value.copy(
+            connectionError = null,
+        )
 
         result.fold(
             onSuccess = { newImageAddress ->
@@ -58,11 +61,12 @@ class ProfileConfigViewModel(
                     _uiState.value = _uiState.value.copy(profileImageUrl = newImageAddress)
                 } ?: run {
                     Log.e("ProfileUpdate", "Utente non autenticato, non posso aggiunger l'immagine ")
+                    _uiState.value = _uiState.value.copy(connectionError =  "Non è stato possibile caricare l'immagine")
                 }
             },
             onFailure = { error ->
                 Log.e("ImgurUpload", "Errore nel caricamento immagine", error)
-                // TODO: mostra messaggio d’errore all’utente
+                _uiState.value = _uiState.value.copy(connectionError =  "Non è stato possibile caricare l'immagine")
             }
         )
     }

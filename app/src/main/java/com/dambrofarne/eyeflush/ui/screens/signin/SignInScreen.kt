@@ -15,8 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.autofill.AutofillNode
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -90,7 +88,6 @@ fun SignInScreen(
                 val idToken = viewModel.requestGoogleCredential(context)
                 if (idToken != null) {
                     viewModel.signInWithGoogle(
-                        context = context,
                         idToken = idToken,
                         navToHome = {
                             navController.navigate(EyeFlushRoute.Home) {

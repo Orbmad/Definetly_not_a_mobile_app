@@ -1,22 +1,22 @@
 package com.dambrofarne.eyeflush.ui.screens.signin
 
+import android.content.Context
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dambrofarne.eyeflush.R
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import android.content.Context
-import androidx.credentials.GetCredentialRequest
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import androidx.credentials.CredentialManager
-import androidx.credentials.CustomCredential
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
 import com.dambrofarne.eyeflush.data.repositories.database.DatabaseRepository
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
 
 data class SignInUiState(
     val email: String = "",
@@ -78,7 +78,36 @@ class SignInViewModel(
         }
     }
 
-    fun signInWithGoogle(context: Context, idToken: String, navToHome: () -> Unit, navToProfileConfig: () -> Unit) {
+    suspend fun requestGoogleCredential(context: Context): String? {
+        val credentialManager = CredentialManager.create(context)
+        val googleIdOption = GetGoogleIdOption.Builder()
+            .setServerClientId(context.getString(R.string.default_web_client_id))
+            .setFilterByAuthorizedAccounts(false)  // false per permettere primo accesso
+            .build()
+
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+
+        return try {
+            val result = credentialManager.getCredential(context, request)
+            val credential = result.credential
+            if (credential is CustomCredential &&
+                credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                googleIdTokenCredential.idToken
+            } else null
+        } catch (e: Exception) {
+            _uiState.value = _uiState.value.copy(connectionError = "Errore login Google: ${e.localizedMessage}")
+            null
+        }
+    }
+
+    fun signInWithGoogle(
+        idToken: String,
+        navToHome: () -> Unit,
+        navToProfileConfig: () -> Unit
+    ) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             val result = auth.signInWithGoogle(idToken)
@@ -104,32 +133,4 @@ class SignInViewModel(
         }
     }
 
-    suspend fun requestGoogleCredential(context: Context): String? {
-        val credentialManager = CredentialManager.create(context)
-
-        val googleIdOption = GetGoogleIdOption.Builder()
-            .setServerClientId(context.getString(com.dambrofarne.eyeflush.R.string.default_web_client_id))
-            .setFilterByAuthorizedAccounts(true)
-            .build()
-
-        val request = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
-            .build()
-
-        return try {
-            val result = credentialManager.getCredential(context, request)
-            val credential = result.credential
-
-            if (credential is CustomCredential &&
-                credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-
-                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                googleIdTokenCredential.idToken
-            } else {
-                null
-            }
-        } catch (e: Exception) {
-            null
-        }
-    }
 }
