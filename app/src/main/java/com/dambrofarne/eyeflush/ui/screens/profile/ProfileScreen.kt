@@ -17,13 +17,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
-import com.dambrofarne.eyeflush.ui.composables.ChoicheProfileImage
 import com.dambrofarne.eyeflush.ui.composables.ProfileImage
-import com.dambrofarne.eyeflush.ui.composables.SignInText
 import com.dambrofarne.eyeflush.ui.composables.SignOutText
 import com.dambrofarne.eyeflush.ui.composables.StandardHeadline
 import com.dambrofarne.eyeflush.ui.composables.StandardText
-import com.dambrofarne.eyeflush.ui.screens.profileconfig.ProfileConfigViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
