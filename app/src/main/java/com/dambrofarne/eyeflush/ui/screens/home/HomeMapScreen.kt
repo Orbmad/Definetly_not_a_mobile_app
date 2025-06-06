@@ -1,0 +1,316 @@
+package com.dambrofarne.eyeflush.ui.screens.home
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
+import androidx.core.content.ContextCompat
+import androidx.navigation.NavHostController
+import com.dambrofarne.eyeflush.R
+import com.dambrofarne.eyeflush.data.constants.IconPaths.ACCOUNT_ICON
+import com.dambrofarne.eyeflush.ui.EyeFlushRoute
+import com.dambrofarne.eyeflush.ui.composables.IconImage
+import com.dambrofarne.eyeflush.data.managers.camera.CameraManager
+import com.dambrofarne.eyeflush.ui.screens.camera.CameraScreen
+import com.dambrofarne.eyeflush.data.managers.location.LocationManager
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.osmdroid.config.Configuration
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.tileprovider.tilesource.XYTileSource
+//import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
+//import org.osmdroid.util.MapTileIndex
+//import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+//import android.util.Log
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun HomeMapScreen(
+    navController: NavHostController,
+    viewModel: HomeMapViewModel = koinViewModel<HomeMapViewModel>()
+) {
+    val context = LocalContext.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    val scope = rememberCoroutineScope()
+
+    val locationManager = remember { LocationManager(context) }
+    val cameraManager = remember { CameraManager(context) }
+
+    // Initialize OSMDroid configuration
+    LaunchedEffect(Unit) {
+        Configuration.getInstance().userAgentValue = context.packageName
+    }
+
+    val permissionsState = rememberMultiplePermissionsState(
+        permissions = listOf(
+            android.Manifest.permission.CAMERA,
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION,
+            android.Manifest.permission.INTERNET,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+    )
+
+    val photoMarkers by viewModel.photoMarkers.collectAsState()
+    val currentLocation by viewModel.currentLocation.collectAsState()
+
+    var showCamera by remember { mutableStateOf(false) }
+    var mapView: MapView? by remember { mutableStateOf(null) }
+    var currentLocationMarker by remember { mutableStateOf<Marker?>(null) }
+
+    val photoMarkersRefs = remember { mutableListOf<Marker>() }
+
+    val defaultZoom = 20.0
+
+    val userLocationIcon = ContextCompat.getDrawable(context, R.drawable.ic_user_location)
+
+    val cameraIcon = ContextCompat.getDrawable(context, android.R.drawable.ic_menu_camera)
+
+    val openStreetMapTileSource = XYTileSource(
+        "OSM",
+        0, 25, 256, ".png",
+        arrayOf("https://tile.openstreetmap.org/")
+    )
+
+//    val cartoLight = object : OnlineTileSourceBase(
+//        "CartoLight",
+//        0, 28, 256, ".png",
+//        arrayOf("https://a.basemaps.cartocdn.com/light_all/")
+//    ) {
+//        override fun getTileURLString(pMapTileIndex: Long): String {
+//            return baseUrl +
+//                    MapTileIndex.getZoom(pMapTileIndex) + "/" +
+//                    MapTileIndex.getX(pMapTileIndex) + "/" +
+//                    MapTileIndex.getY(pMapTileIndex) + ".png"
+//        }
+//    }
+
+//    val cartoDark = object : OnlineTileSourceBase(
+//        "CartoDark",
+//        0, 28, 256, ".png",
+//        arrayOf("https://a.basemaps.cartocdn.com/dark_all/")
+//    ) {
+//        override fun getTileURLString(pMapTileIndex: Long): String {
+//            return baseUrl +
+//                    MapTileIndex.getZoom(pMapTileIndex) + "/" +
+//                    MapTileIndex.getX(pMapTileIndex) + "/" +
+//                    MapTileIndex.getY(pMapTileIndex) + ".png"
+//        }
+//    }
+
+    // Requesting permissions
+    LaunchedEffect(permissionsState.allPermissionsGranted) {
+        if (!permissionsState.allPermissionsGranted) {
+            permissionsState.launchMultiplePermissionRequest()
+        } else {
+            // Get current location
+            locationManager.getCurrentLocation()?.let { location ->
+                viewModel.updateCurrentLocation(location)
+                mapView?.controller?.setCenter(location)
+                mapView?.controller?.setZoom(defaultZoom)
+            }
+        }
+    }
+
+    // Starting Location Listener
+    LaunchedEffect(Unit) {
+        if (permissionsState.allPermissionsGranted) {
+            locationManager.startLocationUpdates { geoPoint ->
+                viewModel.updateCurrentLocation(geoPoint)
+            }
+        }
+    }
+
+    // Re-initialize currentLocationMarker when mapView changes
+    LaunchedEffect(mapView) {
+        if (mapView != null && currentLocation != null) {
+            currentLocationMarker = Marker(mapView).apply {
+                icon = userLocationIcon
+                position = currentLocation!!
+                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                title = "La tua posizione"
+            }
+            mapView?.overlays?.add(currentLocationMarker)
+            mapView?.controller?.setCenter(currentLocation)
+            mapView?.invalidate()
+        }
+    }
+
+    // Update current location marker
+    LaunchedEffect(currentLocation) {
+        //Log.w("Test", "LaunchedEffect(currentLocation) triggered")
+        currentLocation?.let { location ->
+            if (currentLocationMarker == null) {
+                // Create marker once
+                currentLocationMarker = Marker(mapView).apply {
+                    icon = userLocationIcon
+                    position = location
+                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                    title = "La tua posizione"
+                }
+                mapView?.overlays?.add(currentLocationMarker)
+                //Log.w("Test", "Current location marker created")
+            } else {
+                // Update existing marker position
+                currentLocationMarker?.position = location
+                //Log.w("Test", "Current location marker updated")
+            }
+
+            mapView?.controller?.animateTo(location)
+            mapView?.invalidate()
+        }
+    }
+
+    // Update markers when photoMarkers change
+    LaunchedEffect(photoMarkers) {
+        //Log.w("Test", "Updating photo markers, count: ${photoMarkers.size}")
+
+        try {
+            // Rimuovi i vecchi marker delle foto
+            photoMarkersRefs.forEach { marker ->
+                mapView?.overlays?.remove(marker)
+            }
+            photoMarkersRefs.clear()
+
+            // Aggiungi i nuovi marker delle foto
+            photoMarkers.forEach { photoMarker ->
+                //Log.w("Test", "Creating photo marker at ${photoMarker.position}")
+
+                val marker = Marker(mapView).apply {
+                    position = photoMarker.position
+                    title = "Photo Marker"
+                    snippet = "Scattata il ${
+                        java.text.SimpleDateFormat("dd/MM/yyyy HH:mm")
+                            .format(photoMarker.timestamp)
+                    }"
+                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+
+                    // Usa un'icona diversa per i marker delle foto (opzionale)
+                    icon = cameraIcon
+                }
+
+                photoMarkersRefs.add(marker)
+                mapView?.overlays?.add(marker)
+                //Log.w("Test", "Photo marker added successfully")
+            }
+
+            mapView?.invalidate()
+            //Log.w("Test", "Map invalidated, total overlays: ${mapView?.overlays?.size}")
+
+        } catch (e: Exception) {
+            //Log.e("Test", "Error updating photo markers", e)
+        }
+    }
+
+    // HomeScreen View
+    if (showCamera) {
+        CameraScreen(
+            onPhotoTaken = { photoUri ->
+                scope.launch {
+                    currentLocation?.let { location ->
+                        //Log.w("Test", "Adding photo marker at location: $location")
+                        viewModel.addPhotoMarker("photo_${System.currentTimeMillis()}", photoUri.toString(), location)
+                    } ?: run {
+                        //Log.w("Test", "Current location is null, cannot add photo marker")
+                    }
+                    showCamera = false
+                }
+            },
+            onClose = { showCamera = false },
+            cameraManager = cameraManager,
+            lifecycleOwner = lifecycleOwner
+        )
+    } else {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top
+            ) {
+                IconImage(
+                    image = ACCOUNT_ICON,
+                    modifier = Modifier
+                        .clickable{ navController.navigate(EyeFlushRoute.Profile)}
+                )
+            }
+
+            Box(modifier = Modifier.fillMaxSize()) {
+
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.TopCenter)
+                        .zIndex(1f),
+                    text = currentLocation?.let {
+                        "Lat: ${currentLocation!!.latitude}\nLong: ${currentLocation!!.longitude}"
+                    } ?: "Posizione non disponibile"
+                )
+
+                AndroidView(
+                    factory = { ctx ->
+                        MapView(ctx).apply {
+                            setTileSource(openStreetMapTileSource)
+                            setMultiTouchControls(true)
+                            controller.setZoom(defaultZoom)
+                            controller.setCenter(currentLocation) // Rome as default
+                            mapView = this
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize()
+                ) { map ->
+                    mapView = map
+                }
+
+                FloatingActionButton(
+                    onClick = {
+                        scope.launch {
+                            val location = locationManager.getCurrentLocation()
+                            location?.let {
+                                viewModel.updateCurrentLocation(it)
+                                mapView?.controller?.animateTo(it)
+                                mapView?.controller?.setZoom(defaultZoom)
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(16.dp),
+                    shape = CircleShape
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MyLocation,
+                        contentDescription = "Torna alla posizione"
+                    )
+                }
+
+                FloatingActionButton(
+                    onClick = { showCamera = true },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp),
+                    shape = CircleShape
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Camera,
+                        contentDescription = "Scatta foto"
+                    )
+                }
+            }
+        }
+
+
+    }
+}

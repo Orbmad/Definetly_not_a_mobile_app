@@ -40,7 +40,7 @@ android {
     }
     buildFeatures {
         compose = true
-        buildConfig = true //Mi server me recuperare il Client-ID id
+        buildConfig = true //Mi server me recuperare il Client-ID id (Imgur)
         compose = true
     }
 }
@@ -73,6 +73,38 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.androidx.foundation.layout.android)
     implementation(libs.androidx.foundation.layout.android)
+
+
+    //things Material
+    implementation(libs.ui)
+    implementation(libs.ui.tooling.preview)
+
+    implementation(libs.androidx.material3.v112)
+    implementation(libs.androidx.activity.compose.v180)
+    implementation(libs.material.icons.extended)
+
+    //Material
+    implementation(libs.material3)
+
+    //viewModel
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    // OpenStreetMap
+    implementation(libs.osmdroid.android)
+
+    // Camera
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.guava)
+
+    // Permissions
+    implementation(libs.accompanist.permissions)
+
+    // Image loading
+    implementation(libs.coil.compose.v250)
+
+    //Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

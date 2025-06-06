@@ -7,7 +7,6 @@ import com.dambrofarne.eyeflush.data.repositories.database.DatabaseRepository
 import com.dambrofarne.eyeflush.data.repositories.database.FirestoreDatabaseRepository
 import com.dambrofarne.eyeflush.data.repositories.imagestoring.ImageStoringRepository
 import com.dambrofarne.eyeflush.data.repositories.imagestoring.ImgurImageStoringRepository
-import com.dambrofarne.eyeflush.ui.screens.home.HomeViewModel
 import com.dambrofarne.eyeflush.ui.screens.profile.ProfileViewModel
 import com.dambrofarne.eyeflush.ui.screens.profileconfig.ProfileConfigViewModel
 import com.dambrofarne.eyeflush.ui.screens.signin.SignInViewModel

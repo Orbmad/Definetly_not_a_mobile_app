@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.dambrofarne.eyeflush.ui.screens.home.HomeScreen
+import com.dambrofarne.eyeflush.ui.screens.home.HomeMapScreen
 import com.dambrofarne.eyeflush.ui.screens.profile.ProfileScreen
 import com.dambrofarne.eyeflush.ui.screens.profileconfig.ProfileConfigScreen
 import com.dambrofarne.eyeflush.ui.screens.signin.SignInScreen
@@ -42,7 +42,7 @@ fun EyeFlushNavGraph(navController: NavHostController) {
 
         composable<EyeFlushRoute.Home> {
             //ProfileConfigScreen(navController)
-            HomeScreen(navController)
+            HomeMapScreen(navController)
         }
 
         composable<EyeFlushRoute.ProfileConfig> {
