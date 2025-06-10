@@ -1,6 +1,5 @@
 package com.dambrofarne.eyeflush.ui.screens.home
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -36,7 +35,7 @@ import org.osmdroid.tileprovider.tilesource.XYTileSource
 //import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 //import android.util.Log
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeMapScreen(
     navController: NavHostController,
@@ -234,83 +233,93 @@ fun HomeMapScreen(
             lifecycleOwner = lifecycleOwner
         )
     } else {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top
-            ) {
-                IconImage(
-                    image = ACCOUNT_ICON,
-                    modifier = Modifier
-                        .clickable{ navController.navigate(EyeFlushRoute.Profile)}
-                )
-            }
-
-            Box(modifier = Modifier.fillMaxSize()) {
-
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .align(Alignment.TopCenter)
-                        .zIndex(1f),
-                    text = currentLocation?.let {
-                        "Lat: ${currentLocation!!.latitude}\nLong: ${currentLocation!!.longitude}"
-                    } ?: "Posizione non disponibile"
-                )
-
-                AndroidView(
-                    factory = { ctx ->
-                        MapView(ctx).apply {
-                            setTileSource(openStreetMapTileSource)
-                            setMultiTouchControls(true)
-                            controller.setZoom(defaultZoom)
-                            controller.setCenter(currentLocation) // Rome as default
-                            mapView = this
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { "EyeFlush" },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = { navController.navigate(EyeFlushRoute.Profile) }
+                        ) {
+                            IconImage(
+                                image = ACCOUNT_ICON,
+                                modifier = Modifier
+                            )
                         }
                     },
-                    modifier = Modifier.fillMaxSize()
-                ) { map ->
-                    mapView = map
-                }
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                )
+            },
+            content = { innerPadding ->
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)) {
 
-                FloatingActionButton(
-                    onClick = {
-                        scope.launch {
-                            val location = locationManager.getCurrentLocation()
-                            location?.let {
-                                viewModel.updateCurrentLocation(it)
-                                mapView?.controller?.animateTo(it)
-                                mapView?.controller?.setZoom(defaultZoom)
+                    AndroidView(
+                        factory = { ctx ->
+                            MapView(ctx).apply {
+                                setTileSource(openStreetMapTileSource)
+                                setMultiTouchControls(true)
+                                controller.setZoom(defaultZoom)
+                                controller.setCenter(currentLocation)
+                                mapView = this
                             }
-                        }
-                    },
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(16.dp),
-                    shape = CircleShape
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.MyLocation,
-                        contentDescription = "Torna alla posizione"
-                    )
-                }
+                        },
+                        modifier = Modifier.fillMaxSize()
+                    ) { map ->
+                        mapView = map
+                    }
 
-                FloatingActionButton(
-                    onClick = { showCamera = true },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp),
-                    shape = CircleShape
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Camera,
-                        contentDescription = "Scatta foto"
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .align(Alignment.TopCenter)
+                            .zIndex(1f),
+                        text = currentLocation?.let {
+                            "Lat: ${it.latitude}\nLong: ${it.longitude}"
+                        } ?: "Posizione non disponibile"
                     )
+
+                    FloatingActionButton(
+                        onClick = {
+                            scope.launch {
+                                val location = locationManager.getCurrentLocation()
+                                location?.let {
+                                    viewModel.updateCurrentLocation(it)
+                                    mapView?.controller?.animateTo(it)
+                                    mapView?.controller?.setZoom(defaultZoom)
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(16.dp),
+                        shape = CircleShape
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MyLocation,
+                            contentDescription = "Torna alla posizione"
+                        )
+                    }
+
+                    FloatingActionButton(
+                        onClick = { showCamera = true },
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(16.dp),
+                        shape = CircleShape
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Camera,
+                            contentDescription = "Scatta foto"
+                        )
+                    }
                 }
             }
-        }
-
+        )
 
     }
 }

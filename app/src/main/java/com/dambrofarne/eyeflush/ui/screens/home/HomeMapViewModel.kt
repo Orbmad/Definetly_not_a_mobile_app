@@ -2,6 +2,8 @@ package com.dambrofarne.eyeflush.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
+import com.dambrofarne.eyeflush.data.repositories.database.DatabaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +17,10 @@ data class PhotoMarker(
     val timestamp: Long = System.currentTimeMillis()
 )
 
-class HomeMapViewModel : ViewModel() {
+class HomeMapViewModel(
+    private val db : DatabaseRepository,
+    private val auth : AuthRepository
+) : ViewModel() {
     private val _photoMarkers = MutableStateFlow<List<PhotoMarker>>(emptyList())
     val photoMarkers: StateFlow<List<PhotoMarker>> = _photoMarkers.asStateFlow()
 

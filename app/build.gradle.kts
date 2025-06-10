@@ -112,4 +112,16 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // CameraX
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2.v131)
+    implementation(libs.androidx.camera.lifecycle.v131)
+    implementation(libs.androidx.camera.view.v131)
+
+// Permissions
+    implementation(libs.accompanist.permissions)
+
+// Material 3
+    implementation (libs.material3)
 }

@@ -7,6 +7,7 @@ import com.dambrofarne.eyeflush.data.repositories.database.DatabaseRepository
 import com.dambrofarne.eyeflush.data.repositories.database.FirestoreDatabaseRepository
 import com.dambrofarne.eyeflush.data.repositories.imagestoring.ImageStoringRepository
 import com.dambrofarne.eyeflush.data.repositories.imagestoring.ImgurImageStoringRepository
+import com.dambrofarne.eyeflush.ui.screens.home.HomeMapViewModel
 import com.dambrofarne.eyeflush.ui.screens.profile.ProfileViewModel
 import com.dambrofarne.eyeflush.ui.screens.profileconfig.ProfileConfigViewModel
 import com.dambrofarne.eyeflush.ui.screens.signin.SignInViewModel
@@ -29,6 +30,6 @@ val appModule = module {
     viewModel { SignUpViewModel(get(), get()) }
     viewModel { SplashViewModel(get(),get()) }
     viewModel { ProfileConfigViewModel(get(),get(),get())}
-    viewModel { HomeViewModel()}
+    viewModel { HomeMapViewModel(get(), get())}
     viewModel { ProfileViewModel(get(),get()) }
 }
