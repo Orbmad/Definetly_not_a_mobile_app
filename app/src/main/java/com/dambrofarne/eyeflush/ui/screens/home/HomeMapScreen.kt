@@ -20,7 +20,6 @@ import com.dambrofarne.eyeflush.data.constants.IconPaths.ACCOUNT_ICON
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.IconImage
 import com.dambrofarne.eyeflush.data.managers.camera.CameraManager
-import com.dambrofarne.eyeflush.ui.screens.camera.CameraScreen
 import com.dambrofarne.eyeflush.data.managers.location.LocationManager
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -42,11 +41,9 @@ fun HomeMapScreen(
     viewModel: HomeMapViewModel = koinViewModel<HomeMapViewModel>()
 ) {
     val context = LocalContext.current
-    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
 
     val locationManager = remember { LocationManager(context) }
-    val cameraManager = remember { CameraManager(context) }
 
     // Initialize OSMDroid configuration
     LaunchedEffect(Unit) {
@@ -215,24 +212,6 @@ fun HomeMapScreen(
     }
 
     // HomeScreen View
-    if (showCamera) {
-        CameraScreen(
-            onPhotoTaken = { photoUri ->
-                scope.launch {
-                    currentLocation?.let { location ->
-                        //Log.w("Test", "Adding photo marker at location: $location")
-                        viewModel.addPhotoMarker("photo_${System.currentTimeMillis()}", photoUri.toString(), location)
-                    } ?: run {
-                        //Log.w("Test", "Current location is null, cannot add photo marker")
-                    }
-                    showCamera = false
-                }
-            },
-            onClose = { showCamera = false },
-            cameraManager = cameraManager,
-            lifecycleOwner = lifecycleOwner
-        )
-    } else {
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -283,6 +262,7 @@ fun HomeMapScreen(
                         } ?: "Posizione non disponibile"
                     )
 
+                    // Reposition Button
                     FloatingActionButton(
                         onClick = {
                             scope.launch {
@@ -305,8 +285,9 @@ fun HomeMapScreen(
                         )
                     }
 
+                    // Camera Button
                     FloatingActionButton(
-                        onClick = { showCamera = true },
+                        onClick = {navController.navigate(EyeFlushRoute.Camera)},
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .padding(16.dp),
@@ -322,4 +303,4 @@ fun HomeMapScreen(
         )
 
     }
-}
+

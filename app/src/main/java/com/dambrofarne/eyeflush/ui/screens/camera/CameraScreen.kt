@@ -1,79 +1,353 @@
 package com.dambrofarne.eyeflush.ui.screens.camera
 
-import android.net.Uri
+import com.dambrofarne.eyeflush.data.managers.camera.CameraManager
+import android.Manifest
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.LifecycleOwner
-import com.dambrofarne.eyeflush.data.managers.camera.CameraManager
-import kotlinx.coroutines.launch
-import java.util.concurrent.Executors
+import androidx.core.content.ContextCompat
+import androidx.navigation.NavHostController
+import com.dambrofarne.eyeflush.data.managers.camera.CameraState
+import com.dambrofarne.eyeflush.ui.screens.home.HomeMapViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import org.osmdroid.util.GeoPoint
+import java.io.File
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CameraScreen(
-    onPhotoTaken: (Uri) -> Unit,
-    onClose: () -> Unit,
-    cameraManager: CameraManager,
-    lifecycleOwner: LifecycleOwner
+    navController: NavHostController,
+    location: GeoPoint,
+    onNavigateBack: () -> Unit,
+    onSavePhoto: (File) -> Unit
 ) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
+    val cameraManager = remember { CameraManager(context) }
+    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
 
-    var previewView: PreviewView? by remember { mutableStateOf(null) }
-
-    LaunchedEffect(previewView) {
-        previewView?.let { preview ->
-            cameraManager.initializeCamera(preview, lifecycleOwner, cameraExecutor)
+    // Cleanup when leaving the screen
+    DisposableEffect(Unit) {
+        onDispose {
+            cameraManager.cleanup()
         }
     }
 
+    LaunchedEffect(Unit) {
+        if (!cameraPermissionState.status.isGranted) {
+            cameraPermissionState.launchPermissionRequest()
+        }
+    }
+
+    when {
+        cameraPermissionState.status.isGranted -> {
+            CameraContent(
+                cameraManager = cameraManager,
+                onNavigateBack = onNavigateBack,
+                onSavePhoto = onSavePhoto
+            )
+        }
+        else -> {
+            PermissionDeniedContent(onNavigateBack = onNavigateBack)
+        }
+    }
+}
+
+@Composable
+private fun CameraContent(
+    cameraManager: CameraManager,
+    onNavigateBack: () -> Unit,
+    onSavePhoto: (File) -> Unit
+) {
+    val context = LocalContext.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+
+    val cameraState by cameraManager.cameraState.collectAsState()
+    val capturedImage by cameraManager.capturedImage.collectAsState()
+
     Box(modifier = Modifier.fillMaxSize()) {
+        // Camera Preview
         AndroidView(
             factory = { ctx ->
-                PreviewView(ctx).also { previewView = it }
+                val previewView = PreviewView(ctx)
+                val executor = ContextCompat.getMainExecutor(ctx)
+                cameraManager.initializeCamera(previewView, lifecycleOwner, executor)
+                previewView
             },
             modifier = Modifier.fillMaxSize()
         )
 
-        Row(
+        // Overlay for borders 4:5
+        CameraOverlay()
+
+        // Back button
+        IconButton(
+            onClick = onNavigateBack,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(16.dp)
+                .background(
+                    Color.Black.copy(alpha = 0.5f),
+                    CircleShape
+                )
+        ) {
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Back",
+                tint = Color.White
+            )
+        }
+
+        // Capture button
+        CaptureButton(
+            cameraState = cameraState,
+            onCapture = { cameraManager.capturePhoto() },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(32.dp),
-            horizontalArrangement = Arrangement.spacedBy(32.dp)
-        ) {
-            FloatingActionButton(
-                onClick = onClose,
-                containerColor = MaterialTheme.colorScheme.error
-            ) {
-                Icon(Icons.Default.Close, contentDescription = "Chiudi")
-            }
+                .padding(bottom = 32.dp)
+        )
+    }
 
-            FloatingActionButton(
-                onClick = {
-                    scope.launch {
-                        cameraManager.capturePhoto()?.let { uri ->
-                            onPhotoTaken(uri)
-                        }
-                    }
-                },
-                modifier = Modifier.size(64.dp)
+    // Confirm dialog
+    if (cameraState == CameraState.PHOTO_CAPTURED && capturedImage != null) {
+        PhotoConfirmationDialog(
+            onConfirm = {
+                cameraManager.confirmPhoto()?.let { file ->
+                    onSavePhoto(file)
+                    onNavigateBack()
+                }
+            },
+            onRetry = {
+                cameraManager.retryPhoto()
+            },
+            onDismiss = {
+                cameraManager.retryPhoto()
+            }
+        )
+    }
+}
+
+@Composable
+private fun CaptureButton(
+    cameraState: CameraState,
+    onCapture: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val isEnabled = cameraState == CameraState.READY
+    val isCapturing = cameraState == CameraState.CAPTURING
+
+    FloatingActionButton(
+        onClick = { if (isEnabled) onCapture() },
+        modifier = modifier.size(80.dp),
+        containerColor = when {
+            isCapturing -> Color.Gray
+            isEnabled -> Color.White
+            else -> Color.Gray
+        }
+    ) {
+        if (isCapturing) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(32.dp),
+                color = Color.Black
+            )
+        } else {
+            Icon(
+                Icons.Default.Camera,
+                contentDescription = "Scatta foto",
+                modifier = Modifier.size(32.dp),
+                tint = Color.Black
+            )
+        }
+    }
+}
+
+@Composable
+private fun CameraOverlay() {
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        val canvasWidth = size.width
+        val canvasHeight = size.height
+
+        // Calcola le dimensioni del rettangolo 4:5
+        val aspectRatio = 4f / 5f
+        val rectWidth = canvasWidth * 0.8f
+        val rectHeight = rectWidth / aspectRatio
+
+        // Centra il rettangolo
+        val left = (canvasWidth - rectWidth) / 2
+        val top = (canvasHeight - rectHeight) / 2
+
+        // Disegna l'overlay scuro
+        drawRect(
+            color = Color.Black.copy(alpha = 0.5f),
+            topLeft = Offset(0f, 0f),
+            size = Size(canvasWidth, top)
+        )
+        drawRect(
+            color = Color.Black.copy(alpha = 0.5f),
+            topLeft = Offset(0f, top + rectHeight),
+            size = Size(canvasWidth, canvasHeight - (top + rectHeight))
+        )
+        drawRect(
+            color = Color.Black.copy(alpha = 0.5f),
+            topLeft = Offset(0f, top),
+            size = Size(left, rectHeight)
+        )
+        drawRect(
+            color = Color.Black.copy(alpha = 0.5f),
+            topLeft = Offset(left + rectWidth, top),
+            size = Size(canvasWidth - (left + rectWidth), rectHeight)
+        )
+
+        // Draw borders
+        drawRect(
+            color = Color.White,
+            topLeft = Offset(left, top),
+            size = Size(rectWidth, rectHeight),
+            style = Stroke(width = 4.dp.toPx())
+        )
+
+        // Draws anngles
+        val cornerLength = 20.dp.toPx()
+        val cornerWidth = 4.dp.toPx()
+
+        drawLine(
+            color = Color.White,
+            start = Offset(left, top),
+            end = Offset(left + cornerLength, top),
+            strokeWidth = cornerWidth
+        )
+        drawLine(
+            color = Color.White,
+            start = Offset(left, top),
+            end = Offset(left, top + cornerLength),
+            strokeWidth = cornerWidth
+        )
+
+        drawLine(
+            color = Color.White,
+            start = Offset(left + rectWidth, top),
+            end = Offset(left + rectWidth - cornerLength, top),
+            strokeWidth = cornerWidth
+        )
+        drawLine(
+            color = Color.White,
+            start = Offset(left + rectWidth, top),
+            end = Offset(left + rectWidth, top + cornerLength),
+            strokeWidth = cornerWidth
+        )
+
+        drawLine(
+            color = Color.White,
+            start = Offset(left, top + rectHeight),
+            end = Offset(left + cornerLength, top + rectHeight),
+            strokeWidth = cornerWidth
+        )
+        drawLine(
+            color = Color.White,
+            start = Offset(left, top + rectHeight),
+            end = Offset(left, top + rectHeight - cornerLength),
+            strokeWidth = cornerWidth
+        )
+
+        drawLine(
+            color = Color.White,
+            start = Offset(left + rectWidth, top + rectHeight),
+            end = Offset(left + rectWidth - cornerLength, top + rectHeight),
+            strokeWidth = cornerWidth
+        )
+        drawLine(
+            color = Color.White,
+            start = Offset(left + rectWidth, top + rectHeight),
+            end = Offset(left + rectWidth, top + rectHeight - cornerLength),
+            strokeWidth = cornerWidth
+        )
+    }
+}
+
+@Composable
+private fun PhotoConfirmationDialog(
+    onConfirm: () -> Unit,
+    onRetry: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text("Upload Photo")
+        },
+        text = {
+            Text("Do you want to upload the photo?")
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
             ) {
                 Icon(
-                    Icons.Default.Camera,
-                    contentDescription = "Scatta foto",
-                    modifier = Modifier.size(32.dp)
+                    Icons.Default.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
                 )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Ok")
             }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = onRetry) {
+                Icon(
+                    Icons.Default.Close,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Retry")
+            }
+        }
+    )
+}
+
+@Composable
+private fun PermissionDeniedContent(onNavigateBack: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Camera permission requested",
+            style = MaterialTheme.typography.headlineSmall
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Camera permission is necessary to use this function.",
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        Button(onClick = onNavigateBack) {
+            Text("Back")
         }
     }
 }
