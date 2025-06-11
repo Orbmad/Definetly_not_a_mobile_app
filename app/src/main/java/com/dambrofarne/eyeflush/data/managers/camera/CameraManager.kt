@@ -11,6 +11,7 @@ import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.osmdroid.util.GeoPoint
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -26,6 +27,8 @@ class CameraManager(private val context: Context) {
 
     private val _capturedImage = MutableStateFlow<File?>(null)
     val capturedImage: StateFlow<File?> = _capturedImage.asStateFlow()
+
+    var location: GeoPoint? = null
 
     fun initializeCamera(
         previewView: PreviewView,
@@ -112,6 +115,10 @@ class CameraManager(private val context: Context) {
     fun retryPhoto() {
         _capturedImage.value?.delete()
         resetCameraState()
+    }
+
+    fun savePhoto(file: File) {
+        //TODO
     }
 
     fun resetCameraState() {

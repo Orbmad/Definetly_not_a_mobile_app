@@ -56,7 +56,7 @@ fun EyeFlushNavGraph(navController: NavHostController) {
         }
 
         composable<EyeFlushRoute.Camera> {
-            CameraScreen(navController, location)
+            CameraScreen(navController)
         }
     }
 
