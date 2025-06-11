@@ -124,7 +124,6 @@ fun SignOutText(onClick: () -> Unit) {
 }
 
 // Camera button
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CameraButton(
     onClick: () -> Unit,

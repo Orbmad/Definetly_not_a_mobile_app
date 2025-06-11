@@ -57,17 +57,32 @@ fun CameraScreen(
         }
     }
 
-    when {
-        cameraPermissionState.status.isGranted -> {
-            CameraContent(
-                cameraManager = cameraManager,
-                onNavigateBack = {navController.navigate(EyeFlushRoute.Home)},
-            )
+    Scaffold (
+        content = { innerPadding ->
+            Box (
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                when {
+                    cameraPermissionState.status.isGranted -> {
+                        CameraContent(
+                            cameraManager = cameraManager,
+                            onNavigateBack = { navController.navigate(EyeFlushRoute.Home) },
+                        )
+                    }
+
+                    else -> {
+                        PermissionDeniedContent(onNavigateBack = {
+                            navController.navigate(
+                                EyeFlushRoute.Home
+                            )
+                        })
+                    }
+                }
+            }
         }
-        else -> {
-            PermissionDeniedContent(onNavigateBack = {navController.navigate(EyeFlushRoute.Home)})
-        }
-    }
+    )
 }
 
 @Composable
@@ -113,8 +128,9 @@ private fun CameraContent(
             cameraState = cameraState,
             onCapture = { cameraManager.capturePhoto() },
             modifier = Modifier
+                .size(124.dp)
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 64.dp)
+                .padding(16.dp)
         )
     }
 
@@ -148,24 +164,25 @@ private fun CaptureButton(
 
     FloatingActionButton(
         onClick = { if (isEnabled) onCapture() },
-        modifier = modifier.size(80.dp),
+        modifier = modifier.size(124.dp),
         containerColor = when {
             isCapturing -> Color.Gray
-            isEnabled -> Color.White
+            isEnabled -> MaterialTheme.colorScheme.primary
             else -> Color.Gray
-        }
+        },
+        shape = CircleShape
     ) {
         if (isCapturing) {
             CircularProgressIndicator(
                 modifier = Modifier.size(32.dp),
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onPrimary
             )
         } else {
             Icon(
                 Icons.Default.Camera,
                 contentDescription = "Scatta foto",
-                modifier = Modifier.size(32.dp),
-                tint = Color.Black
+                modifier = Modifier.size(74.dp),
+                tint = MaterialTheme.colorScheme.onPrimary
             )
         }
     }
