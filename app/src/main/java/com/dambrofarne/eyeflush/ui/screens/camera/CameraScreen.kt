@@ -193,6 +193,7 @@ private fun CameraOverlay() {
     Canvas(modifier = Modifier.fillMaxSize()) {
         val canvasWidth = size.width
         val canvasHeight = size.height
+        val overlayColor = Color.Black.copy(alpha = 0.85f)
 
         // Calcola le dimensioni del rettangolo 4:5
         val aspectRatio = 4f / 5f
@@ -205,22 +206,22 @@ private fun CameraOverlay() {
 
         // Disegna l'overlay scuro
         drawRect(
-            color = Color.Black.copy(alpha = 0.5f),
+            color = overlayColor,
             topLeft = Offset(0f, 0f),
             size = Size(canvasWidth, top)
         )
         drawRect(
-            color = Color.Black.copy(alpha = 0.5f),
+            color = overlayColor,
             topLeft = Offset(0f, top + rectHeight),
             size = Size(canvasWidth, canvasHeight - (top + rectHeight))
         )
         drawRect(
-            color = Color.Black.copy(alpha = 0.5f),
+            color = overlayColor,
             topLeft = Offset(0f, top),
             size = Size(left, rectHeight)
         )
         drawRect(
-            color = Color.Black.copy(alpha = 0.5f),
+            color = overlayColor,
             topLeft = Offset(left + rectWidth, top),
             size = Size(canvasWidth - (left + rectWidth), rectHeight)
         )

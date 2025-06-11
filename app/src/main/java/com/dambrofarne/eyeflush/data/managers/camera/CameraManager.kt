@@ -73,7 +73,7 @@ class CameraManager(private val context: Context) {
                 imageCapture
             )
         } catch (exc: Exception) {
-            Log.e("CameraManager", "Errore nel binding della fotocamera", exc)
+            Log.e("CameraManager", "Camera binding Error", exc)
             _cameraState.value = CameraState.ERROR
         }
     }
