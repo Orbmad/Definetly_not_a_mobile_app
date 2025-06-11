@@ -3,7 +3,6 @@ package com.dambrofarne.eyeflush.ui.screens.home
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,12 +15,12 @@ import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.R
-import com.dambrofarne.eyeflush.data.constants.IconPaths.ACCOUNT_ICON
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
-import com.dambrofarne.eyeflush.ui.composables.IconImage
-import com.dambrofarne.eyeflush.data.managers.camera.CameraManager
 import com.dambrofarne.eyeflush.data.managers.location.LocationManager
+import com.dambrofarne.eyeflush.ui.composables.BackButton
 import com.dambrofarne.eyeflush.ui.composables.CameraButton
+import com.dambrofarne.eyeflush.ui.composables.CustomTopBar
+import com.dambrofarne.eyeflush.ui.composables.ProfileIcon
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.launch
@@ -35,7 +34,7 @@ import org.osmdroid.tileprovider.tilesource.XYTileSource
 //import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 //import android.util.Log
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun HomeMapScreen(
     navController: NavHostController,
@@ -215,21 +214,34 @@ fun HomeMapScreen(
     // HomeScreen View
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = { "EyeFlush" },
-                    navigationIcon = {
-                        IconButton(
+//                TopAppBar(
+//                    title = { "EyeFlush" },
+//                    navigationIcon = {
+//                        IconButton(
+//                            onClick = { navController.navigate(EyeFlushRoute.Profile) }
+//                        ) {
+//                            IconImage(
+//                                image = ACCOUNT_ICON,
+//                                modifier = Modifier
+//                            )
+//                        }
+//                    },
+//                    colors = TopAppBarDefaults.topAppBarColors(
+//                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+//                    )
+//                )
+                CustomTopBar(
+                    title = "EyeFlush",
+//                    navigationIcon = {
+//                        BackButton(
+//                            onClick = {navController.navigate(EyeFlushRoute.Home)}
+//                        )
+//                    },
+                    actions = {
+                        ProfileIcon(
                             onClick = { navController.navigate(EyeFlushRoute.Profile) }
-                        ) {
-                            IconImage(
-                                image = ACCOUNT_ICON,
-                                modifier = Modifier
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                    )
+                        )
+                    }
                 )
             },
             content = { innerPadding ->
@@ -278,8 +290,9 @@ fun HomeMapScreen(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier
-                            .size(124.dp)
-                            .align(Alignment.BottomStart)
+                            .size(82.dp)
+                            .align(Alignment.BottomCenter)
+                            .offset(x = (-70).dp)
                             .padding(16.dp),
                         shape = CircleShape
                     ) {
@@ -294,7 +307,7 @@ fun HomeMapScreen(
                         onClick = {navController.navigate(EyeFlushRoute.Camera)},
                         modifier = Modifier
                             .size(124.dp)
-                            .align(Alignment.BottomEnd)
+                            .align(Alignment.BottomCenter)
                             .padding(16.dp)
                     )
                 }

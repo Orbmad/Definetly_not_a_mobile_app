@@ -3,14 +3,19 @@ package com.dambrofarne.eyeflush.ui.composables
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -24,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -31,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dambrofarne.eyeflush.R
@@ -132,6 +139,7 @@ fun CameraButton(
     ) {
         Icon(
             imageVector = Icons.Default.Camera,
+            modifier = Modifier.size(74.dp),
             contentDescription = "Take Photo"
         )
     }
@@ -156,7 +164,7 @@ fun ProfileIcon(onClick: () -> Unit, modifier: Modifier = Modifier) {
 @Composable
 fun BackButton(
     onClick: () -> Unit,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     IconButton(
         onClick = onClick,
@@ -174,19 +182,67 @@ fun BackButton(
     }
 }
 
-// Needs Updates
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomTopAppBar(
+fun CustomTopBar(
+    title: String = "",
     modifier: Modifier = Modifier,
-    backButton: @Composable (() -> Unit)? = null,
-    profileIcon: Boolean = true
+    navigationIcon: (@Composable () -> Unit)? = null,
+    actions: (@Composable RowScope.() -> Unit)? = null,
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
+    contentColor: Color = MaterialTheme.colorScheme.onBackground
 ) {
-    Row (
-        modifier = modifier
+    val height = 64.dp
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = backgroundColor,
+        contentColor = contentColor,
+        shadowElevation = 4.dp
     ) {
-        if (backButton != null) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(72.dp)
+                .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Navigation icon (es. back button)
+            Box(
+                modifier = Modifier
+                    .height(height) // touch target
+                    .width(50.dp),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                navigationIcon?.invoke() ?: Spacer(
+                    modifier = Modifier.width(48.dp)
+                )
+            }
 
+            // Centered title
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    maxLines = 1,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            // Action icons
+            Row(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .height(height), // same height of navigation icon
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.End
+            ) {
+                actions?.invoke(this)
+            }
         }
     }
 }
