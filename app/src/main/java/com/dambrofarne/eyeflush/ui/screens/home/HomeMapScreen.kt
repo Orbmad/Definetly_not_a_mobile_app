@@ -21,6 +21,7 @@ import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.IconImage
 import com.dambrofarne.eyeflush.data.managers.camera.CameraManager
 import com.dambrofarne.eyeflush.data.managers.location.LocationManager
+import com.dambrofarne.eyeflush.ui.composables.CameraButton
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.launch
@@ -274,30 +275,28 @@ fun HomeMapScreen(
                                 }
                             }
                         },
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier
+                            .size(124.dp)
                             .align(Alignment.BottomStart)
                             .padding(16.dp),
                         shape = CircleShape
                     ) {
                         Icon(
                             imageVector = Icons.Default.MyLocation,
-                            contentDescription = "Torna alla posizione"
+                            contentDescription = "Center to current position"
                         )
                     }
 
                     // Camera Button
-                    FloatingActionButton(
+                    CameraButton(
                         onClick = {navController.navigate(EyeFlushRoute.Camera)},
                         modifier = Modifier
+                            .size(124.dp)
                             .align(Alignment.BottomEnd)
-                            .padding(16.dp),
-                        shape = CircleShape
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Camera,
-                            contentDescription = "Scatta foto"
-                        )
-                    }
+                            .padding(16.dp)
+                    )
                 }
             }
         )

@@ -28,6 +28,7 @@ import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.data.managers.camera.CameraState
 import com.dambrofarne.eyeflush.data.managers.location.LocationManager
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
+import com.dambrofarne.eyeflush.ui.composables.BackButton
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -96,22 +97,16 @@ private fun CameraContent(
         CameraOverlay()
 
         // Back button
-        IconButton(
+        BackButton(
             onClick = onNavigateBack,
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(16.dp)
                 .background(
-                    Color.Black.copy(alpha = 0.5f),
+                    MaterialTheme.colorScheme.primaryContainer,
                     CircleShape
                 )
-        ) {
-            Icon(
-                Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
-                tint = Color.White
-            )
-        }
+        )
 
         // Capture button
         CaptureButton(
