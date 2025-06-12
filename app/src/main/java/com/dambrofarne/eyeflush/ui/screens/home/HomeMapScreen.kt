@@ -124,6 +124,7 @@ fun HomeMapScreen(
         if (permissionsState.allPermissionsGranted) {
             locationManager.startLocationUpdates { geoPoint ->
                 viewModel.updateCurrentLocation(geoPoint)
+                viewModel.loadPolaroidMarkers()
             }
         }
     }

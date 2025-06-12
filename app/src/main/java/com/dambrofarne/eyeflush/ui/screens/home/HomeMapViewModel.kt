@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
@@ -43,6 +44,7 @@ class HomeMapViewModel(
                 val photoDataList = db.getMarkersInRange(location, range)
                 val markers = createPolaroidMarkersFromMarkers(photoDataList)
                 _polaroidMarkers.value = markers
+                Log.w("test", "Markers:$markers")
             }
         }
     }
