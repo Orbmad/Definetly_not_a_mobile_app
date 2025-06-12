@@ -10,11 +10,10 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.OverlayWithIW
 
 class PolaroidMarker(
-    //private val context: Context,
-    private val markerID: Int,
     private val position: GeoPoint,
-    private val photo: Drawable,
-    private val likeCount: Int,
+    private val photoFrame: Drawable,
+    private val likeCount: Int = 0,
+    private val name: String?,
     private val textColor: Int = Color.BLACK,
     private val paintColor: Int = Color.WHITE,
     private val borderColor: Int = Color.GRAY
@@ -40,9 +39,9 @@ class PolaroidMarker(
     private val overlayWidth = 200
     private val overlayHeight = 250
 
-    private var onMarkerClicked: ((PolaroidMarker) -> Unit)? = null
+    private var onMarkerClicked: (() -> Unit)? = null
 
-    fun setMarkerClickedAction(action: ((PolaroidMarker) -> Unit)) {
+    fun setMarkerClickedAction(action: (() -> Unit)) {
         onMarkerClicked = action
     }
 
@@ -50,8 +49,8 @@ class PolaroidMarker(
         return position
     }
 
-    fun getMarkerID(): Int {
-        return markerID
+    fun getName(): String {
+        return name ?: ""
     }
 
     override fun draw(canvas: Canvas, mapView: MapView, shadow: Boolean) {
@@ -69,7 +68,7 @@ class PolaroidMarker(
         val rect = Rect(left, top, right, bottom)
 
         //Create photo bitmap from drawable
-        val photoBitmapFromDrawable = (photo as BitmapDrawable).bitmap
+        val photoBitmapFromDrawable = (photoFrame as BitmapDrawable).bitmap
         val resizedBitmap = resizeBitmap(photoBitmapFromDrawable)
 
         // Draw polaroid background
@@ -110,7 +109,7 @@ class PolaroidMarker(
 
         if (touchX in left..right && touchY in top..bottom) {
             // Handle marker tap - navigate to detail page
-            onMarkerClicked?.invoke(this)
+            onMarkerClicked?.invoke()
             return true
         }
 
