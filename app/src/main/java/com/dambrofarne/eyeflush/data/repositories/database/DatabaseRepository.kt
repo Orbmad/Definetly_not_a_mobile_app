@@ -17,6 +17,7 @@ interface DatabaseRepository {
     suspend fun getMarkersInRange(point: GeoPoint, rangeMeters: Int) : List<Marker>
     suspend fun addMarker(point: GeoPoint) : String
     suspend fun addMarker(point: GeoPoint, name: String) : String
+    suspend fun getMarkerExtendedInfo(markerId : String) : Result<ExtendedMarker>
 
     //Pictures
     suspend fun addImage(markerId : String, uId : String, timeStamp : LocalDateTime, imgURL : String) : String

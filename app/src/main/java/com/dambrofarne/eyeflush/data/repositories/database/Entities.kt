@@ -32,6 +32,21 @@ data class MarkerRaw(
     )
 }
 
+data class PicQuickRef(
+    val picId : String = "",
+    val url : String = "",
+)
+
+data class ExtendedMarker(
+    val id : String,
+    val name: String?,
+    val coordinates: GeoPoint,
+    val mostLikedPicId : String?,
+    val mostLikedPicURL: String?,
+    val imagesCount : Int,
+    val picturesTaken : List<PicQuickRef>
+)
+
 data class Picture(
     val id: String ="",
     val uId : String = "",

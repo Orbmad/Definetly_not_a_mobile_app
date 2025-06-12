@@ -185,6 +185,55 @@ class FirestoreDatabaseRepository(
         }
     }
 
+    override suspend fun getMarkerExtendedInfo(markerId: String): Result<ExtendedMarker> {
+        return try {
+            val snapshot = db.collection("markers")
+                .document(markerId)
+                .get()
+                .await()
+
+            if (!snapshot.exists()) {
+                return Result.failure(Exception("Marker con id $markerId non trovato"))
+            }
+
+            val id = snapshot.id
+            val name = snapshot.getString("name")
+            val latitude = snapshot.getDouble("latitude") ?: 0.0
+            val longitude = snapshot.getDouble("longitude") ?: 0.0
+            val coordinates = GeoPoint(latitude, longitude)
+
+            val mostLikedPicId = snapshot.getString("mostLikedPicId")
+            val mostLikedPicURL = snapshot.getString("mostLikedPicURL")
+            val imagesCount = snapshot.getLong("imagesCount")?.toInt() ?: 0
+
+            val rawList = snapshot.get("picturesTaken") as? List<*>
+            val pictureRefs = rawList?.mapNotNull { item ->
+                if (item is Map<*, *>) {
+                    val itId = item["id"] as? String
+                    val itUrl = item["url"] as? String
+                    if (itId != null && itUrl != null) {
+                        PicQuickRef(picId = itId, url = itUrl)
+                    } else null
+                } else null
+            } ?: emptyList()
+
+            Result.success(
+                ExtendedMarker(
+                    id = id,
+                    name = name,
+                    coordinates = coordinates,
+                    mostLikedPicId = mostLikedPicId,
+                    mostLikedPicURL = mostLikedPicURL,
+                    imagesCount = imagesCount,
+                    picturesTaken = pictureRefs
+                )
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
     override suspend fun addImage(
         markerId: String,
         uId: String,
