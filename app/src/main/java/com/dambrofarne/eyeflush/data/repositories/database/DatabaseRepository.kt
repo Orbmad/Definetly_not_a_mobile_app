@@ -12,6 +12,7 @@ interface DatabaseRepository {
     suspend fun isUsernameTaken(username: String) : Boolean
     suspend fun getUsername(uId: String) : String
     //Markers
-    suspend fun getMarkersInRange(point: GeoPoint, rangeMeters: Int) : List<Marker>;
-    suspend fun getNearestMarker(point: GeoPoint, range: Int);
+    suspend fun getMarkersInRange(point: GeoPoint, rangeMeters: Int) : List<Marker>
+    suspend fun addMarker(point: GeoPoint) : String
+    suspend fun addMarker(point: GeoPoint, name: String) : String
 }

@@ -142,8 +142,40 @@ class FirestoreDatabaseRepository(
         }
     }
 
+    override suspend fun addMarker(point: GeoPoint): String {
+        return try {
+            val newMarker = MarkerRaw(
+                latitude = point.latitude,
+                longitude = point.longitude
+            )
 
-    override suspend fun getNearestMarker(point: GeoPoint, range: Int) {
-        TODO("Not yet implemented")
+            val docRef = db.collection("markers")
+                .add(newMarker)
+                .await()
+            docRef.id
+
+        } catch (e: Exception) {
+            Log.e("dbRepo", "Errore aggiungendo marker", e)
+            ""
+        }
+    }
+
+    override suspend fun addMarker(point: GeoPoint, name: String): String {
+        return try {
+            val newMarker = MarkerRaw(
+                latitude = point.latitude,
+                longitude = point.longitude,
+                name = name
+            )
+
+            val docRef = db.collection("markers")
+                .add(newMarker)
+                .await()
+            docRef.id
+
+        } catch (e: Exception) {
+            Log.e("dbRepo", "Errore aggiungendo marker", e)
+            ""
+        }
     }
 }
