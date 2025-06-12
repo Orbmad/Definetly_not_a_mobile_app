@@ -60,7 +60,7 @@ fun HomeMapScreen(
         )
     )
 
-    val photoMarkers by viewModel.photoMarkers.collectAsState()
+    val photoMarkers by viewModel.polaroidMarkers.collectAsState()
     val currentLocation by viewModel.currentLocation.collectAsState()
 
     var showCamera by remember { mutableStateOf(false) }
