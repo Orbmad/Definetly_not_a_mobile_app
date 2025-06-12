@@ -1,6 +1,7 @@
 package com.dambrofarne.eyeflush.data.repositories.database
 
 import org.osmdroid.util.GeoPoint
+import java.time.LocalDateTime
 
 interface DatabaseRepository {
     //Users
@@ -11,8 +12,12 @@ interface DatabaseRepository {
     suspend fun getUserImagePath(uId: String) : String
     suspend fun isUsernameTaken(username: String) : Boolean
     suspend fun getUsername(uId: String) : String
+
     //Markers
     suspend fun getMarkersInRange(point: GeoPoint, rangeMeters: Int) : List<Marker>
     suspend fun addMarker(point: GeoPoint) : String
     suspend fun addMarker(point: GeoPoint, name: String) : String
+
+    //Pictures
+    suspend fun addImage(markerId : String, uId : String, timeStamp : LocalDateTime, imgURL : String) : String
 }

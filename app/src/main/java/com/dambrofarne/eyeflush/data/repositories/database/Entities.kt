@@ -1,5 +1,6 @@
 package com.dambrofarne.eyeflush.data.repositories.database
 
+import com.google.firebase.Timestamp
 import org.osmdroid.util.GeoPoint
 
 
@@ -30,3 +31,12 @@ data class MarkerRaw(
         imagesCount = imagesCount
     )
 }
+
+data class Picture(
+    val id: String ="",
+    val uId : String = "",
+    val markerId : String = "",
+    val url : String = "",
+    val timeStamp : Timestamp = Timestamp.now(),
+    val likes : Int = 0,
+)

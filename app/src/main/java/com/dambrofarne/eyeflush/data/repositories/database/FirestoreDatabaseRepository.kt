@@ -3,12 +3,16 @@ package com.dambrofarne.eyeflush.data.repositories.database
 import android.util.Log
 import com.dambrofarne.eyeflush.utils.getBoundingBox
 import com.dambrofarne.eyeflush.utils.isWithinRange
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import org.osmdroid.util.GeoPoint
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.Date
 
 class FirestoreDatabaseRepository(
     private val db: FirebaseFirestore = Firebase.firestore
@@ -175,6 +179,34 @@ class FirestoreDatabaseRepository(
 
         } catch (e: Exception) {
             Log.e("dbRepo", "Errore aggiungendo marker", e)
+            ""
+        }
+    }
+
+    override suspend fun addImage(markerId: String, uId: String, timeStamp: LocalDateTime, imgURL : String): String {
+        return try {
+            // Converte LocalDateTime in Timestamp compatibile con Firestore
+            val timestamp = Timestamp(
+                Date.from(timeStamp.atZone(ZoneId.systemDefault()).toInstant())
+            )
+
+            val newPicture = Picture(
+                id = "",
+                uId = uId,
+                markerId = markerId,
+                url = imgURL,
+                timeStamp = timestamp,
+                likes = 0
+            )
+
+            val docRef = db.collection("pictures")
+                .add(newPicture)
+                .await()
+
+            docRef.id
+
+        } catch (e: Exception) {
+            Log.e("dbRepo", "Errore aggiungendo immagine", e)
             ""
         }
     }
