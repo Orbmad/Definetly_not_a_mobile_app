@@ -10,11 +10,12 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.OverlayWithIW
 
 class PolaroidMarker(
+    private val id: String,
     private val position: GeoPoint,
     private val photoFrame: Drawable,
-    private val likeCount: Int = 0,
+    private val photoCount: Int = 1,
     private val name: String? = null,
-    private val userName: String,
+    private val mostLikedPicID: String? = null,
     private val textColor: Int = Color.BLACK,
     private val paintColor: Int = Color.WHITE,
     private val borderColor: Int = Color.GRAY
@@ -54,8 +55,12 @@ class PolaroidMarker(
         return name ?: ""
     }
 
-    fun getUserName(): String {
-        return userName
+    fun getID(): String {
+        return id
+    }
+
+    fun getMostLikedPicID(): String? {
+        return mostLikedPicID
     }
 
     override fun draw(canvas: Canvas, mapView: MapView, shadow: Boolean) {
@@ -90,7 +95,7 @@ class PolaroidMarker(
         canvas.drawBitmap(resizedBitmap, null, photoRect, null)
 
         // Draw number of likes
-        val likeText = "❤️ $likeCount"
+        val likeText = "$photoCount"
         val textWidth = textPaint.measureText(likeText)
         canvas.drawText(
             likeText,
