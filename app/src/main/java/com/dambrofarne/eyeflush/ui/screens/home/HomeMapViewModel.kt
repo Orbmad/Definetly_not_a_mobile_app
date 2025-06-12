@@ -1,5 +1,11 @@
 package com.dambrofarne.eyeflush.ui.screens.home
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
@@ -24,16 +30,55 @@ class HomeMapViewModel(
         _currentLocation.value = location
     }
 
-//    fun addPhotoMarker(photoID: String, photoUri: String, location: GeoPoint) {
+//    fun loadPolaroidMarkers() {
 //        viewModelScope.launch {
-//            val newMarker = PhotoMarker(
-//                id = photoID,
-//                position = location,
-//                photoUri = photoUri
-//            )
-//            _photoMarkers.value += newMarker
+//            val photoDataList = db.getAllPhotos() // hypothetical suspend function returning list of photo info
+//            val markers = photoDataList.map { photo ->
+//                PolaroidMarker(
+//                    position = photo.geoPoint,
+//                    photoFrame = photo.drawable,  // or load from a URI using a helper
+//                    likeCount = photo.likes,
+//                    name = photo.userName
+//                )
+//            }
+//            _polaroidMarkers.value = markers
 //        }
 //    }
 
-    
+    fun createDummyMarkers() {
+        viewModelScope.launch {
+            val dummyMarkers = listOf(
+                PolaroidMarker(
+                    position = GeoPoint(44.1482, 12.2356), // Università
+                    photoFrame = createDummyDrawable(Color.RED),
+                    likeCount = 12,
+                    userName = "Patrick"
+                ),
+                PolaroidMarker(
+                    position = GeoPoint(44.1464, 12.2374), // Vicino coop
+                    photoFrame = createDummyDrawable(Color.BLUE),
+                    likeCount = 34,
+                    userName = "Giulia"
+                ),
+                PolaroidMarker(
+                    position = GeoPoint(44.1480, 12.2330), // Ponte Nutrie
+                    photoFrame = createDummyDrawable(Color.GREEN),
+                    likeCount = 7,
+                    userName = "Marotta"
+                )
+            )
+
+            _polaroidMarkers.value = dummyMarkers
+        }
+    }
+
+    private fun createDummyDrawable(color: Int): Drawable {
+        val size = 100
+        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val paint = Paint().apply { this.color = color }
+        canvas.drawRect(0f, 0f, size.toFloat(), size.toFloat(), paint)
+        return BitmapDrawable(null, bitmap)
+    }
+
 }

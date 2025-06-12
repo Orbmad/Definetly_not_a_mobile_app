@@ -13,7 +13,8 @@ class PolaroidMarker(
     private val position: GeoPoint,
     private val photoFrame: Drawable,
     private val likeCount: Int = 0,
-    private val name: String?,
+    private val name: String? = null,
+    private val userName: String,
     private val textColor: Int = Color.BLACK,
     private val paintColor: Int = Color.WHITE,
     private val borderColor: Int = Color.GRAY
@@ -51,6 +52,10 @@ class PolaroidMarker(
 
     fun getName(): String {
         return name ?: ""
+    }
+
+    fun getUserName(): String {
+        return userName
     }
 
     override fun draw(canvas: Canvas, mapView: MapView, shadow: Boolean) {

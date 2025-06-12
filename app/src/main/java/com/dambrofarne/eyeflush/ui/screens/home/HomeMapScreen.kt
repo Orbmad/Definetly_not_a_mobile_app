@@ -60,20 +60,18 @@ fun HomeMapScreen(
         )
     )
 
-    val photoMarkers by viewModel.polaroidMarkers.collectAsState()
+    val polaroidMarkers by viewModel.polaroidMarkers.collectAsState()
     val currentLocation by viewModel.currentLocation.collectAsState()
 
     var showCamera by remember { mutableStateOf(false) }
     var mapView: MapView? by remember { mutableStateOf(null) }
     var currentLocationMarker by remember { mutableStateOf<Marker?>(null) }
 
-    val photoMarkersRefs = remember { mutableListOf<Marker>() }
+    val polaroidMarkersRefs = remember { mutableListOf<PolaroidMarker>() }
 
     val defaultZoom = 20.0
 
     val userLocationIcon = ContextCompat.getDrawable(context, R.drawable.ic_user_location)
-
-    val cameraIcon = ContextCompat.getDrawable(context, android.R.drawable.ic_menu_camera)
 
     val openStreetMapTileSource = XYTileSource(
         "OSM",
@@ -171,35 +169,24 @@ fun HomeMapScreen(
     }
 
     // Update markers when photoMarkers change
-    LaunchedEffect(photoMarkers) {
+    LaunchedEffect(polaroidMarkers) {
         //Log.w("Test", "Updating photo markers, count: ${photoMarkers.size}")
 
         try {
             // Rimuovi i vecchi marker delle foto
-            photoMarkersRefs.forEach { marker ->
+            polaroidMarkersRefs.forEach { marker ->
                 mapView?.overlays?.remove(marker)
             }
-            photoMarkersRefs.clear()
+            polaroidMarkersRefs.clear()
+
+            viewModel.createDummyMarkers()
 
             // Aggiungi i nuovi marker delle foto
-            photoMarkers.forEach { photoMarker ->
+            polaroidMarkers.forEach { photoMarker ->
                 //Log.w("Test", "Creating photo marker at ${photoMarker.position}")
 
-                val marker = Marker(mapView).apply {
-                    position = photoMarker.position
-                    title = "Photo Marker"
-                    snippet = "Scattata il ${
-                        java.text.SimpleDateFormat("dd/MM/yyyy HH:mm")
-                            .format(photoMarker.timestamp)
-                    }"
-                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-
-                    // Usa un'icona diversa per i marker delle foto (opzionale)
-                    icon = cameraIcon
-                }
-
-                photoMarkersRefs.add(marker)
-                mapView?.overlays?.add(marker)
+                polaroidMarkersRefs.add(photoMarker)
+                mapView?.overlays?.add(photoMarker)
                 //Log.w("Test", "Photo marker added successfully")
             }
 
