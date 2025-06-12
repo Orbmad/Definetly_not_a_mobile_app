@@ -3,6 +3,7 @@ package com.dambrofarne.eyeflush.data.repositories.imagestoring
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.Base64
 import android.util.Log
@@ -21,16 +22,38 @@ class ImgurImageStoringRepository(private val context: Context) : ImageStoringRe
     private val CLIENT_ID = BuildConfig.IMGUR_CLIENT_ID;
 
     override suspend fun uploadImage(uri: Uri): Result<String> {
-        return try {
-            val inputStream = context.contentResolver.openInputStream(uri)
-            val bitmap = BitmapFactory.decodeStream(inputStream)
-                ?: return Result.failure(Exception("Bitmap non valido."))
+        return withContext(Dispatchers.IO) {
+            try {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                    ?: return@withContext Result.failure(Exception("Bitmap non valido."))
 
-            val base64Image = encodeImageToBase64(bitmap)
-            uploadImageToImgur(base64Image)
+                val base64Image = encodeImageToBase64(bitmap)
+                uploadImageToImgur(base64Image)
 
-        } catch (e: Exception) {
-            Result.failure(e)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+
+    override suspend fun getDrawableImage(uri: Uri): Result<Drawable> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val inputStream = when (uri.scheme) {
+                    "http", "https" -> URL(uri.toString()).openStream()
+                    else -> context.contentResolver.openInputStream(uri)
+                } ?: return@withContext Result.failure(Exception("Impossibile aprire input stream per $uri"))
+
+                val drawable = Drawable.createFromStream(inputStream, uri.toString())
+                    ?: return@withContext Result.failure(Exception("Impossibile creare Drawable da $uri"))
+
+                Result.success(drawable)
+
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
         }
     }
 
