@@ -31,6 +31,7 @@ class ImgurImageStoringRepository(private val context: Context) : ImageStoringRe
 
                 uploadImage(bitmap)
             } catch (e: Exception) {
+                Log.w("ImageUpload", e);
                 Result.failure(e)
             }
         }
@@ -44,6 +45,7 @@ class ImgurImageStoringRepository(private val context: Context) : ImageStoringRe
 
                 uploadImage(bitmap)
             } catch (e: Exception) {
+                Log.w("ImageUpload", e);
                 Result.failure(e)
             }
         }
