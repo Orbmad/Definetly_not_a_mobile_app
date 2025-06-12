@@ -105,11 +105,8 @@ class HomeMapViewModel(
                 val drawable = imgRepo.getDrawableImage(Uri.parse(uri)).getOrNull()
                 return@runBlocking drawable ?: createDummyDrawable(Color.BLUE)
             }
-        } else {
-            return createDummyDrawable(Color.BLUE)
         }
-
-
+        return createDummyDrawable(Color.BLUE)
     }
 
 }
