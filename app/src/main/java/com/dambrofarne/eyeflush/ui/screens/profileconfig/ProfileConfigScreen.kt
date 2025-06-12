@@ -111,7 +111,7 @@ fun ProfileConfigScreen(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .offset(x = (-20).dp, y = (-20).dp)
-                    .clickable{ viewModel.onPickPhotoClick()}
+                    .clickable { viewModel.onPickPhotoClick() }
             )
         }
 
