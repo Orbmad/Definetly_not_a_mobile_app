@@ -23,7 +23,7 @@ import org.osmdroid.util.GeoPoint
 class HomeMapViewModel(
     private val db : DatabaseRepository,
     private val imgRepo: ImageStoringRepository,
-    private val auth : AuthRepository
+    //private val auth : AuthRepository
 ) : ViewModel() {
     private val _polaroidMarkers = MutableStateFlow<List<PolaroidMarker>>(emptyList())
     val polaroidMarkers: StateFlow<List<PolaroidMarker>> = _polaroidMarkers.asStateFlow()
@@ -89,7 +89,7 @@ class HomeMapViewModel(
                     id = marker.id,
                     position = marker.coordinates,
                     photoFrame = createPhotoFrame(marker.mostLikedPicURL),
-                    photoCount = 1, //TODO
+                    photoCount = marker.imagesCount,
                     name = marker.name,
                     mostLikedPicID = marker.mostLikedPicId
                 )

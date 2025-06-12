@@ -163,6 +163,7 @@ fun HomeMapScreen(
                 //Log.w("Test", "Current location marker updated")
             }
 
+            viewModel.loadPolaroidMarkers()
             mapView?.controller?.animateTo(location)
             mapView?.invalidate()
         }
@@ -179,7 +180,7 @@ fun HomeMapScreen(
             }
             polaroidMarkersRefs.clear()
 
-            viewModel.createDummyMarkers()
+            //viewModel.createDummyMarkers()
 
             // Aggiungi i nuovi marker delle foto
             polaroidMarkers.forEach { photoMarker ->
