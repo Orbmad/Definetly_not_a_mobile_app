@@ -1,11 +1,14 @@
 package com.dambrofarne.eyeflush.data.repositories.database
 
 import android.util.Log
+import com.dambrofarne.eyeflush.utils.getBoundingBox
+import com.dambrofarne.eyeflush.utils.isWithinRange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
+import org.osmdroid.util.GeoPoint
 
 class FirestoreDatabaseRepository(
     private val db: FirebaseFirestore = Firebase.firestore
@@ -103,5 +106,44 @@ class FirestoreDatabaseRepository(
             Log.e("UserRepo", "Errore recuperando username del profilo per $uId", e)
             ""
         }
+    }
+
+    override suspend fun getMarkersInRange(point: GeoPoint, rangeMeters: Int): List<Marker> {
+        return try {
+            val db = FirebaseFirestore.getInstance()
+
+            // Calcola bounding box (min/max lat/lng)
+            val boundingBox = getBoundingBox(point.latitude, point.longitude, rangeMeters)
+
+            val querySnapshot = db.collection("markers")
+                .whereGreaterThanOrEqualTo("latitude", boundingBox.minLat)
+                .whereLessThanOrEqualTo("latitude", boundingBox.maxLat)
+                .whereGreaterThanOrEqualTo("longitude", boundingBox.minLng)
+                .whereLessThanOrEqualTo("longitude", boundingBox.maxLng)
+                .get()
+                .await()
+
+            querySnapshot.documents.mapNotNull { doc ->
+                try {
+                    val raw = doc.toObject(MarkerRaw::class.java)
+                    raw?.let {
+                        val markerPoint = GeoPoint(it.latitude, it.longitude)
+                        if (isWithinRange(point, markerPoint, rangeMeters)) {
+                            it.toMarker().copy(id = doc.id)
+                        } else null
+                    }
+                } catch (e: Exception) {
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("dbRepo", "Errore recuperando i marker", e)
+            emptyList()
+        }
+    }
+
+
+    override suspend fun getNearestMarker(point: GeoPoint, range: Int) {
+        TODO("Not yet implemented")
     }
 }
