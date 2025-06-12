@@ -4,6 +4,7 @@ import android.util.Log
 import com.dambrofarne.eyeflush.utils.getBoundingBox
 import com.dambrofarne.eyeflush.utils.isWithinRange
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
@@ -19,7 +20,8 @@ class FirestoreDatabaseRepository(
 ) : DatabaseRepository {
     override suspend fun addUser(uId: String, username: String): Result<String> {
         val user = hashMapOf(
-            "username" to username
+            "username" to username,
+            "picsCount" to 0
         )
         return try {
             db.collection("users")
@@ -183,15 +185,18 @@ class FirestoreDatabaseRepository(
         }
     }
 
-    override suspend fun addImage(markerId: String, uId: String, timeStamp: LocalDateTime, imgURL : String): String {
+    override suspend fun addImage(
+        markerId: String,
+        uId: String,
+        timeStamp: LocalDateTime,
+        imgURL: String
+    ): String {
         return try {
-            // Converte LocalDateTime in Timestamp compatibile con Firestore
-            val timestamp = Timestamp(
-                Date.from(timeStamp.atZone(ZoneId.systemDefault()).toInstant())
-            )
+            val timestamp = Timestamp(Date.from(timeStamp.atZone(ZoneId.systemDefault()).toInstant()))
+            val pictureRef = db.collection("pictures").document()
 
             val newPicture = Picture(
-                id = "",
+                id = pictureRef.id,
                 uId = uId,
                 markerId = markerId,
                 url = imgURL,
@@ -199,16 +204,42 @@ class FirestoreDatabaseRepository(
                 likes = 0
             )
 
-            val docRef = db.collection("pictures")
-                .add(newPicture)
-                .await()
+            val pictureData = mapOf("id" to pictureRef.id, "url" to imgURL)
+            val userRef = db.collection("users").document(uId)
+            val markerRef = db.collection("markers").document(markerId)
 
-            docRef.id
+            db.runTransaction { transaction ->
+                // Salvo la nuova immagine
+                transaction.set(pictureRef, newPicture)
+
+                // Aggiorno l'utente
+                transaction.update(userRef, "picsCount", FieldValue.increment(1))
+                transaction.update(userRef, "picturesTaken", FieldValue.arrayUnion(pictureData))
+
+                // Recupero dati del marker
+                val markerSnap = transaction.get(markerRef)
+
+                val existingPics = markerSnap.get("picturesTaken") as? List<*>
+
+                // Se il marker non ha ancora immagini, aggiornio anche l'immagine più popolare
+                if (existingPics == null || existingPics.isEmpty()) {
+                    transaction.update(markerRef, mapOf(
+                        "picturesTaken" to FieldValue.arrayUnion(pictureData),
+                        "mostLikedPicId" to pictureRef.id,
+                        "mostLikedPicURL" to imgURL
+                    ))
+                } else {
+                    transaction.update(markerRef, "picturesTaken", FieldValue.arrayUnion(pictureData))
+                }
+            }.await()
+
+            pictureRef.id
 
         } catch (e: Exception) {
-            Log.e("dbRepo", "Errore aggiungendo immagine", e)
+            Log.e("dbRepo", "Errore nella transazione per aggiungere immagine", e)
             ""
         }
     }
+
 
 }
