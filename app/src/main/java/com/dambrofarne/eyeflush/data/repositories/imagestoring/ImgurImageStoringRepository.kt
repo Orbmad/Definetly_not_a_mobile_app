@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.net.URL
 import java.net.URLEncoder
 import javax.net.ssl.HttpsURLConnection
@@ -28,13 +29,29 @@ class ImgurImageStoringRepository(private val context: Context) : ImageStoringRe
                 val bitmap = BitmapFactory.decodeStream(inputStream)
                     ?: return@withContext Result.failure(Exception("Bitmap non valido."))
 
-                val base64Image = encodeImageToBase64(bitmap)
-                uploadImageToImgur(base64Image)
-
+                uploadImage(bitmap)
             } catch (e: Exception) {
                 Result.failure(e)
             }
         }
+    }
+
+    override suspend fun uploadImage(file: File): Result<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                    ?: return@withContext Result.failure(Exception("Bitmap non valido."))
+
+                uploadImage(bitmap)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    private suspend fun uploadImage(bitmap: Bitmap): Result<String> {
+        val base64Image = encodeImageToBase64(bitmap)
+        return uploadImageToImgur(base64Image)
     }
 
 

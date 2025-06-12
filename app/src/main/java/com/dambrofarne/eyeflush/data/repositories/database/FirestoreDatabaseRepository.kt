@@ -118,7 +118,7 @@ class FirestoreDatabaseRepository(
         return try {
             val db = FirebaseFirestore.getInstance()
 
-            // Calcola bounding box (min/max lat/lng)
+            // Calcolo bounding box (min/max lat/lng)
             val boundingBox = getBoundingBox(point.latitude, point.longitude, rangeMeters)
 
             val querySnapshot = db.collection("markers")
