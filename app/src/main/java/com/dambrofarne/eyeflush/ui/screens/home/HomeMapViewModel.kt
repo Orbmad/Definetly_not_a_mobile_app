@@ -100,13 +100,14 @@ class HomeMapViewModel(
     }
 
     private fun createPhotoFrame(uri: String?) : Drawable {
-        if (uri != null) {
+        return if (uri != null) {
             runBlocking {
-                val drawable = imgRepo.getDrawableImage(Uri.parse(uri)).getOrNull()
-                return@runBlocking drawable ?: createDummyDrawable(Color.BLUE)
+                imgRepo.getDrawableImage(Uri.parse(uri)).getOrElse {
+                    createDummyDrawable(Color.BLUE)
+                }
             }
+        } else {
+            createDummyDrawable(Color.BLUE)
         }
-        return createDummyDrawable(Color.BLUE)
     }
-
 }
