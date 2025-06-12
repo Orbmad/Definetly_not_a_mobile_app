@@ -114,6 +114,47 @@ class FirestoreDatabaseRepository(
         }
     }
 
+    override suspend fun getUserExtendedInfo(uId: String): Result<User> {
+        return try {
+            val snapshot = db.collection("users")
+                .document(uId)
+                .get()
+                .await()
+
+            if (!snapshot.exists()) {
+                return Result.failure(Exception("User con id $uId non trovato"))
+            }
+
+            val id = snapshot.id
+            val username = snapshot.getString("username")
+            val score = snapshot.getLong("imagesCount")?.toInt() ?: 0
+            val imagesCount = snapshot.getLong("imagesCount")?.toInt() ?: 0
+
+            val rawList = snapshot.get("picturesTaken") as? List<*>
+            val pictureRefs = rawList?.mapNotNull { item ->
+                if (item is Map<*, *>) {
+                    val itId = item["id"] as? String
+                    val itUrl = item["url"] as? String
+                    if (itId != null && itUrl != null) {
+                        PicQuickRef(picId = itId, url = itUrl)
+                    } else null
+                } else null
+            } ?: emptyList()
+
+            Result.success(
+                User(
+                    uId = id,
+                    username = username,
+                    score = score,
+                    imagesCount = imagesCount,
+                    picturesTaken = pictureRefs
+                )
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun getMarkersInRange(point: GeoPoint, rangeMeters: Int): List<Marker> {
         return try {
             val db = FirebaseFirestore.getInstance()
@@ -204,6 +245,8 @@ class FirestoreDatabaseRepository(
 
             val mostLikedPicId = snapshot.getString("mostLikedPicId")
             val mostLikedPicURL = snapshot.getString("mostLikedPicURL")
+            val mostLikedPicUserId= snapshot.getString("mostLikedPicUserId")
+            val mostLikedPicLikes= snapshot.getLong("mostLikedPicLikes")?.toInt() ?: 0
             val imagesCount = snapshot.getLong("imagesCount")?.toInt() ?: 0
 
             val rawList = snapshot.get("picturesTaken") as? List<*>
@@ -224,6 +267,8 @@ class FirestoreDatabaseRepository(
                     coordinates = coordinates,
                     mostLikedPicId = mostLikedPicId,
                     mostLikedPicURL = mostLikedPicURL,
+                    mostLikedPicUserId = mostLikedPicUserId,
+                    mostLikedPicLikes = mostLikedPicLikes,
                     imagesCount = imagesCount,
                     picturesTaken = pictureRefs
                 )
@@ -275,7 +320,9 @@ class FirestoreDatabaseRepository(
                     transaction.update(markerRef, mapOf(
                         "picturesTaken" to FieldValue.arrayUnion(pictureData),
                         "mostLikedPicId" to pictureRef.id,
-                        "mostLikedPicURL" to imgURL
+                        "mostLikedPicURL" to imgURL,
+                        "mostLikedPicUserId" to uId,
+                        "mostLikedPicLikes" to 0
                     ))
                 } else {
                     transaction.update(markerRef, "picturesTaken", FieldValue.arrayUnion(pictureData))

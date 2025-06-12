@@ -12,6 +12,7 @@ interface DatabaseRepository {
     suspend fun getUserImagePath(uId: String) : String
     suspend fun isUsernameTaken(username: String) : Boolean
     suspend fun getUsername(uId: String) : String
+    suspend fun getUserExtendedInfo(uId : String) : Result<User>
 
     //Markers
     suspend fun getMarkersInRange(point: GeoPoint, rangeMeters: Int) : List<Marker>
