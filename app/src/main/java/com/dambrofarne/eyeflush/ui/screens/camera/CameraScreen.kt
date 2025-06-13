@@ -8,7 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -24,36 +23,41 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.data.managers.camera.CameraState
-import com.dambrofarne.eyeflush.data.managers.location.LocationManager
+import com.dambrofarne.eyeflush.data.managers.location.LocationManagerImpl
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.BackButton
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CameraScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: CameraViewModel = koinViewModel<CameraViewModel>()
 ) {
-    val context = LocalContext.current
-    val cameraManager = remember { CameraManager(context) }
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
-    val locationManager = LocationManager(context)
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    val cameraState by viewModel.cameraManager.cameraState.collectAsState()
+    val capturedImage by viewModel.cameraManager.capturedImage.collectAsState()
 
     // Cleanup when leaving the screen
     DisposableEffect(Unit) {
         onDispose {
-            cameraManager.cleanup()
+            viewModel.cameraManager.cleanup()
         }
     }
 
     LaunchedEffect(Unit) {
         if (!cameraPermissionState.status.isGranted) {
             cameraPermissionState.launchPermissionRequest()
-            cameraManager.location = locationManager.getCurrentLocation()
         }
     }
 
@@ -66,13 +70,69 @@ fun CameraScreen(
             ) {
                 when {
                     cameraPermissionState.status.isGranted -> {
-                        CameraContent(
-                            cameraManager = cameraManager,
-                            onNavigateBack = { navController.navigate(EyeFlushRoute.Home) },
-                        )
+                        // Camera Content
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            // Camera Preview
+                            AndroidView(
+                                factory = { ctx ->
+                                    val previewView = PreviewView(ctx)
+                                    val executor = ContextCompat.getMainExecutor(ctx)
+                                    viewModel.cameraManager.initializeCamera(previewView, lifecycleOwner, executor)
+                                    previewView
+                                },
+                                modifier = Modifier.fillMaxSize()
+                            )
+
+                            // Overlay for borders 4:5
+                            CameraOverlay()
+
+                            // Back button
+                            BackButton(
+                                onClick = { navController.navigate(EyeFlushRoute.Home) },
+                                modifier = Modifier
+                                    .align(Alignment.TopStart)
+                                    .padding(16.dp)
+                                    .background(
+                                        MaterialTheme.colorScheme.primaryContainer,
+                                        CircleShape
+                                    )
+                            )
+
+                            // Capture button
+                            CaptureButton(
+                                cameraState = cameraState,
+                                onCapture = { viewModel.cameraManager.capturePhoto() },
+                                modifier = Modifier
+                                    .size(124.dp)
+                                    .align(Alignment.BottomCenter)
+                                    .padding(16.dp)
+                            )
+                        }
+
+                        // Confirm dialog
+                        if (cameraState == CameraState.PHOTO_CAPTURED && capturedImage != null) {
+                            PhotoConfirmationDialog(
+                                onConfirm = {
+                                    viewModel.cameraManager.confirmPhoto()?.let { file ->
+                                        viewModel.viewModelScope.launch {
+                                            viewModel.savePhoto(file)
+                                            navController.navigate(EyeFlushRoute.Home)
+                                        }
+                                        // Decide if navigate back is inside coroutine
+                                    }
+                                },
+                                onRetry = {
+                                    viewModel.cameraManager.retryPhoto()
+                                },
+                                onDismiss = {
+                                    viewModel.cameraManager.retryPhoto()
+                                }
+                            )
+                        }
                     }
 
                     else -> {
+                        // Permission Denied Content
                         PermissionDeniedContent(onNavigateBack = {
                             navController.navigate(
                                 EyeFlushRoute.Home
@@ -83,74 +143,6 @@ fun CameraScreen(
             }
         }
     )
-}
-
-@Composable
-private fun CameraContent(
-    cameraManager: CameraManager,
-    onNavigateBack: () -> Unit
-) {
-    val context = LocalContext.current
-    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
-
-    val cameraState by cameraManager.cameraState.collectAsState()
-    val capturedImage by cameraManager.capturedImage.collectAsState()
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Camera Preview
-        AndroidView(
-            factory = { ctx ->
-                val previewView = PreviewView(ctx)
-                val executor = ContextCompat.getMainExecutor(ctx)
-                cameraManager.initializeCamera(previewView, lifecycleOwner, executor)
-                previewView
-            },
-            modifier = Modifier.fillMaxSize()
-        )
-
-        // Overlay for borders 4:5
-        CameraOverlay()
-
-        // Back button
-        BackButton(
-            onClick = onNavigateBack,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(16.dp)
-                .background(
-                    MaterialTheme.colorScheme.primaryContainer,
-                    CircleShape
-                )
-        )
-
-        // Capture button
-        CaptureButton(
-            cameraState = cameraState,
-            onCapture = { cameraManager.capturePhoto() },
-            modifier = Modifier
-                .size(124.dp)
-                .align(Alignment.BottomCenter)
-                .padding(16.dp)
-        )
-    }
-
-    // Confirm dialog
-    if (cameraState == CameraState.PHOTO_CAPTURED && capturedImage != null) {
-        PhotoConfirmationDialog(
-            onConfirm = {
-                cameraManager.confirmPhoto()?.let { file ->
-                    cameraManager.savePhoto(file)
-                    onNavigateBack()
-                }
-            },
-            onRetry = {
-                cameraManager.retryPhoto()
-            },
-            onDismiss = {
-                cameraManager.retryPhoto()
-            }
-        )
-    }
 }
 
 @Composable

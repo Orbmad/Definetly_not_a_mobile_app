@@ -10,6 +10,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dambrofarne.eyeflush.data.managers.location.LocationManager
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
 import com.dambrofarne.eyeflush.data.repositories.database.DatabaseRepository
 import com.dambrofarne.eyeflush.data.repositories.database.Marker
@@ -24,6 +25,7 @@ import org.osmdroid.util.GeoPoint
 class HomeMapViewModel(
     private val db : DatabaseRepository,
     private val imgRepo: ImageStoringRepository,
+    val locationManager: LocationManager
     //private val auth : AuthRepository
 ) : ViewModel() {
     private val _polaroidMarkers = MutableStateFlow<List<PolaroidMarker>>(emptyList())
