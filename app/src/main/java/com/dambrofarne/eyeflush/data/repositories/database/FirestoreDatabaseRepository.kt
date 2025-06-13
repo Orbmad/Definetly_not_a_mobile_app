@@ -136,7 +136,9 @@ class FirestoreDatabaseRepository(
                     val itId = item["id"] as? String
                     val itUrl = item["url"] as? String
                     if (itId != null && itUrl != null) {
-                        PicQuickRef(picId = itId, url = itUrl)
+                        val liked = hasUserLiked(uId, itId)
+                        val likes = getPictureLikes(itId)
+                        PicQuickRef(picId = itId, url = itUrl, liked = liked, likes = likes)
                     } else null
                 } else null
             } ?: emptyList()
@@ -189,25 +191,7 @@ class FirestoreDatabaseRepository(
         }
     }
 
-    override suspend fun addMarker(point: GeoPoint): String {
-        return try {
-            val newMarker = MarkerRaw(
-                latitude = point.latitude,
-                longitude = point.longitude
-            )
-
-            val docRef = db.collection("markers")
-                .add(newMarker)
-                .await()
-            docRef.id
-
-        } catch (e: Exception) {
-            Log.e("dbRepo", "Errore aggiungendo marker", e)
-            ""
-        }
-    }
-
-    override suspend fun addMarker(point: GeoPoint, name: String): String {
+    override suspend fun addMarker(point: GeoPoint, name: String?): String {
         return try {
             val newMarker = MarkerRaw(
                 latitude = point.latitude,
@@ -226,7 +210,7 @@ class FirestoreDatabaseRepository(
         }
     }
 
-    override suspend fun getMarkerExtendedInfo(markerId: String): Result<ExtendedMarker> {
+    override suspend fun getMarkerExtendedInfo(markerId: String, requesterUId: String): Result<ExtendedMarker> {
         return try {
             val snapshot = db.collection("markers")
                 .document(markerId)
@@ -245,8 +229,8 @@ class FirestoreDatabaseRepository(
 
             val mostLikedPicId = snapshot.getString("mostLikedPicId")
             val mostLikedPicURL = snapshot.getString("mostLikedPicURL")
-            val mostLikedPicUserId= snapshot.getString("mostLikedPicUserId")
-            val mostLikedPicLikes= snapshot.getLong("mostLikedPicLikes")?.toInt() ?: 0
+            val mostLikedPicUserId = snapshot.getString("mostLikedPicUserId")
+            val mostLikedPicLikes = snapshot.getLong("mostLikedPicLikes")?.toInt() ?: 0
             val imagesCount = snapshot.getLong("imagesCount")?.toInt() ?: 0
 
             val rawList = snapshot.get("picturesTaken") as? List<*>
@@ -255,7 +239,9 @@ class FirestoreDatabaseRepository(
                     val itId = item["id"] as? String
                     val itUrl = item["url"] as? String
                     if (itId != null && itUrl != null) {
-                        PicQuickRef(picId = itId, url = itUrl)
+                        val liked = hasUserLiked(requesterUId, itId)
+                        val likes = getPictureLikes(itId)
+                        PicQuickRef(picId = itId, url = itUrl, liked = liked, likes = likes)
                     } else null
                 } else null
             } ?: emptyList()
@@ -298,7 +284,9 @@ class FirestoreDatabaseRepository(
                 likes = 0
             )
 
-            val pictureData = mapOf("id" to pictureRef.id, "url" to imgURL)
+            val pictureData = mapOf(
+                "id" to pictureRef.id,
+                "url" to imgURL)
             val userRef = db.collection("users").document(uId)
             val markerRef = db.collection("markers").document(markerId)
 
@@ -337,5 +325,68 @@ class FirestoreDatabaseRepository(
         }
     }
 
+    override suspend fun likeImage(uId: String, picId: String): Result<String> {
+        return try {
+            val userDocRef = db.collection("users").document(uId)
+            val imageDocRef = db.collection("images").document(picId)
 
+            val snapshot = userDocRef.get().await()
+
+            if (snapshot.exists()) {
+                val rawLikes = snapshot.get("likes") as? List<*>
+                val likes = rawLikes?.filterIsInstance<String>()?.toMutableList() ?: mutableListOf()
+
+                if (!likes.contains(picId)) {
+                    likes.add(picId)
+                    userDocRef.update("likes", likes).await()
+                    imageDocRef.update("likes", FieldValue.increment(1)).await()
+                }
+            } else {
+                userDocRef.set(mapOf("likes" to listOf(picId))).await()
+                imageDocRef.update("likes", FieldValue.increment(1)).await()
+            }
+
+            Result.success("Operazione completata")
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun hasUserLiked(uId: String, picId: String): Boolean {
+        return try {
+            val snapshot = db
+                .collection("users")
+                .document(uId)
+                .get()
+                .await()
+
+            if (snapshot.exists()) {
+                val rawLikes = snapshot.get("likes") as? List<*>
+                val likes = rawLikes?.filterIsInstance<String>()
+                likes?.contains(picId) == true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    private suspend fun getPictureLikes(picId: String): Int {
+        return try {
+            val imageDoc = db
+                .collection("images")
+                .document(picId)
+                .get()
+                .await()
+
+            if (imageDoc.exists()) {
+                imageDoc.getLong("likes")?.toInt() ?: 0
+            } else {
+                0
+            }
+        } catch (e: Exception) {
+            0
+        }
+    }
 }
