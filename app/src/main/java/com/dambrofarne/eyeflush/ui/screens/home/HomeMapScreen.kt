@@ -42,8 +42,6 @@ fun HomeMapScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val locationManager = remember { LocationManagerImpl(context) }
-
     // Initialize OSMDroid configuration
     LaunchedEffect(Unit) {
         Configuration.getInstance().userAgentValue = context.packageName
@@ -110,7 +108,7 @@ fun HomeMapScreen(
             permissionsState.launchMultiplePermissionRequest()
         } else {
             // Get current location
-            locationManager.getCurrentLocation()?.let { location ->
+            viewModel.locationManager.getCurrentLocation()?.let { location ->
                 viewModel.updateCurrentLocation(location)
                 mapView?.controller?.setCenter(location)
                 mapView?.controller?.setZoom(defaultZoom)
@@ -121,7 +119,7 @@ fun HomeMapScreen(
     // Starting Location Listener
     LaunchedEffect(Unit) {
         if (permissionsState.allPermissionsGranted) {
-            locationManager.startLocationUpdates { geoPoint ->
+            viewModel.locationManager.startLocationUpdates { geoPoint ->
                 viewModel.updateCurrentLocation(geoPoint)
                 viewModel.loadPolaroidMarkers()
             }
@@ -267,7 +265,7 @@ fun HomeMapScreen(
                     FloatingActionButton(
                         onClick = {
                             scope.launch {
-                                val location = locationManager.getCurrentLocation()
+                                val location = viewModel.locationManager.getCurrentLocation()
                                 location?.let {
                                     viewModel.updateCurrentLocation(it)
                                     mapView?.controller?.animateTo(it)
