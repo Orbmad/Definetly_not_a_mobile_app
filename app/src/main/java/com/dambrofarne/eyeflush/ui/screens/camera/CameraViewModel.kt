@@ -79,7 +79,7 @@ class CameraViewModel (
 
     private fun createNewMarker(location: GeoPoint): String{
         val markerId = runBlocking {
-            db.addMarker(location)
+            db.addMarker(location, null)
         }
         return markerId
     }
