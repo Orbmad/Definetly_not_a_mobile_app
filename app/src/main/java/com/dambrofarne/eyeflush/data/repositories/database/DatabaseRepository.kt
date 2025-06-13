@@ -16,10 +16,14 @@ interface DatabaseRepository {
 
     //Markers
     suspend fun getMarkersInRange(point: GeoPoint, rangeMeters: Int) : List<Marker>
-    suspend fun addMarker(point: GeoPoint) : String
-    suspend fun addMarker(point: GeoPoint, name: String) : String
-    suspend fun getMarkerExtendedInfo(markerId : String) : Result<ExtendedMarker>
+    suspend fun addMarker(point: GeoPoint, name: String?) : String
+    suspend fun getMarkerExtendedInfo(
+        markerId : String,
+        requesterUId: String) //The id of the user viewing the marker page, used to display its likes
+    : Result<ExtendedMarker>
 
     //Pictures
     suspend fun addImage(markerId : String, uId : String, timeStamp : LocalDateTime, imgURL : String) : String
+    suspend fun likeImage(uId: String, picId : String) : Result<String>
+    suspend fun hasUserLiked(uId: String, picId: String): Boolean
 }

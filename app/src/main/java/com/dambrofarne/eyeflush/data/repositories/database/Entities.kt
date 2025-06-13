@@ -41,6 +41,8 @@ data class MarkerRaw(
 data class PicQuickRef(
     val picId : String = "",
     val url : String = "",
+    val liked : Boolean = false,
+    val likes : Int = 0
 )
 
 data class ExtendedMarker(
