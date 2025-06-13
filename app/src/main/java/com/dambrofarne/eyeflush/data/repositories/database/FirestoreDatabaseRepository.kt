@@ -141,7 +141,7 @@ class FirestoreDatabaseRepository(
                         PicQuickRef(picId = itId, url = itUrl, liked = liked, likes = likes)
                     } else null
                 } else null
-            } ?: emptyList()
+            }?.sortedByDescending { it.likes } ?: emptyList()
 
             Result.success(
                 User(
@@ -244,7 +244,7 @@ class FirestoreDatabaseRepository(
                         PicQuickRef(picId = itId, url = itUrl, liked = liked, likes = likes)
                     } else null
                 } else null
-            } ?: emptyList()
+            }?.sortedByDescending { it.likes } ?: emptyList()
 
             Result.success(
                 ExtendedMarker(
