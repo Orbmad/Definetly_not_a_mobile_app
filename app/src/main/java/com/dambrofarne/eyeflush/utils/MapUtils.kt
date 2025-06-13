@@ -1,5 +1,6 @@
 package com.dambrofarne.eyeflush.utils
 
+import com.dambrofarne.eyeflush.data.repositories.database.Marker
 import com.dambrofarne.eyeflush.ui.screens.home.PolaroidMarker
 import org.osmdroid.util.GeoPoint
 import kotlin.math.atan2
@@ -76,33 +77,33 @@ fun isWithinRange(p1: GeoPoint, p2: GeoPoint, rangeMeters: Int): Boolean {
 }
 
 fun findNearestMarkerInRadius(
-    polaroidMarkersList: List<PolaroidMarker>,
+    markersList: List<Marker>,
     location: GeoPoint,
     radiusInMeters: Double
-) : GeoPoint? {
+) : Marker? {
 
-    if (polaroidMarkersList.isEmpty()) return null
+    if (markersList.isEmpty()) return null
 
-    var nearestGeoPoint: GeoPoint = polaroidMarkersList[0].getPosition()
-    var lowerDistance: Double = locationMetersDistance(nearestGeoPoint, location)
+    var nearestMarker: Marker = markersList[0]
+    var lowerDistance: Double = locationMetersDistance(nearestMarker.coordinates, location)
     var distance = lowerDistance
-    var markerPos: GeoPoint
+    var tempMarker: Marker
     var foundFlag = false
 
-    polaroidMarkersList.forEach { marker ->
-        markerPos = marker.getPosition()
-        if (isLocationInRadius(markerPos, location, radiusInMeters)) {
-            distance = locationMetersDistance(markerPos, location)
+    markersList.forEach { marker ->
+        tempMarker = marker
+        if (isLocationInRadius(tempMarker.coordinates, location, radiusInMeters)) {
+            distance = locationMetersDistance(tempMarker.coordinates, location)
             foundFlag = true
             if (distance < lowerDistance) {
                 lowerDistance = distance
-                nearestGeoPoint = markerPos
+                nearestMarker = tempMarker
             }
         }
     }
 
     return if (foundFlag) {
-        nearestGeoPoint
+        nearestMarker
     } else {
         null
     }

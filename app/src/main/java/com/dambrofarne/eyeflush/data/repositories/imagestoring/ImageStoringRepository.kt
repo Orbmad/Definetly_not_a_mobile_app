@@ -8,4 +8,5 @@ interface ImageStoringRepository {
     suspend fun uploadImage(uri: Uri): Result<String>
     suspend fun uploadImage(file: File): Result<String>
     suspend fun getDrawableImage(uri : Uri): Result<Drawable>
+    suspend fun uploadCroppedImage(file: File): Result<String>
 }

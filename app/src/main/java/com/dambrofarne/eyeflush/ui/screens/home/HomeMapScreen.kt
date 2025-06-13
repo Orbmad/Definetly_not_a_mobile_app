@@ -16,8 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.R
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
-import com.dambrofarne.eyeflush.data.managers.location.LocationManager
-import com.dambrofarne.eyeflush.ui.composables.BackButton
+import com.dambrofarne.eyeflush.data.managers.location.LocationManagerImpl
 import com.dambrofarne.eyeflush.ui.composables.CameraButton
 import com.dambrofarne.eyeflush.ui.composables.CustomTopBar
 import com.dambrofarne.eyeflush.ui.composables.ProfileIcon
@@ -42,8 +41,6 @@ fun HomeMapScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-
-    val locationManager = remember { LocationManager(context) }
 
     // Initialize OSMDroid configuration
     LaunchedEffect(Unit) {
@@ -111,7 +108,7 @@ fun HomeMapScreen(
             permissionsState.launchMultiplePermissionRequest()
         } else {
             // Get current location
-            locationManager.getCurrentLocation()?.let { location ->
+            viewModel.locationManager.getCurrentLocation()?.let { location ->
                 viewModel.updateCurrentLocation(location)
                 mapView?.controller?.setCenter(location)
                 mapView?.controller?.setZoom(defaultZoom)
@@ -122,7 +119,7 @@ fun HomeMapScreen(
     // Starting Location Listener
     LaunchedEffect(Unit) {
         if (permissionsState.allPermissionsGranted) {
-            locationManager.startLocationUpdates { geoPoint ->
+            viewModel.locationManager.startLocationUpdates { geoPoint ->
                 viewModel.updateCurrentLocation(geoPoint)
                 viewModel.loadPolaroidMarkers()
             }
@@ -268,7 +265,7 @@ fun HomeMapScreen(
                     FloatingActionButton(
                         onClick = {
                             scope.launch {
-                                val location = locationManager.getCurrentLocation()
+                                val location = viewModel.locationManager.getCurrentLocation()
                                 location?.let {
                                     viewModel.updateCurrentLocation(it)
                                     mapView?.controller?.animateTo(it)

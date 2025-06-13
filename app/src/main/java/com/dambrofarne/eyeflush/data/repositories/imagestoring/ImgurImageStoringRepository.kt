@@ -8,6 +8,7 @@ import android.net.Uri
 import android.util.Base64
 import android.util.Log
 import com.dambrofarne.eyeflush.BuildConfig
+import com.dambrofarne.eyeflush.utils.cropToCenterAspectRatio
 import com.google.api.LogProto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -44,6 +45,21 @@ class ImgurImageStoringRepository(private val context: Context) : ImageStoringRe
                     ?: return@withContext Result.failure(Exception("Bitmap non valido."))
 
                 uploadImage(bitmap)
+            } catch (e: Exception) {
+                Log.w("ImageUpload", e);
+                Result.failure(e)
+            }
+        }
+    }
+
+    override suspend fun uploadCroppedImage(file: File): Result<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                    ?: return@withContext Result.failure(Exception("Bitmap non valido."))
+
+                val cropped = cropToCenterAspectRatio(bitmap, 4f / 5f)
+                uploadImage(cropped)
             } catch (e: Exception) {
                 Log.w("ImageUpload", e);
                 Result.failure(e)
