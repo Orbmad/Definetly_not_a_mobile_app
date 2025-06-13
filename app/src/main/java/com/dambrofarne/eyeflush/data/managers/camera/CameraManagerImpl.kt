@@ -27,10 +27,10 @@ class CameraManagerImpl(
     private val imageStoring = ImgurImageStoringRepository(context)
 
     private val _cameraState = MutableStateFlow(CameraState.IDLE)
-    val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
+    override val cameraState: StateFlow<CameraState> = _cameraState.asStateFlow()
 
     private val _capturedImage = MutableStateFlow<File?>(null)
-    val capturedImage: StateFlow<File?> = _capturedImage.asStateFlow()
+    override val capturedImage: StateFlow<File?> = _capturedImage.asStateFlow()
 
     override fun initializeCamera(
         previewView: PreviewView,
