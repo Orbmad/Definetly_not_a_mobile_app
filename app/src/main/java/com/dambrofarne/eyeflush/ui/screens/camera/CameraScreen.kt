@@ -8,7 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -26,22 +25,23 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.data.managers.camera.CameraState
-import com.dambrofarne.eyeflush.data.managers.location.LocationManager
+import com.dambrofarne.eyeflush.data.managers.location.LocationManagerImpl
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.BackButton
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CameraScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: CameraViewModel = koinViewModel<CameraViewModel>()
 ) {
     val context = LocalContext.current
-    val cameraManager = remember { CameraManager(context) }
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
-    val locationManager = LocationManager(context)
+    val locationManager = LocationManagerImpl(context)
 
     // Cleanup when leaving the screen
     DisposableEffect(Unit) {
@@ -53,7 +53,14 @@ fun CameraScreen(
     LaunchedEffect(Unit) {
         if (!cameraPermissionState.status.isGranted) {
             cameraPermissionState.launchPermissionRequest()
+        }
+    }
+
+    LaunchedEffect(cameraPermissionState.status) {
+        if (cameraPermissionState.status.isGranted) {
             cameraManager.location = locationManager.getCurrentLocation()
+        } else {
+            cameraPermissionState.launchPermissionRequest()
         }
     }
 

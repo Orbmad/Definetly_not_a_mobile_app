@@ -16,8 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.R
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
-import com.dambrofarne.eyeflush.data.managers.location.LocationManager
-import com.dambrofarne.eyeflush.ui.composables.BackButton
+import com.dambrofarne.eyeflush.data.managers.location.LocationManagerImpl
 import com.dambrofarne.eyeflush.ui.composables.CameraButton
 import com.dambrofarne.eyeflush.ui.composables.CustomTopBar
 import com.dambrofarne.eyeflush.ui.composables.ProfileIcon
@@ -43,7 +42,7 @@ fun HomeMapScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val locationManager = remember { LocationManager(context) }
+    val locationManager = remember { LocationManagerImpl(context) }
 
     // Initialize OSMDroid configuration
     LaunchedEffect(Unit) {

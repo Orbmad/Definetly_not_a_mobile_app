@@ -1,12 +1,17 @@
 package com.dambrofarne.eyeflush
 
 
+import com.dambrofarne.eyeflush.data.managers.camera.CameraManager
+import com.dambrofarne.eyeflush.data.managers.camera.CameraManagerImpl
+import com.dambrofarne.eyeflush.data.managers.location.LocationManager
+import com.dambrofarne.eyeflush.data.managers.location.LocationManagerImpl
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
 import com.dambrofarne.eyeflush.data.repositories.auth.FirebaseAuthRepository
 import com.dambrofarne.eyeflush.data.repositories.database.DatabaseRepository
 import com.dambrofarne.eyeflush.data.repositories.database.FirestoreDatabaseRepository
 import com.dambrofarne.eyeflush.data.repositories.imagestoring.ImageStoringRepository
 import com.dambrofarne.eyeflush.data.repositories.imagestoring.ImgurImageStoringRepository
+import com.dambrofarne.eyeflush.ui.screens.camera.CameraViewModel
 import com.dambrofarne.eyeflush.ui.screens.home.HomeMapViewModel
 import com.dambrofarne.eyeflush.ui.screens.profile.ProfileViewModel
 import com.dambrofarne.eyeflush.ui.screens.profileconfig.ProfileConfigViewModel
@@ -25,6 +30,8 @@ val appModule = module {
     single<AuthRepository> { FirebaseAuthRepository(get()) }
     single<DatabaseRepository> { FirestoreDatabaseRepository(get())}
     single<ImageStoringRepository> { ImgurImageStoringRepository(get()) }
+    single<CameraManager> { CameraManagerImpl(get()) }
+    single<LocationManager> { LocationManagerImpl(get()) }
 
     viewModel { SignInViewModel(get(),get()) }
     viewModel { SignUpViewModel(get(), get()) }
@@ -32,4 +39,5 @@ val appModule = module {
     viewModel { ProfileConfigViewModel(get(),get(),get())}
     viewModel { HomeMapViewModel(get(), get())}
     viewModel { ProfileViewModel(get(),get()) }
+    viewModel { CameraViewModel(get(), get(), get(), get()) }
 }
