@@ -4,8 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.dambrofarne.eyeflush.ui.screens.camera.CameraScreen
 import com.dambrofarne.eyeflush.ui.screens.home.HomeMapScreen
+import com.dambrofarne.eyeflush.ui.screens.markerOverview.MarkerOverviewScreen
 import com.dambrofarne.eyeflush.ui.screens.profile.ProfileScreen
 import com.dambrofarne.eyeflush.ui.screens.profileconfig.ProfileConfigScreen
 import com.dambrofarne.eyeflush.ui.screens.signin.SignInScreen
@@ -23,6 +25,7 @@ sealed interface EyeFlushRoute {
     @Serializable data object ProfileConfig : EyeFlushRoute
     @Serializable data object Profile : EyeFlushRoute
     @Serializable data object Camera: EyeFlushRoute
+    @Serializable data class MarkerOverview(val markerId : String) : EyeFlushRoute
 }
 
 @Composable
@@ -57,6 +60,12 @@ fun EyeFlushNavGraph(navController: NavHostController) {
 
         composable<EyeFlushRoute.Camera> {
             CameraScreen(navController)
+        }
+
+        composable<EyeFlushRoute.MarkerOverview>{ backStackEntry ->
+            val route = backStackEntry.toRoute<EyeFlushRoute.MarkerOverview>()
+            val markerId = route.markerId
+            MarkerOverviewScreen(navController,markerId)
         }
     }
 
