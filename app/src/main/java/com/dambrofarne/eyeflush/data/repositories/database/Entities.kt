@@ -2,6 +2,7 @@ package com.dambrofarne.eyeflush.data.repositories.database
 
 import com.google.firebase.Timestamp
 import org.osmdroid.util.GeoPoint
+import java.time.LocalDateTime
 
 
 data class Marker(
@@ -53,6 +54,9 @@ data class ExtendedMarker(
     val mostLikedPicURL: String?,
     val mostLikedPicUserId : String ?,
     val mostLikedPicLikes : Int ?,
+    val mostLikedPicUserImage : String ?,
+    val mostLikedPicUsername : String ?,
+    val mostLikedPicTimeStamp : String ?,
     val imagesCount : Int,
     val picturesTaken : List<PicQuickRef>
 )

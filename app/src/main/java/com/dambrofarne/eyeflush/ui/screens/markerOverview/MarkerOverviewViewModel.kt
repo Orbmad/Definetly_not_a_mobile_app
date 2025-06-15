@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
+import java.time.LocalDateTime
 
 data class MarkerOverviewUiState(
     val id: String = "",
@@ -19,6 +20,9 @@ data class MarkerOverviewUiState(
     val mostLikedPicId: String? = null,
     val mostLikedPicURL: String? = null,
     val mostLikedPicUserId: String? = null,
+    val mostLikedPicUserImage: String? = null,
+    val mostLikedPicUsername: String? = null,
+    val mostLikedPicTimeStamp : String? = null,
     val mostLikedPicLikes: Int = 0,
     val imagesCount: Int = 0,
     val picturesTaken: List<PicQuickRef> = emptyList(),
@@ -55,6 +59,8 @@ class MarkerOverviewViewModel(
                     mostLikedPicURL = marker.mostLikedPicURL,
                     mostLikedPicUserId = marker.mostLikedPicUserId,
                     mostLikedPicLikes = marker.mostLikedPicLikes ?: 0,
+                    mostLikedPicUserImage = marker.mostLikedPicUserImage,
+                    mostLikedPicUsername =  marker.mostLikedPicUsername,
                     imagesCount = marker.imagesCount,
                     picturesTaken = marker.picturesTaken,
                     isLoading = false

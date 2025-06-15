@@ -7,12 +7,14 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import org.osmdroid.util.GeoPoint
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Date
 
 class FirestoreDatabaseRepository(
@@ -210,7 +212,10 @@ class FirestoreDatabaseRepository(
         }
     }
 
-    override suspend fun getMarkerExtendedInfo(markerId: String, requesterUId: String): Result<ExtendedMarker> {
+    override suspend fun getMarkerExtendedInfo(
+        markerId: String,
+        requesterUId: String
+    ): Result<ExtendedMarker> {
         return try {
             val snapshot = db.collection("markers")
                 .document(markerId)
@@ -246,6 +251,10 @@ class FirestoreDatabaseRepository(
                 } else null
             }?.sortedByDescending { it.likes } ?: emptyList()
 
+            val mostLikedPicUserImage = mostLikedPicUserId?.let { getUserImagePath(it) }
+            val mostLikedPicUsername = mostLikedPicUserId?.let { getUsername(it) }
+            val mostLikedPicTimeStamp = mostLikedPicId?.let { getFormattedImageDate(it) }
+
             Result.success(
                 ExtendedMarker(
                     id = id,
@@ -255,6 +264,9 @@ class FirestoreDatabaseRepository(
                     mostLikedPicURL = mostLikedPicURL,
                     mostLikedPicUserId = mostLikedPicUserId,
                     mostLikedPicLikes = mostLikedPicLikes,
+                    mostLikedPicUserImage = mostLikedPicUserImage,
+                    mostLikedPicUsername = mostLikedPicUsername,
+                    mostLikedPicTimeStamp = mostLikedPicTimeStamp,
                     imagesCount = imagesCount,
                     picturesTaken = pictureRefs
                 )
@@ -272,7 +284,8 @@ class FirestoreDatabaseRepository(
         imgURL: String
     ): String {
         return try {
-            val timestamp = Timestamp(Date.from(timeStamp.atZone(ZoneId.systemDefault()).toInstant()))
+            val timestamp =
+                Timestamp(Date.from(timeStamp.atZone(ZoneId.systemDefault()).toInstant()))
             val pictureRef = db.collection("pictures").document()
 
             val newPicture = Picture(
@@ -286,7 +299,8 @@ class FirestoreDatabaseRepository(
 
             val pictureData = mapOf(
                 "id" to pictureRef.id,
-                "url" to imgURL)
+                "url" to imgURL
+            )
             val userRef = db.collection("users").document(uId)
             val markerRef = db.collection("markers").document(markerId)
 
@@ -305,15 +319,21 @@ class FirestoreDatabaseRepository(
 
                 // Se il marker non ha ancora immagini, aggiornio anche l'immagine più popolare
                 if (existingPics == null || existingPics.isEmpty()) {
-                    transaction.update(markerRef, mapOf(
-                        "picturesTaken" to FieldValue.arrayUnion(pictureData),
-                        "mostLikedPicId" to pictureRef.id,
-                        "mostLikedPicURL" to imgURL,
-                        "mostLikedPicUserId" to uId,
-                        "mostLikedPicLikes" to 0
-                    ))
+                    transaction.update(
+                        markerRef, mapOf(
+                            "picturesTaken" to FieldValue.arrayUnion(pictureData),
+                            "mostLikedPicId" to pictureRef.id,
+                            "mostLikedPicURL" to imgURL,
+                            "mostLikedPicUserId" to uId,
+                            "mostLikedPicLikes" to 0
+                        )
+                    )
                 } else {
-                    transaction.update(markerRef, "picturesTaken", FieldValue.arrayUnion(pictureData))
+                    transaction.update(
+                        markerRef,
+                        "picturesTaken",
+                        FieldValue.arrayUnion(pictureData)
+                    )
                 }
             }.await()
 
@@ -387,6 +407,25 @@ class FirestoreDatabaseRepository(
             }
         } catch (e: Exception) {
             0
+        }
+    }
+
+    private suspend fun getFormattedImageDate(picId: String): String {
+        return try {
+            val imageDoc = db
+                .collection("images")
+                .document(picId)
+                .get()
+                .await()
+
+            val timestamp = imageDoc.getTimestamp("timestamp")
+            timestamp?.toDate()?.toInstant()?.let { instant ->
+                val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+                val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")
+                localDateTime.format(formatter)
+            } ?: "Data non disponibile"
+        } catch (e: Exception) {
+            "Data non disponibile"
         }
     }
 }
