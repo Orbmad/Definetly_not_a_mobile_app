@@ -1,5 +1,6 @@
 package com.dambrofarne.eyeflush.ui.composables
 
+import android.content.res.Resources.Theme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,4 +42,12 @@ fun PageTitle(text: String) {
             color = colors.primary
         )
     }
+}
+
+@Composable
+fun ImageLabel(text: String){
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelLarge
+    )
 }

@@ -40,10 +40,17 @@ class FirestoreDatabaseRepository(
 
     override suspend fun addUser(uId: String): Result<String> {
         return try {
+            val initialUserData = mapOf(
+                "likes" to emptyList<String>(),
+                "picsCount" to 0,
+                "picturesTaken" to emptyList<Map<String, String>>()
+            )
+
             db.collection("users")
                 .document(uId)
-                .set(emptyMap<String, Any>())
+                .set(initialUserData)
                 .await()
+
             Result.success("Utente creato correttamente.")
         } catch (e: Exception) {
             Log.e("Firestore", "Errore creando documento utente per $uId", e)
@@ -244,6 +251,9 @@ class FirestoreDatabaseRepository(
             val mostLikedPicUserId = snapshot.getString("mostLikedPicUserId")
             val mostLikedPicLikes = snapshot.getLong("mostLikedPicLikes")?.toInt() ?: 0
             val imagesCount = snapshot.getLong("imagesCount")?.toInt() ?: 0
+            val mostLikedPicTimeStamp = snapshot
+                .getTimestamp("mostLikedPicTimeStamp")
+                ?.let { getFormattedImageDate(it) } ?: "Data sconosciuta"
 
             val rawList = snapshot.get("picturesTaken") as? List<*>
             val pictureRefs = rawList?.mapNotNull { item ->
@@ -260,7 +270,6 @@ class FirestoreDatabaseRepository(
 
             val mostLikedPicUserImage = mostLikedPicUserId?.let { getUserImagePath(it) }
             val mostLikedPicUsername = mostLikedPicUserId?.let { getUsername(it) }
-            val mostLikedPicTimeStamp = mostLikedPicId?.let { getFormattedImageDate(it) }
 
             Result.success(
                 ExtendedMarker(
@@ -351,29 +360,45 @@ class FirestoreDatabaseRepository(
         }
     }
 
-    override suspend fun likeImage(uId: String, picId: String): Result<String> {
+    override suspend fun likeImage(uId: String, picId: String): Result<Boolean> {
         return try {
+            Log.w("Likes","Inizio prcoedura")
             val userDocRef = db.collection("users").document(uId)
-            val imageDocRef = db.collection("images").document(picId)
+            val imageDocRef = db.collection("pictures").document(picId)
 
             val snapshot = userDocRef.get().await()
+
+            var liked = false
 
             if (snapshot.exists()) {
                 val rawLikes = snapshot.get("likes") as? List<*>
                 val likes = rawLikes?.filterIsInstance<String>()?.toMutableList() ?: mutableListOf()
 
-                if (!likes.contains(picId)) {
+                if (likes.contains(picId)) {
+                    // Rimuovi like
+                    likes.remove(picId)
+                    userDocRef.update("likes", likes).await()
+                    imageDocRef.update("likes", FieldValue.increment(-1)).await()
+                    liked = false
+                } else {
+                    // Aggiungi like
                     likes.add(picId)
                     userDocRef.update("likes", likes).await()
                     imageDocRef.update("likes", FieldValue.increment(1)).await()
+                    liked = true
                 }
             } else {
+                // Primo like per questo utente
                 userDocRef.set(mapOf("likes" to listOf(picId))).await()
                 imageDocRef.update("likes", FieldValue.increment(1)).await()
+                liked = true
             }
 
-            Result.success("Operazione completata")
+            Log.w("Likes",liked.toString())
+            Result.success(liked) // true se aggiunto, false se rimosso
+
         } catch (e: Exception) {
+            Log.w("Likes",e)
             Result.failure(e)
         }
     }
@@ -416,16 +441,9 @@ class FirestoreDatabaseRepository(
         }
     }
 
-    private suspend fun getFormattedImageDate(picId: String): String {
+    private suspend fun getFormattedImageDate(timestamp: Timestamp): String {
         return try {
-            val imageDoc = db
-                .collection("images")
-                .document(picId)
-                .get()
-                .await()
-
-            val timestamp = imageDoc.getTimestamp("timestamp")
-            timestamp?.toDate()?.toInstant()?.let { instant ->
+            timestamp.toDate().toInstant()?.let { instant ->
                 val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
                 val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")
                 localDateTime.format(formatter)

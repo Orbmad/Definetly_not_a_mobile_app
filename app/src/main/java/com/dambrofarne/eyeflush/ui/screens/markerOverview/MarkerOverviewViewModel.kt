@@ -61,6 +61,7 @@ class MarkerOverviewViewModel(
                     mostLikedPicLikes = marker.mostLikedPicLikes ?: 0,
                     mostLikedPicUserImage = marker.mostLikedPicUserImage,
                     mostLikedPicUsername =  marker.mostLikedPicUsername,
+                    mostLikedPicTimeStamp = marker.mostLikedPicTimeStamp,
                     imagesCount = marker.imagesCount,
                     picturesTaken = marker.picturesTaken,
                     isLoading = false
@@ -69,6 +70,21 @@ class MarkerOverviewViewModel(
         } else {
             val errorMsg = result.exceptionOrNull()?.message ?: "Errore sconosciuto"
             _uiState.update { it.copy(isLoading = false, errorMessage = errorMsg) }
+        }
+    }
+
+    suspend fun toggleLike(picId: String): Boolean {
+        Log.w("Like", "Chiamo funzione di toggle")
+
+        val currentUser = auth.getCurrentUserId()
+        return if (currentUser != null) {
+            val result = db.likeImage(currentUser, picId)
+            result.getOrElse {
+                Log.e("Like", "Errore nel like", it)
+                false
+            }
+        } else {
+            false
         }
     }
 }

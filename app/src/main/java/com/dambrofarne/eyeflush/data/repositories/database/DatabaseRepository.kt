@@ -24,6 +24,6 @@ interface DatabaseRepository {
 
     //Pictures
     suspend fun addImage(markerId : String, uId : String, timeStamp : LocalDateTime, imgURL : String) : String
-    suspend fun likeImage(uId: String, picId : String) : Result<String>
+    suspend fun likeImage(uId: String, picId : String) : Result<Boolean>
     suspend fun hasUserLiked(uId: String, picId: String): Boolean
 }

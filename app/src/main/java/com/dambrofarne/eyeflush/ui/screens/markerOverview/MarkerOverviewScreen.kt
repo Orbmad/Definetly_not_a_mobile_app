@@ -11,12 +11,15 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,8 +35,10 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
 import com.dambrofarne.eyeflush.ui.composables.ImageGrid
+import com.dambrofarne.eyeflush.ui.composables.ImageLabel
 import com.dambrofarne.eyeflush.ui.composables.PageTitle
 import com.dambrofarne.eyeflush.ui.composables.StandardHeadline
+import com.dambrofarne.eyeflush.ui.composables.StandardText
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -70,6 +75,8 @@ fun MarkerOverviewScreen(
                     uiState.coordinates.longitude
                 )
                 PageTitle(markerTitle)
+                StandardText("Immagini scattate qui: " + uiState.imagesCount.toString())
+                Spacer(modifier = Modifier.height(20.dp))
 
                 uiState.mostLikedPicURL?.let { url ->
                     Row(
@@ -84,8 +91,8 @@ fun MarkerOverviewScreen(
                             contentDescription = "Most Liked",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(4f / 5f)
+                                .width(180.dp)
+                                .height(225.dp)
                         )
 
                         Spacer(modifier = Modifier.width(16.dp))
@@ -93,10 +100,10 @@ fun MarkerOverviewScreen(
                         Column(
                             modifier = Modifier
                                 .weight(1f)
-                                .padding(top = 4.dp), // porta il contenuto un po' più in alto
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                                .padding(top = 4.dp),
+                            verticalArrangement = Arrangement.Top,
+                            horizontalAlignment = Alignment.Start
                         ) {
-                            // Riga con immagine profilo e autore
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -106,38 +113,34 @@ fun MarkerOverviewScreen(
                                         painter = rememberAsyncImagePainter(imageUrl),
                                         contentDescription = "User Profile",
                                         modifier = Modifier
-                                            .size(24.dp)
+                                            .size(45.dp)
                                             .clip(RoundedCornerShape(50)) // cerchio
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                 }
 
-                                Text(
-                                    text = uiState.mostLikedPicUserId?: "Autore sconosciuto",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
+                                ImageLabel(uiState.mostLikedPicUsername?: "Autore sconosciuto")
                             }
-
-                            // Likes
-                            Text(
-                                text = "❤️ ${uiState.mostLikedPicLikes}",
-                                style = MaterialTheme.typography.labelMedium
-                            )
-
-                            // (Opzionale) Data
-                            uiState.mostLikedPicTimeStamp?.let { timestamp ->
-                                Text(
-                                    text = "🕒 $timestamp",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                                )
-                            }
+                            Spacer(modifier = Modifier.height(20.dp))
+                            ImageLabel("🕒 ${uiState.mostLikedPicTimeStamp}")
+                            ImageLabel("❤️ ${uiState.mostLikedPicLikes}")
                         }
                     }
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        thickness = 1.dp,
+                        color = MaterialTheme.colorScheme.outline
+                    )
                 }
 
-                // Grid section
-                ImageGrid(urls = uiState.picturesTaken.map { it.url })
+
+                ImageGrid(
+                    pictures = uiState.picturesTaken,
+                    onImageClick = { clickedPicId ->
+                        // navController.navigate("pictureDetail/$clickedPicId")
+                    },
+                    onToggleLike = viewModel::toggleLike
+                )
             }
         }
     }
