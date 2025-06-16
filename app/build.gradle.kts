@@ -97,6 +97,7 @@ dependencies {
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
     implementation(libs.guava)
+    implementation(libs.androidx.exifinterface)
 
     // Permissions
     implementation(libs.accompanist.permissions)

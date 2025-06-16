@@ -98,6 +98,7 @@ class HomeMapViewModel(
                     mostLikedPicID = marker.mostLikedPicId
                 )
             )
+            Log.w("Marker test", "marker most liked: ${marker.mostLikedPicURL}")
         }
 
         return polaroidMarkerList

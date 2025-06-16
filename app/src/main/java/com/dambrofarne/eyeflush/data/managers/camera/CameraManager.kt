@@ -22,7 +22,7 @@ interface CameraManager {
 
     fun retryPhoto()
 
-    suspend fun savePhoto(file: File)
+    // suspend fun savePhoto(file: File)
 
     fun resetCameraState()
 
