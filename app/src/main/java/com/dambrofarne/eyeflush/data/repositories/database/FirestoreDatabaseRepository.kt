@@ -204,8 +204,6 @@ class FirestoreDatabaseRepository(
                 "mostLikedPicId" to null,
                 "mostLikedPicURL" to null,
                 "mostLikedPicUserId" to null,
-                "mostLikedPicUserImage" to null,
-                "mostLikedPicUsername" to null,
                 "mostLikedPicTimeStamp" to null,
                 "mostLikedPicLikes" to 0
             )
@@ -314,19 +312,16 @@ class FirestoreDatabaseRepository(
             val markerRef = db.collection("markers").document(markerId)
 
             db.runTransaction { transaction ->
-                // Salvo la nuova immagine
-                transaction.set(pictureRef, newPicture)
-
-                // Aggiorno l'utente
-                transaction.update(userRef, "picsCount", FieldValue.increment(1))
-                transaction.update(userRef, "picturesTaken", FieldValue.arrayUnion(pictureData))
-
-                // Recupero dati del marker
+                //Letture
                 val markerSnap = transaction.get(markerRef)
-
                 val existingPics = markerSnap.get("picturesTaken") as? List<*>
 
-                // Se il marker non ha ancora immagini, aggiornio anche l'immagine più popolare
+                //Scritture
+                transaction.set(pictureRef, newPicture)
+                transaction.update(userRef, "picsCount", FieldValue.increment(1))
+                transaction.update(userRef, "picturesTaken", FieldValue.arrayUnion(pictureData))
+                transaction.update(markerRef, "imagesCount", FieldValue.increment(1))
+
                 if (existingPics == null || existingPics.isEmpty()) {
                     transaction.update(
                         markerRef, mapOf(
@@ -334,7 +329,8 @@ class FirestoreDatabaseRepository(
                             "mostLikedPicId" to pictureRef.id,
                             "mostLikedPicURL" to imgURL,
                             "mostLikedPicUserId" to uId,
-                            "mostLikedPicLikes" to 0
+                            "mostLikedPicLikes" to 0,
+                            "mostLikedPicTimeStamp" to Timestamp(Date.from(timeStamp.atZone(ZoneId.systemDefault()).toInstant()))
                         )
                     )
                 } else {
@@ -345,6 +341,7 @@ class FirestoreDatabaseRepository(
                     )
                 }
             }.await()
+
 
             pictureRef.id
 
