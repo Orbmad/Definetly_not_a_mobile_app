@@ -1,7 +1,7 @@
 package com.dambrofarne.eyeflush.ui.screens.camera
 
-import com.dambrofarne.eyeflush.data.managers.camera.CameraManager
 import android.Manifest
+import android.graphics.BitmapFactory
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -18,24 +18,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.data.managers.camera.CameraState
-import com.dambrofarne.eyeflush.data.managers.location.LocationManagerImpl
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.BackButton
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import java.io.File
+import androidx.compose.foundation.Image
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -126,7 +126,8 @@ fun CameraScreen(
                                 },
                                 onDismiss = {
                                     viewModel.cameraManager.retryPhoto()
-                                }
+                                },
+                                imageFile = capturedImage
                             )
                         }
                     }
@@ -185,7 +186,7 @@ private fun CameraOverlay() {
     Canvas(modifier = Modifier.fillMaxSize()) {
         val canvasWidth = size.width
         val canvasHeight = size.height
-        val overlayColor = Color.Black.copy(alpha = 0.85f)
+        val overlayColor = Color.Black.copy(alpha = 0.80f)
 
         // Calcola le dimensioni del rettangolo 4:5
         val aspectRatio = 4f / 5f
@@ -288,15 +289,37 @@ private fun CameraOverlay() {
 private fun PhotoConfirmationDialog(
     onConfirm: () -> Unit,
     onRetry: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    imageFile: File?
 ) {
+    val bitmap = remember(imageFile) {
+        imageFile?.let {
+            BitmapFactory.decodeFile(it.absolutePath)?.asImageBitmap()
+        }
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Text("Upload Photo")
         },
         text = {
-            Text("Do you want to upload the photo?")
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                if (bitmap != null) {
+                    Image(
+                        bitmap = bitmap,
+                        contentDescription = "Photo preview",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            //.aspectRatio(4f / 5f) // 4:5 come la cornice
+                            .padding(8.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                } else {
+                    Text("Photo loading error")
+                }
+                Text("Do you want to upload this photo?")
+            }
         },
         confirmButton = {
             Button(
