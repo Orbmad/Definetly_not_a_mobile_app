@@ -33,7 +33,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import com.dambrofarne.eyeflush.data.repositories.database.PicQuickRef
 import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
+import com.dambrofarne.eyeflush.ui.composables.ImageCard
 import com.dambrofarne.eyeflush.ui.composables.ImageGrid
 import com.dambrofarne.eyeflush.ui.composables.ImageLabel
 import com.dambrofarne.eyeflush.ui.composables.PageTitle
@@ -85,15 +87,23 @@ fun MarkerOverviewScreen(
                             .padding(bottom = 16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Most liked image
-                        Image(
-                            painter = rememberAsyncImagePainter(url),
-                            contentDescription = "Most Liked",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .width(180.dp)
-                                .height(225.dp)
-                        )
+                        if (uiState.mostLikedPicId != null) {
+                            ImageCard(
+                                onClick = { clickedPicId ->
+                                    // navController.navigate("pictureDetail/$clickedPicId")
+                                },
+                                onToggleLike = viewModel::toggleLike,
+                                picture = PicQuickRef(
+                                    picId = uiState.mostLikedPicId!!,
+                                    url = uiState.mostLikedPicURL!!,
+                                    likes = uiState.mostLikedPicLikes,
+                                    liked = uiState.userLikesMostLiked
+                                ),
+                                modifier = Modifier
+                                    .width(200.dp)
+                                    .height(250.dp)
+                            )
+                        }
 
                         Spacer(modifier = Modifier.width(16.dp))
 

@@ -27,7 +27,8 @@ data class MarkerOverviewUiState(
     val imagesCount: Int = 0,
     val picturesTaken: List<PicQuickRef> = emptyList(),
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val userLikesMostLiked: Boolean = false
 )
 
 
@@ -46,6 +47,7 @@ class MarkerOverviewViewModel(
             _uiState.update { it.copy(isLoading = false, errorMessage = "Utente non autenticato") }
             return
         }
+
 
         val result = db.getMarkerExtendedInfo(markerId, userId)
         if (result.isSuccess) {
@@ -67,24 +69,25 @@ class MarkerOverviewViewModel(
                     isLoading = false
                 )
             }
+            val userLikesMostLiked = marker.mostLikedPicId?.let{ db.hasUserLiked(userId,it)}
+            Log.w("Likes", userLikesMostLiked.toString())
+            if (userLikesMostLiked != null) {
+                _uiState.update { it.copy(userLikesMostLiked = userLikesMostLiked) }
+            }
+
         } else {
             val errorMsg = result.exceptionOrNull()?.message ?: "Errore sconosciuto"
             _uiState.update { it.copy(isLoading = false, errorMessage = errorMsg) }
         }
     }
 
-    suspend fun toggleLike(picId: String): Boolean {
-        Log.w("Like", "Chiamo funzione di toggle")
-
-        val currentUser = auth.getCurrentUserId()
-        return if (currentUser != null) {
+    fun toggleLike(picId: String) {
+        viewModelScope.launch {
+            val currentUser = auth.getCurrentUserId() ?: return@launch
             val result = db.likeImage(currentUser, picId)
-            result.getOrElse {
-                Log.e("Like", "Errore nel like", it)
-                false
+            if (result.isSuccess) {
+                loadMarkerInfo(_uiState.value.id)
             }
-        } else {
-            false
         }
     }
 }

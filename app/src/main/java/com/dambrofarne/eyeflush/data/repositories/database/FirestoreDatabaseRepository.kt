@@ -266,7 +266,8 @@ class FirestoreDatabaseRepository(
                         PicQuickRef(picId = itId, url = itUrl, liked = liked, likes = likes)
                     } else null
                 } else null
-            }?.sortedByDescending { it.likes } ?: emptyList()
+            }?.filter { it.picId != mostLikedPicId }
+                ?.sortedByDescending { it.likes } ?: emptyList()
 
             val mostLikedPicUserImage = mostLikedPicUserId?.let { getUserImagePath(it) }
             val mostLikedPicUsername = mostLikedPicUserId?.let { getUsername(it) }
@@ -291,6 +292,7 @@ class FirestoreDatabaseRepository(
             Result.failure(e)
         }
     }
+
 
 
     override suspend fun addImage(
@@ -364,9 +366,13 @@ class FirestoreDatabaseRepository(
         return try {
             Log.w("Likes","Inizio prcoedura")
             val userDocRef = db.collection("users").document(uId)
-            val imageDocRef = db.collection("pictures").document(picId)
-
             val snapshot = userDocRef.get().await()
+
+            val imageDocRef = db.collection("pictures").document(picId)
+            val imageSnap = imageDocRef.get().await()
+
+            val markerId = imageSnap.getString("markerId") ?: return Result.failure(Exception("Marker ID mancante"))
+            val markerDocRef = db.collection("markers").document(markerId)
 
             var liked = false
 
@@ -394,14 +400,43 @@ class FirestoreDatabaseRepository(
                 liked = true
             }
 
-            Log.w("Likes",liked.toString())
-            Result.success(liked) // true se aggiunto, false se rimosso
+            // Aggiorno il marker
+            val imagesQuerySnap = db.collection("pictures")
+                .whereEqualTo("markerId", markerId)
+                .get()
+                .await()
+
+            // Trovo immagine con massimo like
+            val mostLikedImage = imagesQuerySnap.documents.maxByOrNull {
+                it.getLong("likes") ?: 0L
+            }
+
+            if (mostLikedImage != null) {
+                val mostLikedPicId = mostLikedImage.id
+                val mostLikedPicURL = mostLikedImage.getString("url") ?: ""
+                val mostLikedPicLikes = mostLikedImage.getLong("likes")?.toInt() ?: 0
+                val mostLikedPicUserId = mostLikedImage.getString("uid") ?: ""
+
+                // Aggiorno documento marker
+                markerDocRef.update(
+                    mapOf(
+                        "mostLikedPicId" to mostLikedPicId,
+                        "mostLikedPicURL" to mostLikedPicURL,
+                        "mostLikedPicLikes" to mostLikedPicLikes,
+                        "mostLikedPicUserId" to mostLikedPicUserId
+                    )
+                ).await()
+            }
+
+            Log.w("Likes", liked.toString())
+            Result.success(liked)
 
         } catch (e: Exception) {
-            Log.w("Likes",e)
+            Log.w("Likes", e)
             Result.failure(e)
         }
     }
+
 
     override suspend fun hasUserLiked(uId: String, picId: String): Boolean {
         return try {
@@ -426,7 +461,7 @@ class FirestoreDatabaseRepository(
     private suspend fun getPictureLikes(picId: String): Int {
         return try {
             val imageDoc = db
-                .collection("images")
+                .collection("pictures")
                 .document(picId)
                 .get()
                 .await()

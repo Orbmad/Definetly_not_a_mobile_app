@@ -40,7 +40,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -146,7 +145,7 @@ fun ChoicheSmallProfileImage(
 fun ImageCard(
     picture: PicQuickRef,
     onClick: (String) -> Unit,
-    onToggleLike: suspend (String) -> Boolean,
+    onToggleLike: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
@@ -177,23 +176,12 @@ fun ImageCard(
                     .align(Alignment.TopEnd)
                     .background(Color.Black.copy(alpha = 0.5f))
                     .clickable {
-                        // Optimistic update
+                        // Ottimistic update
                         liked = !liked
                         likeCount += if (liked) 1 else -1
 
                         // Backend sync
-                        scope.launch {
-                            try {
-                                val newLiked = onToggleLike(picture.picId)
-                                if (newLiked != liked) {
-                                    liked = newLiked
-                                    likeCount += if (newLiked) 1 else -1
-                                }
-                            } catch (e: Exception) {
-                                liked = !liked
-                                likeCount += if (liked) 1 else -1
-                            }
-                        }
+                        onToggleLike(picture.picId)
                     }
                     .padding(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -219,7 +207,7 @@ fun ImageCard(
 fun ImageGrid(
     pictures: List<PicQuickRef>,
     onImageClick: (String) -> Unit,
-    onToggleLike: suspend (String) -> Boolean
+    onToggleLike: (String) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 120.dp),
