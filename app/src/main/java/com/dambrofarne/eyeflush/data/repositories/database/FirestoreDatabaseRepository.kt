@@ -195,15 +195,24 @@ class FirestoreDatabaseRepository(
 
     override suspend fun addMarker(point: GeoPoint, name: String?): String {
         return try {
-            val newMarker = MarkerRaw(
-                latitude = point.latitude,
-                longitude = point.longitude,
-                name = name
+            val newMarker = mapOf(
+                "latitude" to point.latitude,
+                "longitude" to point.longitude,
+                "name" to name,
+                "imagesCount" to 0,
+                "picturesTaken" to emptyList<Map<String, String>>(),
+                "mostLikedPicId" to null,
+                "mostLikedPicURL" to null,
+                "mostLikedPicUserId" to null,
+                "mostLikedPicUserImage" to null,
+                "mostLikedPicUsername" to null,
+                "mostLikedPicTimeStamp" to null,
+                "mostLikedPicLikes" to 0
             )
 
-            val docRef = db.collection("markers")
-                .add(newMarker)
-                .await()
+            val docRef = db.collection("markers").document()
+            docRef.set(newMarker, SetOptions.merge()).await()
+
             docRef.id
 
         } catch (e: Exception) {
