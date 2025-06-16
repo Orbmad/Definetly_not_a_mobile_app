@@ -7,7 +7,6 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
@@ -364,7 +363,6 @@ class FirestoreDatabaseRepository(
 
     override suspend fun likeImage(uId: String, picId: String): Result<Boolean> {
         return try {
-            Log.w("Likes","Inizio prcoedura")
             val userDocRef = db.collection("users").document(uId)
             val snapshot = userDocRef.get().await()
 
@@ -416,6 +414,7 @@ class FirestoreDatabaseRepository(
                 val mostLikedPicURL = mostLikedImage.getString("url") ?: ""
                 val mostLikedPicLikes = mostLikedImage.getLong("likes")?.toInt() ?: 0
                 val mostLikedPicUserId = mostLikedImage.getString("uid") ?: ""
+                val mostLikedPicTimeStamp = mostLikedImage.getTimestamp("timeStamp") ?: Timestamp.now()
 
                 // Aggiorno documento marker
                 markerDocRef.update(
@@ -423,7 +422,8 @@ class FirestoreDatabaseRepository(
                         "mostLikedPicId" to mostLikedPicId,
                         "mostLikedPicURL" to mostLikedPicURL,
                         "mostLikedPicLikes" to mostLikedPicLikes,
-                        "mostLikedPicUserId" to mostLikedPicUserId
+                        "mostLikedPicUserId" to mostLikedPicUserId,
+                        "mostLikedPicTimeStamp" to mostLikedPicTimeStamp
                     )
                 ).await()
             }

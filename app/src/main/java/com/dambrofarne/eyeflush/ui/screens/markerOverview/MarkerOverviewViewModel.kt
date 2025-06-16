@@ -27,6 +27,7 @@ data class MarkerOverviewUiState(
     val imagesCount: Int = 0,
     val picturesTaken: List<PicQuickRef> = emptyList(),
     val isLoading: Boolean = false,
+    val isUpdating: Boolean = false,
     val errorMessage: String? = null,
     val userLikesMostLiked: Boolean = false
 )
@@ -39,9 +40,11 @@ class MarkerOverviewViewModel(
     private val _uiState = MutableStateFlow(MarkerOverviewUiState())
     val uiState: StateFlow<MarkerOverviewUiState> = _uiState
 
-    suspend fun loadMarkerInfo(markerId: String) {
-        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
+    suspend fun loadMarkerInfo(markerId: String, isInitialLoad: Boolean = true) {
+        _uiState.update { it.copy(
+            isLoading = if (isInitialLoad) true else it.isLoading,
+            errorMessage = null
+        ) }
         val userId = auth.getCurrentUserId()
         if (userId == null) {
             _uiState.update { it.copy(isLoading = false, errorMessage = "Utente non autenticato") }
@@ -70,7 +73,7 @@ class MarkerOverviewViewModel(
                 )
             }
             val userLikesMostLiked = marker.mostLikedPicId?.let{ db.hasUserLiked(userId,it)}
-            Log.w("Likes", userLikesMostLiked.toString())
+
             if (userLikesMostLiked != null) {
                 _uiState.update { it.copy(userLikesMostLiked = userLikesMostLiked) }
             }
@@ -83,11 +86,27 @@ class MarkerOverviewViewModel(
 
     fun toggleLike(picId: String) {
         viewModelScope.launch {
-            val currentUser = auth.getCurrentUserId() ?: return@launch
-            val result = db.likeImage(currentUser, picId)
-            if (result.isSuccess) {
-                loadMarkerInfo(_uiState.value.id)
+            _uiState.update { it.copy(isUpdating = true) }
+
+            val currentUser = auth.getCurrentUserId()
+            if (currentUser == null) {
+                _uiState.update { it.copy(isUpdating = false, errorMessage = "Utente non autenticato") }
+                return@launch
             }
+
+            val result = db.likeImage(currentUser, picId)
+
+            if (result.isSuccess) {
+                loadMarkerInfo(
+                    markerId = _uiState.value.id,
+                    isInitialLoad = false
+                )
+            } else {
+                _uiState.update { it.copy(errorMessage = "Errore nel toggle like") }
+            }
+
+            _uiState.update { it.copy(isUpdating = false) }
         }
     }
+
 }

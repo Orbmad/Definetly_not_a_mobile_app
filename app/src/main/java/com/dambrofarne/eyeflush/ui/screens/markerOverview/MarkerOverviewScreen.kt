@@ -36,6 +36,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.dambrofarne.eyeflush.data.repositories.database.PicQuickRef
 import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
 import com.dambrofarne.eyeflush.ui.composables.ImageCard
+import com.dambrofarne.eyeflush.ui.composables.ImageCardSimple
 import com.dambrofarne.eyeflush.ui.composables.ImageGrid
 import com.dambrofarne.eyeflush.ui.composables.ImageLabel
 import com.dambrofarne.eyeflush.ui.composables.PageTitle
@@ -78,6 +79,22 @@ fun MarkerOverviewScreen(
                 )
                 PageTitle(markerTitle)
                 StandardText("Immagini scattate qui: " + uiState.imagesCount.toString())
+                if (uiState.isUpdating) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(16.dp)
+                                .padding(end = 8.dp),
+                            strokeWidth = 2.dp
+                        )
+                        Text("Aggiornamento...", style = MaterialTheme.typography.labelMedium)
+                    }
+                }
                 Spacer(modifier = Modifier.height(20.dp))
 
                 uiState.mostLikedPicURL?.let { url ->
@@ -88,20 +105,17 @@ fun MarkerOverviewScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         if (uiState.mostLikedPicId != null) {
-                            ImageCard(
-                                onClick = { clickedPicId ->
-                                    // navController.navigate("pictureDetail/$clickedPicId")
-                                },
+                            ImageCardSimple(
+                                picId = uiState.mostLikedPicId!!,
+                                url = uiState.mostLikedPicURL!!,
+                                likes = uiState.mostLikedPicLikes,
+                                liked = uiState.userLikesMostLiked,
+                                onClick = { /* ... */ },
                                 onToggleLike = viewModel::toggleLike,
-                                picture = PicQuickRef(
-                                    picId = uiState.mostLikedPicId!!,
-                                    url = uiState.mostLikedPicURL!!,
-                                    likes = uiState.mostLikedPicLikes,
-                                    liked = uiState.userLikesMostLiked
-                                ),
                                 modifier = Modifier
                                     .width(200.dp)
-                                    .height(250.dp)
+                                    .height(250.dp),
+                                enabled = !uiState.isUpdating
                             )
                         }
 
@@ -149,7 +163,8 @@ fun MarkerOverviewScreen(
                     onImageClick = { clickedPicId ->
                         // navController.navigate("pictureDetail/$clickedPicId")
                     },
-                    onToggleLike = viewModel::toggleLike
+                    onToggleLike = viewModel::toggleLike,
+                    enabled = !uiState.isUpdating
                 )
             }
         }

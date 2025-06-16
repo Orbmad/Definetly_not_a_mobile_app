@@ -1,5 +1,6 @@
 package com.dambrofarne.eyeflush.ui.composables
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -146,16 +147,14 @@ fun ImageCard(
     picture: PicQuickRef,
     onClick: (String) -> Unit,
     onToggleLike: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
-    val scope = rememberCoroutineScope()
-
-    // Stato locale per like e counter
-    var liked by remember { mutableStateOf(picture.liked) }
-    var likeCount by remember { mutableStateOf(picture.likes) }
+    var liked by remember(picture.picId, picture.liked) { mutableStateOf(picture.liked) }
+    var likeCount by remember(picture.picId, picture.likes) { mutableStateOf(picture.likes) }
 
     Card(
-        onClick = { onClick(picture.picId) },
+        onClick = { if (enabled) onClick(picture.picId) },
         modifier = modifier
             .padding(8.dp)
             .aspectRatio(0.8f)
@@ -175,12 +174,9 @@ fun ImageCard(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .background(Color.Black.copy(alpha = 0.5f))
-                    .clickable {
-                        // Ottimistic update
+                    .clickable(enabled = enabled) {
                         liked = !liked
                         likeCount += if (liked) 1 else -1
-
-                        // Backend sync
                         onToggleLike(picture.picId)
                     }
                     .padding(4.dp),
@@ -204,10 +200,71 @@ fun ImageCard(
 }
 
 @Composable
+fun ImageCardSimple(
+    picId: String,
+    url: String,
+    likes: Int,
+    liked: Boolean,
+    onClick: (String) -> Unit,
+    onToggleLike: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    var localLiked by remember(picId, liked) { mutableStateOf(liked) }
+    var localLikes by remember(picId, likes) { mutableStateOf(likes) }
+
+    Card(
+        onClick = { if (enabled) onClick(picId) },
+        modifier = modifier
+            .padding(8.dp)
+            .aspectRatio(0.8f)
+            .sizeIn(maxWidth = 120.dp, maxHeight = 150.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        shape = RectangleShape
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            AsyncImage(
+                model = url,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .clickable(enabled = enabled) {
+                        localLiked = !localLiked
+                        localLikes += if (localLiked) 1 else -1
+                        onToggleLike(picId)
+                    }
+                    .padding(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = if (localLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = null,
+                    tint = if (localLiked) Color.Red else Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "$localLikes",
+                    color = Color.White,
+                    fontSize = 16.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun ImageGrid(
     pictures: List<PicQuickRef>,
     onImageClick: (String) -> Unit,
-    onToggleLike: (String) -> Unit
+    onToggleLike: (String) -> Unit,
+    enabled : Boolean = true
 ) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 120.dp),
@@ -219,7 +276,8 @@ fun ImageGrid(
             ImageCard(
                 picture = picture,
                 onClick = onImageClick,
-                onToggleLike = onToggleLike
+                onToggleLike = onToggleLike,
+                enabled = enabled
             )
         }
     }
