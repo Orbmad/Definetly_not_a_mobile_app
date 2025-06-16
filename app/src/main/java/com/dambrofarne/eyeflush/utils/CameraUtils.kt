@@ -76,7 +76,7 @@ fun cropRelativeToOverlay(bitmap: Bitmap): Bitmap {
     val originalWidth = bitmap.width
     val originalHeight = bitmap.height
 
-    val overlayWidthRatio = 0.55f
+    val overlayWidthRatio = 0.7f
     val overlayAspectRatio = 4f / 5f
 
     val cropWidth = (originalWidth * overlayWidthRatio).toInt()

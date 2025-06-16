@@ -77,7 +77,8 @@ class CameraManagerImpl(private val context: Context) : CameraManager {
 
             imageCapture = ImageCapture.Builder()
                 .setTargetRotation(targetRotation)
-                .setTargetResolution(Size(1080, 1350))
+                .setTargetAspectRatio(AspectRatio.RATIO_16_9)
+                //.setTargetResolution(Size(1080, 1350))
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
                 .setJpegQuality(JPEG_QUALITY)
                 .build()

@@ -311,7 +311,7 @@ private fun PhotoConfirmationDialog(
                         contentDescription = "Photo preview",
                         modifier = Modifier
                             .fillMaxWidth()
-                            //.aspectRatio(4f / 5f) // 4:5 come la cornice
+                            .aspectRatio(4f / 5f) // 4:5 come la cornice
                             .padding(8.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))

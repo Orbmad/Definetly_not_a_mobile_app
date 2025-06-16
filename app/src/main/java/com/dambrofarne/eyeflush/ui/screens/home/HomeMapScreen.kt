@@ -65,7 +65,7 @@ fun HomeMapScreen(
 
     val defaultZoom = 20.0
 
-    val userLocationIcon = ContextCompat.getDrawable(context, R.drawable.ic_user_location)
+    val userLocationIcon = ContextCompat.getDrawable(context, R.drawable.diamond_man_3)
 
     val openStreetMapTileSource = XYTileSource(
         "OSM",
