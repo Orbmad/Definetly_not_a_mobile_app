@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.os.Build
 import android.util.Log
 import android.util.Size
 import androidx.camera.core.*
@@ -168,12 +169,18 @@ class CameraManagerImpl(private val context: Context) : CameraManager {
             )
 
             val matrix = Matrix()
-            when (orientation) {
-                ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
-                ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
-                ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
-                ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> matrix.postScale(-1f, 1f)
-                ExifInterface.ORIENTATION_FLIP_VERTICAL -> matrix.postScale(1f, -1f)
+            val isEmulator = Build.FINGERPRINT.contains("generic") || Build.MODEL.contains("Emulator")
+
+            when {
+                isEmulator -> {
+                    Log.d(TAG, "Running on emulator, applying manual 90° rotation")
+                    matrix.postRotate(90f) // oppure 270f se l'immagine è capovolta
+                }
+                orientation == ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+                orientation == ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+                orientation == ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+                orientation == ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> matrix.postScale(-1f, 1f)
+                orientation == ExifInterface.ORIENTATION_FLIP_VERTICAL -> matrix.postScale(1f, -1f)
             }
 
             Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
