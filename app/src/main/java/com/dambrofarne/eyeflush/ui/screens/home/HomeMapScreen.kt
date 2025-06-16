@@ -1,5 +1,6 @@
 package com.dambrofarne.eyeflush.ui.screens.home
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -28,10 +29,6 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.tileprovider.tilesource.XYTileSource
-//import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
-//import org.osmdroid.util.MapTileIndex
-//import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-//import android.util.Log
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -59,8 +56,8 @@ fun HomeMapScreen(
 
     val polaroidMarkers by viewModel.polaroidMarkers.collectAsState()
     val currentLocation by viewModel.currentLocation.collectAsState()
+    val locationUpdated by viewModel.locationUpdated.collectAsState()
 
-    var showCamera by remember { mutableStateOf(false) }
     var mapView: MapView? by remember { mutableStateOf(null) }
     var currentLocationMarker by remember { mutableStateOf<Marker?>(null) }
 
@@ -76,94 +73,52 @@ fun HomeMapScreen(
         arrayOf("https://tile.openstreetmap.org/")
     )
 
-//    val cartoLight = object : OnlineTileSourceBase(
-//        "CartoLight",
-//        0, 28, 256, ".png",
-//        arrayOf("https://a.basemaps.cartocdn.com/light_all/")
-//    ) {
-//        override fun getTileURLString(pMapTileIndex: Long): String {
-//            return baseUrl +
-//                    MapTileIndex.getZoom(pMapTileIndex) + "/" +
-//                    MapTileIndex.getX(pMapTileIndex) + "/" +
-//                    MapTileIndex.getY(pMapTileIndex) + ".png"
-//        }
-//    }
-
-//    val cartoDark = object : OnlineTileSourceBase(
-//        "CartoDark",
-//        0, 28, 256, ".png",
-//        arrayOf("https://a.basemaps.cartocdn.com/dark_all/")
-//    ) {
-//        override fun getTileURLString(pMapTileIndex: Long): String {
-//            return baseUrl +
-//                    MapTileIndex.getZoom(pMapTileIndex) + "/" +
-//                    MapTileIndex.getX(pMapTileIndex) + "/" +
-//                    MapTileIndex.getY(pMapTileIndex) + ".png"
-//        }
-//    }
-
     // Requesting permissions
-    LaunchedEffect(permissionsState.allPermissionsGranted) {
+    LaunchedEffect(Unit) {
         if (!permissionsState.allPermissionsGranted) {
             permissionsState.launchMultiplePermissionRequest()
         } else {
-            // Get current location
-            viewModel.locationManager.getCurrentLocation()?.let { location ->
-                viewModel.updateCurrentLocation(location)
-                mapView?.controller?.setCenter(location)
-                mapView?.controller?.setZoom(defaultZoom)
+            // ✅ 1. Recupera subito la posizione iniziale
+            val initialLocation = viewModel.locationManager.getCurrentLocation()
+            initialLocation?.let {
+                Log.w("HomeMapScreen", "Initial location acquired")
+                viewModel.updateCurrentLocation(it)
+                //mapView?.controller?.animateTo(it)
             }
-        }
-    }
 
-    // Starting Location Listener
-    LaunchedEffect(Unit) {
-        if (permissionsState.allPermissionsGranted) {
+            // Get current location
             viewModel.locationManager.startLocationUpdates { geoPoint ->
                 viewModel.updateCurrentLocation(geoPoint)
-                viewModel.loadPolaroidMarkers()
+                //viewModel.loadPolaroidMarkers()
+                //mapView?.controller?.animateTo(geoPoint)
+                mapView?.invalidate()
+
+                Log.w("HomeMapScreen", "Routine location update")
             }
         }
     }
 
-    // Re-initialize currentLocationMarker when mapView changes
-    LaunchedEffect(mapView) {
-        if (mapView != null && currentLocation != null) {
-            currentLocationMarker = Marker(mapView).apply {
-                icon = userLocationIcon
-                position = currentLocation!!
-                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                title = "La tua posizione"
-            }
-            mapView?.overlays?.add(currentLocationMarker)
-            mapView?.controller?.setCenter(currentLocation)
-            mapView?.invalidate()
-        }
-    }
+    LaunchedEffect(mapView, currentLocation, locationUpdated) {
+        val location = currentLocation
+        val map = mapView
 
-    // Update current location marker
-    LaunchedEffect(currentLocation) {
-        //Log.w("Test", "LaunchedEffect(currentLocation) triggered")
-        currentLocation?.let { location ->
+        if (map != null && location != null) {
             if (currentLocationMarker == null) {
-                // Create marker once
-                currentLocationMarker = Marker(mapView).apply {
+                // Crea nuovo marker se non esiste
+                currentLocationMarker = Marker(map).apply {
                     icon = userLocationIcon
                     position = location
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                     title = "La tua posizione"
                 }
-                mapView?.overlays?.add(currentLocationMarker)
-                //Log.w("Test", "Current location marker created")
+                map.overlays.add(currentLocationMarker)
             } else {
-                // Update existing marker position
+                // Aggiorna posizione del marker esistente
                 currentLocationMarker?.position = location
-                //Log.w("Test", "Current location marker updated")
             }
 
-            viewModel.loadPolaroidMarkers()
-            mapView?.controller?.animateTo(location)
-            mapView?.invalidate()
+            map.controller.animateTo(location)
+            map.invalidate()
         }
     }
 
@@ -240,6 +195,7 @@ fun HomeMapScreen(
                             MapView(ctx).apply {
                                 setTileSource(openStreetMapTileSource)
                                 setMultiTouchControls(true)
+                                setBuiltInZoomControls(false)
                                 controller.setZoom(defaultZoom)
                                 controller.setCenter(currentLocation)
                                 mapView = this
