@@ -122,7 +122,7 @@ class FirestoreDatabaseRepository(
         }
     }
 
-    override suspend fun getUserExtendedInfo(uId: String): Result<User> {
+    override suspend fun getUserExtendedInfo(uId: String, requesterUId: String): Result<User> {
         return try {
             val snapshot = db.collection("users")
                 .document(uId)
@@ -134,9 +134,10 @@ class FirestoreDatabaseRepository(
             }
 
             val id = snapshot.id
-            val username = snapshot.getString("username")
-            val score = snapshot.getLong("imagesCount")?.toInt() ?: 0
-            val imagesCount = snapshot.getLong("imagesCount")?.toInt() ?: 0
+            val username = snapshot.getString("username") ?: ""
+            val score = snapshot.getLong("score")?.toInt() ?: 0
+            val imagesCount = snapshot.getLong("picsCount")?.toInt() ?: 0
+            val profileImagePath = snapshot.getString("profileImagePath")  ?: ""
 
             val rawList = snapshot.get("picturesTaken") as? List<*>
             val pictureRefs = rawList?.mapNotNull { item ->
@@ -144,7 +145,7 @@ class FirestoreDatabaseRepository(
                     val itId = item["id"] as? String
                     val itUrl = item["url"] as? String
                     if (itId != null && itUrl != null) {
-                        val liked = hasUserLiked(uId, itId)
+                        val liked = hasUserLiked(requesterUId, itId)
                         val likes = getPictureLikes(itId)
                         PicQuickRef(picId = itId, url = itUrl, liked = liked, likes = likes)
                     } else null
@@ -155,6 +156,7 @@ class FirestoreDatabaseRepository(
                 User(
                     uId = id,
                     username = username,
+                    profileImagePath = profileImagePath,
                     score = score,
                     imagesCount = imagesCount,
                     picturesTaken = pictureRefs

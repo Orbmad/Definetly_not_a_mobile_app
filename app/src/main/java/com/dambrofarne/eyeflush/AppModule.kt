@@ -19,6 +19,7 @@ import com.dambrofarne.eyeflush.ui.screens.signin.SignInViewModel
 import com.dambrofarne.eyeflush.ui.screens.signup.SignUpViewModel
 import com.dambrofarne.eyeflush.ui.screens.splash.SplashViewModel
 import com.dambrofarne.eyeflush.ui.screens.markerOverview.MarkerOverviewViewModel
+import com.dambrofarne.eyeflush.ui.screens.userOverview.UserOverviewViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import org.koin.core.module.dsl.viewModel
@@ -42,4 +43,5 @@ val appModule = module {
     viewModel { ProfileViewModel(get(),get()) }
     viewModel { CameraViewModel(get(), get(), get(), get(), get()) }
     viewModel { MarkerOverviewViewModel(get(), get()) }
+    viewModel { UserOverviewViewModel(get(),get())}
 }

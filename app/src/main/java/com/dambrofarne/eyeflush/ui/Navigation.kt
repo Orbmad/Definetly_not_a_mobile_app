@@ -13,6 +13,7 @@ import com.dambrofarne.eyeflush.ui.screens.profileconfig.ProfileConfigScreen
 import com.dambrofarne.eyeflush.ui.screens.signin.SignInScreen
 import com.dambrofarne.eyeflush.ui.screens.signup.SignUpScreen
 import com.dambrofarne.eyeflush.ui.screens.splash.SplashScreen
+import com.dambrofarne.eyeflush.ui.screens.userOverview.userOverviewScreen
 import kotlinx.serialization.Serializable
 
 sealed interface EyeFlushRoute {
@@ -26,6 +27,8 @@ sealed interface EyeFlushRoute {
     @Serializable data object Profile : EyeFlushRoute
     @Serializable data object Camera: EyeFlushRoute
     @Serializable data class MarkerOverview(val markerId : String) : EyeFlushRoute
+    @Serializable data class UserOverview(val uId : String) : EyeFlushRoute
+
 }
 
 @Composable
@@ -48,7 +51,8 @@ fun EyeFlushNavGraph(navController: NavHostController) {
         composable<EyeFlushRoute.Home> {
             //ProfileConfigScreen(navController)
             //MarkerOverviewScreen(navController,"NrzOJYoy3RfCUFxkMoOX")
-            HomeMapScreen(navController)
+            //HomeMapScreen(navController)
+            userOverviewScreen(navController,"uYyDPYNRuHZXVogRVwYXMIraRZF3")
         }
 
         composable<EyeFlushRoute.ProfileConfig> {
@@ -67,6 +71,12 @@ fun EyeFlushNavGraph(navController: NavHostController) {
             val route = backStackEntry.toRoute<EyeFlushRoute.MarkerOverview>()
             val markerId = route.markerId
             MarkerOverviewScreen(navController,markerId)
+        }
+
+        composable<EyeFlushRoute.UserOverview>{ backStackEntry ->
+            val route = backStackEntry.toRoute<EyeFlushRoute.UserOverview>()
+            val uId =  route.uId
+            MarkerOverviewScreen(navController,uId)
         }
     }
 
