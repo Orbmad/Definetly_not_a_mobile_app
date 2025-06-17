@@ -31,6 +31,7 @@ class CameraViewModel (
             val imageUrl = runBlocking {
                 imgRepo.uploadCroppedImage(file).getOrNull()
             }
+            Log.w("Marker test", "uploaded imgURL: $imageUrl")
             // Associate marker and get marker ID
             val markerId = associateMarkerToPhoto(location)
             if ((imageUrl != null) && (markerId != null) && (userId != null)) {
@@ -43,12 +44,13 @@ class CameraViewModel (
                         imgURL = imageUrl
                     )
                 }
+                Log.w("Marker test", "Uploaded photo, associated to Marker")
                 return true
             } else {
                 return false
             }
         } else {
-            Log.e("Error: Image upload", "The Image was not uploaded")
+            Log.e("Marker test", "The Image was not uploaded")
             return false
         }
     }

@@ -17,35 +17,21 @@ import org.osmdroid.util.GeoPoint
 import kotlin.coroutines.resume
 
 class LocationManagerImpl(private val context: Context) : LocationManager {
+
     private val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as AndroidLocationManager
 
-    override suspend fun getCurrentLocation(): GeoPoint? {
-        return withContext(Dispatchers.Main) {
-            try {
-                if (!hasLocationPermission()) {
-                    return@withContext null
-                }
-
-                // Prima prova con l'ultima posizione conosciuta
-                getLastKnownLocation()?.let { location ->
-                    return@withContext GeoPoint(location.latitude, location.longitude)
-                }
-
-                // Se non c'è una posizione conosciuta, richiedi una nuova posizione
-                requestCurrentLocation()?.let { location ->
-                    GeoPoint(location.latitude, location.longitude)
-                }
-            } catch (e: Exception) {
-                null
-            }
-        }
-    }
+    private var locationListener: LocationListener? = null
 
     @SuppressLint("MissingPermission")
     override fun startLocationUpdates(onLocationUpdate: (GeoPoint) -> Unit) {
         val provider = AndroidLocationManager.GPS_PROVIDER
         if (hasLocationPermission() && locationManager.isProviderEnabled(provider)) {
-            val listener = object : LocationListener {
+            // Rimuovi listener precedente se presente
+            locationListener?.let {
+                locationManager.removeUpdates(it)
+            }
+
+            locationListener = object : LocationListener {
                 override fun onLocationChanged(location: Location) {
                     onLocationUpdate(GeoPoint(location.latitude, location.longitude))
                 }
@@ -56,10 +42,42 @@ class LocationManagerImpl(private val context: Context) : LocationManager {
                 override fun onProviderDisabled(provider: String) {}
             }
 
-            locationManager.requestLocationUpdates(provider, 2000L, 3f, listener)
+            // minTime = 2000ms, minDistance = 0f per aggiornamenti ogni 2 secondi anche senza spostamenti
+            locationManager.requestLocationUpdates(
+                provider,
+                2000L,
+                0f,
+                locationListener!!
+            )
         }
     }
 
+    fun stopLocationUpdates() {
+        locationListener?.let {
+            locationManager.removeUpdates(it)
+            locationListener = null
+        }
+    }
+
+    override suspend fun getCurrentLocation(): GeoPoint? {
+        return withContext(Dispatchers.Main) {
+            try {
+                if (!hasLocationPermission()) {
+                    return@withContext null
+                }
+
+                getLastKnownLocation()?.let { location ->
+                    return@withContext GeoPoint(location.latitude, location.longitude)
+                }
+
+                requestCurrentLocation()?.let { location ->
+                    GeoPoint(location.latitude, location.longitude)
+                }
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
 
     private fun hasLocationPermission(): Boolean {
         return ContextCompat.checkSelfPermission(
@@ -98,7 +116,7 @@ class LocationManagerImpl(private val context: Context) : LocationManager {
     }
 
     private suspend fun requestCurrentLocation(): Location? {
-        return withTimeoutOrNull(10000L) { // Timeout di 10 secondi
+        return withTimeoutOrNull(10000L) {
             suspendCancellableCoroutine { continuation ->
                 val providers = listOf(
                     AndroidLocationManager.GPS_PROVIDER,
@@ -115,13 +133,10 @@ class LocationManagerImpl(private val context: Context) : LocationManager {
                                 override fun onLocationChanged(location: Location) {
                                     if (!resumed) {
                                         resumed = true
-                                        // Rimuovi tutti i listener
-                                        listeners.forEach { listener ->
+                                        listeners.forEach { l ->
                                             try {
-                                                locationManager.removeUpdates(listener)
-                                            } catch (e: Exception) {
-                                                // TODO
-                                            }
+                                                locationManager.removeUpdates(l)
+                                            } catch (_: Exception) {}
                                         }
                                         continuation.resume(location)
                                     }
@@ -136,8 +151,8 @@ class LocationManagerImpl(private val context: Context) : LocationManager {
                             listeners.add(listener)
                             locationManager.requestLocationUpdates(
                                 provider,
-                                1000L, // minTime
-                                3f, // minDistance
+                                1000L,
+                                3f,
                                 listener
                             )
                         } catch (e: SecurityException) {
@@ -146,18 +161,14 @@ class LocationManagerImpl(private val context: Context) : LocationManager {
                     }
                 }
 
-                // Cleanup quando la coroutine viene cancellata
                 continuation.invokeOnCancellation {
                     listeners.forEach { listener ->
                         try {
                             locationManager.removeUpdates(listener)
-                        } catch (e: Exception) {
-                            // TODO
-                        }
+                        } catch (_: Exception) {}
                     }
                 }
 
-                // Se nessun provider è disponibile, ritorna null
                 if (listeners.isEmpty()) {
                     continuation.resume(null)
                 }
@@ -170,9 +181,8 @@ class LocationManagerImpl(private val context: Context) : LocationManager {
             return true
         }
 
-        // Controlla se la nuova posizione è più recente
         val timeDelta = location.time - currentBestLocation.time
-        val isSignificantlyNewer = timeDelta > 10 * 1000 // 10 secondi
+        val isSignificantlyNewer = timeDelta > 10 * 1000
         val isSignificantlyOlder = timeDelta < -10 * 1000
         val isNewer = timeDelta > 0
 
@@ -182,13 +192,10 @@ class LocationManagerImpl(private val context: Context) : LocationManager {
             return false
         }
 
-        // Controlla l'accuratezza
         val accuracyDelta = (location.accuracy - currentBestLocation.accuracy).toInt()
         val isLessAccurate = accuracyDelta > 0
         val isMoreAccurate = accuracyDelta < 0
         val isSignificantlyLessAccurate = accuracyDelta > 200
-
-        // Determina se utilizzare la nuova posizione
         val isFromSameProvider = location.provider == currentBestLocation.provider
 
         return when {

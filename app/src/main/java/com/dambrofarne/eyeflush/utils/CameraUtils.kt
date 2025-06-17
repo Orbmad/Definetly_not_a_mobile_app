@@ -1,26 +1,90 @@
 package com.dambrofarne.eyeflush.utils
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import androidx.exifinterface.media.ExifInterface
+import java.io.File
+import java.io.FileOutputStream
 
-fun cropToCenterAspectRatio(bitmap: Bitmap, aspectRatio: Float): Bitmap {
+private const val TARGET_ASPECT_RATIO = 4f/5f
+
+fun cropToCenterAspectRatio(bitmap: Bitmap, aspectRatio: Float = TARGET_ASPECT_RATIO): Bitmap {
+    val originalWidth = bitmap.width
+    val originalHeight = bitmap.height
+    val originalRatio = originalWidth.toFloat() / originalHeight.toFloat()
+
+    val cropWidth: Int
+    val cropHeight: Int
+
+    if (originalRatio > aspectRatio) {
+        // Immagine più larga rispetto al target, tagliare i lati
+        cropHeight = originalHeight
+        cropWidth = (cropHeight * aspectRatio).toInt()
+    } else {
+        // Immagine più alta rispetto al target, tagliare sopra/sotto
+        cropWidth = originalWidth
+        cropHeight = (cropWidth / aspectRatio).toInt()
+    }
+
+    val xOffset = (originalWidth - cropWidth) / 2
+    val yOffset = (originalHeight - cropHeight) / 2
+
+    return Bitmap.createBitmap(bitmap, xOffset, yOffset, cropWidth, cropHeight)
+}
+
+
+fun rotateBitmap(bitmap: Bitmap, degrees: Float): Bitmap {
+    val matrix = Matrix().apply { postRotate(degrees) }
+    return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+}
+
+fun fixImageOrientationAndCrop(photoFile: File, aspectRatio: Float = 4f / 5f): File {
+    val exif = ExifInterface(photoFile.absolutePath)
+    val orientation = exif.getAttributeInt(
+        ExifInterface.TAG_ORIENTATION,
+        ExifInterface.ORIENTATION_NORMAL
+    )
+
+    val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+    val rotatedBitmap = when (orientation) {
+        ExifInterface.ORIENTATION_ROTATE_90 -> rotateBitmap(bitmap, 90f)
+        ExifInterface.ORIENTATION_ROTATE_180 -> rotateBitmap(bitmap, 180f)
+        ExifInterface.ORIENTATION_ROTATE_270 -> rotateBitmap(bitmap, 270f)
+        else -> bitmap
+    }
+
+    val croppedBitmap = cropToCenterAspectRatio(rotatedBitmap, aspectRatio)
+
+    // Salva l'immagine corretta nello stesso file
+    FileOutputStream(photoFile).use { out ->
+        croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+    }
+
+    // Reset EXIF orientation
+    val newExif = ExifInterface(photoFile.absolutePath)
+    newExif.setAttribute(
+        ExifInterface.TAG_ORIENTATION,
+        ExifInterface.ORIENTATION_NORMAL.toString()
+    )
+    newExif.saveAttributes()
+
+    return photoFile
+}
+
+fun cropRelativeToOverlay(bitmap: Bitmap): Bitmap {
     val originalWidth = bitmap.width
     val originalHeight = bitmap.height
 
-    val targetWidth = originalWidth
-    val targetHeight = (targetWidth / aspectRatio).toInt()
+    val overlayWidthRatio = 0.7f
+    val overlayAspectRatio = 4f / 5f
 
-    val finalWidth: Int
-    val finalHeight: Int
-    if (targetHeight > originalHeight) {
-        finalHeight = originalHeight
-        finalWidth = (finalHeight * aspectRatio).toInt()
-    } else {
-        finalWidth = targetWidth
-        finalHeight = targetHeight
-    }
+    val cropWidth = (originalWidth * overlayWidthRatio).toInt()
+    val cropHeight = (cropWidth / overlayAspectRatio).toInt()
 
-    val left = (originalWidth - finalWidth) / 2
-    val top = (originalHeight - finalHeight) / 2
+    val xOffset = (originalWidth - cropWidth) / 2
+    val yOffset = (originalHeight - cropHeight) / 2
 
-    return Bitmap.createBitmap(bitmap, left, top, finalWidth, finalHeight)
+    return Bitmap.createBitmap(bitmap, xOffset, yOffset, cropWidth, cropHeight)
 }
+
