@@ -6,8 +6,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.dambrofarne.eyeflush.ui.screens.camera.CameraScreen
+import com.dambrofarne.eyeflush.ui.screens.gamification.GamificationScreen
 import com.dambrofarne.eyeflush.ui.screens.home.HomeMapScreen
 import com.dambrofarne.eyeflush.ui.screens.markerOverview.MarkerOverviewScreen
+import com.dambrofarne.eyeflush.ui.screens.notifications.NotificationScreen
 import com.dambrofarne.eyeflush.ui.screens.profile.ProfileScreen
 import com.dambrofarne.eyeflush.ui.screens.profileconfig.ProfileConfigScreen
 import com.dambrofarne.eyeflush.ui.screens.signin.SignInScreen
@@ -26,6 +28,8 @@ sealed interface EyeFlushRoute {
     @Serializable data object ProfileConfig : EyeFlushRoute
     @Serializable data object Profile : EyeFlushRoute
     @Serializable data object Camera: EyeFlushRoute
+    @Serializable data object Game: EyeFlushRoute
+    @Serializable data object Notification: EyeFlushRoute
     @Serializable data class MarkerOverview(val markerId : String) : EyeFlushRoute
     @Serializable data class UserOverview(val uId : String) : EyeFlushRoute
 
@@ -61,6 +65,14 @@ fun EyeFlushNavGraph(navController: NavHostController) {
 
         composable<EyeFlushRoute.Profile> {
             ProfileScreen(navController)
+        }
+
+        composable<EyeFlushRoute.Game> {
+            GamificationScreen(navController)
+        }
+
+        composable<EyeFlushRoute.Notification> {
+            NotificationScreen(navController)
         }
 
         composable<EyeFlushRoute.Camera> {
