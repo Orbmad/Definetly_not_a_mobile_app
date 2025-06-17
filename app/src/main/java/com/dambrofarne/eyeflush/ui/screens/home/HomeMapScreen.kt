@@ -138,10 +138,8 @@ fun HomeMapScreen(
             // Aggiungi i nuovi marker delle foto
             polaroidMarkers.forEach { marker ->
                 //Log.w("Test", "Creating photo marker at ${photoMarker.position}")
-
                 val polaroidMarker = marker
-                Log.w("HomeMapScreen", "added marker id: ${marker.id}")
-                polaroidMarker.setMarkerClickedAction { navController.navigate(EyeFlushRoute.MarkerOverview(polaroidMarker.id)) }
+                polaroidMarker.setMarkerClickedAction { navController.navigate(EyeFlushRoute.MarkerOverview(polaroidMarker.getID())) }
                 polaroidMarkersRefs.add(polaroidMarker)
                 mapView?.overlays?.add(polaroidMarker)
                 //Log.w("Test", "Photo marker added successfully")

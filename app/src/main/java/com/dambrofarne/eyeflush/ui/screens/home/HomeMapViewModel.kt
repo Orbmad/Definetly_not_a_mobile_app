@@ -61,6 +61,7 @@ class HomeMapViewModel(
     private fun loadPolaroidMarkers(location: GeoPoint) {
         viewModelScope.launch {
             val photoDataList = db.getMarkersInRange(location, 1500)
+
             val markers = createPolaroidMarkersFromMarkers(photoDataList)
             _polaroidMarkers.value = markers
             //Log.w("test", "Markers: $markers")
