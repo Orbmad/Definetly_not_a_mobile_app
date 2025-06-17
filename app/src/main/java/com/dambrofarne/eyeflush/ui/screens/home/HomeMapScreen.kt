@@ -17,12 +17,9 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.R
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
-import com.dambrofarne.eyeflush.data.managers.location.LocationManagerImpl
 import com.dambrofarne.eyeflush.ui.composables.CameraButton
 import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
-import com.dambrofarne.eyeflush.ui.composables.CustomTopBar
 import com.dambrofarne.eyeflush.ui.composables.NavScreen
-import com.dambrofarne.eyeflush.ui.composables.ProfileIcon
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.launch
