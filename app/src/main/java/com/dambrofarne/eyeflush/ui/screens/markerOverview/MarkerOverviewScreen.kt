@@ -135,7 +135,7 @@ fun MarkerOverviewScreen(
                                 userId = uiState.mostLikedPicUserId,
                                 username = uiState.mostLikedPicUsername,
                                 userImageUrl = uiState.mostLikedPicUserImage,
-                                onUserClick = { userId -> 
+                                onUserClick = { userId ->
                                     navController.navigate(EyeFlushRoute.UserOverview(userId))
                                 }
                             )
