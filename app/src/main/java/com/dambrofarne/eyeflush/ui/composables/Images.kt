@@ -6,15 +6,19 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -41,6 +45,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -282,3 +287,85 @@ fun ImageGrid(
         }
     }
 }
+
+@Composable
+fun PolaroidOverlayCard(
+    imageUrl: String,
+    uId : String,
+    username: String,
+    userImage : String,
+    timestamp: String,
+    onUserClick : (String) -> Unit,
+    likeCount: Int,
+    modifier: Modifier = Modifier,
+    onDismiss: (() -> Unit)? = null
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.6f))
+            .clickable { onDismiss?.invoke() }, // dismiss al tocco sull’overlay
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            shape = RoundedCornerShape(4.dp),
+            elevation = CardDefaults.cardElevation(12.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            modifier = Modifier
+                .padding(24.dp)
+                .widthIn(max = 360.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(bottom = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = "Polaroid Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .border(
+                            width = 12.dp,
+                            color = Color.White,
+                        )
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        UserProfileRow(
+                            userId = uId,
+                            username = username,
+                            userImageUrl = userImage,
+                            onUserClick = onUserClick
+                        )
+                        Text(
+                            text = timestamp,
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
+                    }
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = "Likes",
+                            tint = Color.Red,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(text = "$likeCount", fontSize = 14.sp)
+                    }
+                }
+            }
+        }
+    }
+}
+

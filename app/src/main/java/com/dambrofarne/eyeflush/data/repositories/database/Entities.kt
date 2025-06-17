@@ -68,7 +68,23 @@ data class Picture(
     val url : String = "",
     val timeStamp : Timestamp = Timestamp.now(),
     val likes : Int = 0,
+    val authorUsername : String =  "",
+    val authorImageUrl : String =  "",
+    val markerName : String =  "",
 )
+
+data class PictureFormatted(
+    val id: String ="",
+    val uId : String = "",
+    val markerId : String = "",
+    val url : String = "",
+    val timeStamp : String = "",
+    val likes : Int = 0,
+    val authorUsername : String =  "",
+    val authorImageUrl : String =  "",
+    val markerName : String =  "",
+)
+
 
 data class User (
     val uId : String,

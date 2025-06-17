@@ -1,6 +1,7 @@
 package com.dambrofarne.eyeflush.ui.screens.markerOverview
 
 import android.util.Log
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
@@ -29,7 +30,16 @@ data class MarkerOverviewUiState(
     val isLoading: Boolean = false,
     val isUpdating: Boolean = false,
     val errorMessage: String? = null,
-    val userLikesMostLiked: Boolean = false
+    val userLikesMostLiked: Boolean = false,
+
+    val showOverlay : Boolean = false,
+    val imageUrlOverlay: String = "",
+    val uIdvOverlay : String = "",
+    val usernameOverlay : String = "",
+    val userImageOverlay : String = "",
+    val markerNameOverlay : String = "",
+    val timestampOverlay: String = "",
+    val likeCountOverlay : Int = 0
 )
 
 
@@ -109,4 +119,29 @@ class MarkerOverviewViewModel(
         }
     }
 
+    fun showOverlay(picId : String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(showOverlay = true) }
+            val result = db.getPictureExtendedInfo(picId)
+            if (result.isSuccess) {
+                val picture = result.getOrNull()!!
+
+
+                _uiState.update {
+                    it.copy(
+                        imageUrlOverlay = picture.url,
+                        uIdvOverlay = picture.uId,
+                        usernameOverlay = picture.authorUsername,
+                        userImageOverlay = picture.authorImageUrl,
+                        markerNameOverlay = picture.markerName,
+                        timestampOverlay = picture.timeStamp,
+                        likeCountOverlay = picture.likes
+                    )
+                }
+
+            } else {
+                _uiState.update { it.copy(showOverlay = false) }
+            }
+        }
+    }
 }

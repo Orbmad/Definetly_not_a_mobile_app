@@ -26,6 +26,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,6 +45,7 @@ import com.dambrofarne.eyeflush.ui.composables.ImageCardSimple
 import com.dambrofarne.eyeflush.ui.composables.ImageGrid
 import com.dambrofarne.eyeflush.ui.composables.ImageLabel
 import com.dambrofarne.eyeflush.ui.composables.PageTitle
+import com.dambrofarne.eyeflush.ui.composables.PolaroidOverlayCard
 import com.dambrofarne.eyeflush.ui.composables.StandardHeadline
 import com.dambrofarne.eyeflush.ui.composables.StandardText
 import com.dambrofarne.eyeflush.ui.composables.UserProfileRow
@@ -59,6 +63,7 @@ fun MarkerOverviewScreen(
         viewModel.loadMarkerInfo(markerId)
     }
 
+
     when {
         uiState.isLoading -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -69,97 +74,112 @@ fun MarkerOverviewScreen(
             AuthenticationError(text = uiState.errorMessage!!)
         }
         else -> {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(WindowInsets.safeDrawing.asPaddingValues()) // Evita notch/cutouts
-                    .padding(16.dp) // Spaziatura interna extra
-            ) {
-                // Top section with most liked image
-                val markerTitle = uiState.name ?: "[%.6f, %.6f]".format(
-                    uiState.coordinates.latitude,
-                    uiState.coordinates.longitude
+            if (uiState.showOverlay) {
+                PolaroidOverlayCard(
+                    imageUrl = uiState.imageUrlOverlay,
+                    username = uiState.usernameOverlay,
+                    timestamp = uiState.timestampOverlay,
+                    likeCount = uiState.likeCountOverlay,
+                    onDismiss = { },
+                    uId = uiState.uIdvOverlay,
+                    userImage = uiState.userImageOverlay,
+                    onUserClick = { userId ->
+                        navController.navigate(EyeFlushRoute.UserOverview(userId))
+                    },
                 )
-                PageTitle(markerTitle)
-                StandardText("Immagini scattate qui: " + uiState.imagesCount.toString())
-                if (uiState.isUpdating) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp)
-                    ) {
-                        CircularProgressIndicator(
+            }else{
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(WindowInsets.safeDrawing.asPaddingValues()) // Evita notch/cutouts
+                        .padding(16.dp) // Spaziatura interna extra
+                ) {
+                    // Top section with most liked image
+                    val markerTitle = uiState.name ?: "[%.6f, %.6f]".format(
+                        uiState.coordinates.latitude,
+                        uiState.coordinates.longitude
+                    )
+                    PageTitle(markerTitle)
+                    StandardText("Immagini scattate qui: " + uiState.imagesCount.toString())
+                    if (uiState.isUpdating) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .size(16.dp)
-                                .padding(end = 8.dp),
-                            strokeWidth = 2.dp
-                        )
-                        Text("Aggiornamento...", style = MaterialTheme.typography.labelMedium)
-                    }
-                }
-                Spacer(modifier = Modifier.height(20.dp))
-
-                uiState.mostLikedPicURL?.let { url ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (uiState.mostLikedPicId != null) {
-                            ImageCardSimple(
-                                picId = uiState.mostLikedPicId!!,
-                                url = uiState.mostLikedPicURL!!,
-                                likes = uiState.mostLikedPicLikes,
-                                liked = uiState.userLikesMostLiked,
-                                onClick = { /* ... */ },
-                                onToggleLike = viewModel::toggleLike,
-                                modifier = Modifier
-                                    .width(200.dp)
-                                    .height(250.dp),
-                                enabled = !uiState.isUpdating
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(16.dp))
-
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(top = 4.dp),
-                            verticalArrangement = Arrangement.Top,
-                            horizontalAlignment = Alignment.Start
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp)
                         ) {
-                            UserProfileRow(
-                                userId = uiState.mostLikedPicUserId,
-                                username = uiState.mostLikedPicUsername,
-                                userImageUrl = uiState.mostLikedPicUserImage,
-                                onUserClick = { userId ->
-                                    navController.navigate(EyeFlushRoute.UserOverview(userId))
-                                }
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .size(16.dp)
+                                    .padding(end = 8.dp),
+                                strokeWidth = 2.dp
                             )
-                            Spacer(modifier = Modifier.height(20.dp))
-                            ImageLabel("🕒 ${uiState.mostLikedPicTimeStamp}")
-                            ImageLabel("❤️ ${uiState.mostLikedPicLikes}")
+                            Text("Aggiornamento...", style = MaterialTheme.typography.labelMedium)
                         }
                     }
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.outline
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    uiState.mostLikedPicURL?.let { url ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (uiState.mostLikedPicId != null) {
+                                ImageCardSimple(
+                                    picId = uiState.mostLikedPicId!!,
+                                    url = uiState.mostLikedPicURL!!,
+                                    likes = uiState.mostLikedPicLikes,
+                                    liked = uiState.userLikesMostLiked,
+                                    onClick = { /* ... */ },
+                                    onToggleLike = viewModel::toggleLike,
+                                    modifier = Modifier
+                                        .width(200.dp)
+                                        .height(250.dp),
+                                    enabled = !uiState.isUpdating
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(top = 4.dp),
+                                verticalArrangement = Arrangement.Top,
+                                horizontalAlignment = Alignment.Start
+                            ) {
+                                UserProfileRow(
+                                    userId = uiState.mostLikedPicUserId,
+                                    username = uiState.mostLikedPicUsername,
+                                    userImageUrl = uiState.mostLikedPicUserImage,
+                                    onUserClick = { userId ->
+                                        navController.navigate(EyeFlushRoute.UserOverview(userId))
+                                    }
+                                )
+                                Spacer(modifier = Modifier.height(20.dp))
+                                ImageLabel("🕒 ${uiState.mostLikedPicTimeStamp}")
+                                ImageLabel("❤️ ${uiState.mostLikedPicLikes}")
+                            }
+                        }
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            thickness = 1.dp,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                    }
+
+
+                    ImageGrid(
+                        pictures = uiState.picturesTaken,
+                        onImageClick = { clickedPicId ->
+                            viewModel.showOverlay(clickedPicId)
+                        },
+                        onToggleLike = viewModel::toggleLike,
+                        enabled = !uiState.isUpdating
                     )
                 }
-
-
-                ImageGrid(
-                    pictures = uiState.picturesTaken,
-                    onImageClick = { clickedPicId ->
-                        // navController.navigate("pictureDetail/$clickedPicId")
-                    },
-                    onToggleLike = viewModel::toggleLike,
-                    enabled = !uiState.isUpdating
-                )
             }
         }
     }
