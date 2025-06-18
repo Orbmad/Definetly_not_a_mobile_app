@@ -89,7 +89,6 @@ data class User (
     val uId : String,
     val username: String,
     val profileImagePath : String,
-    val score: Int,
     val imagesCount: Int,
     val picturesTaken : List<PicQuickRef>
 )
