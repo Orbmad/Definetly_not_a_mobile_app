@@ -37,7 +37,9 @@ import com.dambrofarne.eyeflush.ui.composables.NavScreen
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -45,8 +47,11 @@ fun NotificationScreen(
     navController: NavHostController,
     viewModel: NotificationViewModel = koinViewModel<NotificationViewModel>()
 ) {
-    val notifications = viewModel.notifications
+    val uiState by viewModel.uiState.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.loadNotifications()
+    }
 
     CustomScaffold(
         title = "Notifications",
@@ -54,30 +59,53 @@ fun NotificationScreen(
         navController = navController,
         currentScreen = NavScreen.NOTIFICATIONS,
         content = {
-            LazyColumn {
-                items(notifications,
-                    key = { it.id }
-                ) { notification ->
-                    val dismissState = rememberDismissState()
+            when {
+                uiState.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
 
-                    LaunchedEffect(dismissState.currentValue) {
-                        if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
-                            viewModel.markAsRead(notification.id)
-                            // Reimposta stato se non vuoi che venga mantenuto
-                            dismissState.reset()
+                else -> {
+                    if (uiState.notificationsList.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = "You have no notifications for now...")
+                        }
+                    } else {
+                        LazyColumn {
+                            items(uiState.notificationsList,
+                                key = { it.id }
+                            ) { notification ->
+                                val dismissState = rememberDismissState()
+
+                                LaunchedEffect(dismissState.currentValue) {
+                                    if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
+                                        viewModel.markAsRead(notification.id)
+                                        // Reset state
+                                        dismissState.reset()
+                                    }
+                                }
+
+                                SwipeToDismiss(
+                                    state = dismissState,
+                                    directions = setOf(DismissDirection.StartToEnd),
+                                    background = {
+                                        SwipeBackground(isRead = notification.isRead)
+                                    },
+                                    dismissContent = {
+                                        NotificationCard(notification = notification, onClick = {})
+                                    }
+                                )
+                            }
                         }
                     }
 
-                    SwipeToDismiss(
-                        state = dismissState,
-                        directions = setOf(DismissDirection.StartToEnd),
-                        background = {
-                            SwipeBackground(isRead = notification.isRead)
-                        },
-                        dismissContent = {
-                            NotificationCard(notification = notification, onClick = {})
-                        }
-                    )
                 }
             }
         }
@@ -106,7 +134,7 @@ fun NotificationCard(
             Spacer(modifier = Modifier.height(4.dp))
             Text(notification.message, style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(notification.time.toString(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.tertiary)
+            Text(notification.time, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.tertiary)
         }
     }
 }
