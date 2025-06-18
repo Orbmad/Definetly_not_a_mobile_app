@@ -202,15 +202,16 @@ fun HomeMapScreen(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier
-                            .size(82.dp)
+                            .size(86.dp)
                             .align(Alignment.BottomCenter)
-                            .offset(x = (-70).dp)
+                            .offset(x = (-72).dp)
                             .padding(16.dp),
                         shape = CircleShape
                     ) {
                         Icon(
                             imageVector = Icons.Default.MyLocation,
-                            contentDescription = "Center to current position"
+                            contentDescription = "Center to current position",
+                            modifier = Modifier.size(32.dp)
                         )
                     }
 

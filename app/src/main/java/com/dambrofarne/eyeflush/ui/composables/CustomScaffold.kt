@@ -87,10 +87,11 @@ fun CustomScaffold(
                     .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
             ) {
                 val iconColor = MaterialTheme.colorScheme.primary
-                val iconSize = 64.dp
+                val iconSize = 36.dp
 
                 // Home button
                 NavigationBarItem(
+                    modifier = Modifier,
                     icon = {
                         Icon(
                             imageVector = Icons.Default.Home,
