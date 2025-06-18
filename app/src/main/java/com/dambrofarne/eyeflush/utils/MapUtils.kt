@@ -1,7 +1,6 @@
 package com.dambrofarne.eyeflush.utils
 
 import com.dambrofarne.eyeflush.data.repositories.database.Marker
-import com.dambrofarne.eyeflush.ui.screens.home.PolaroidMarker
 import org.osmdroid.util.GeoPoint
 import kotlin.math.atan2
 import kotlin.math.cos
