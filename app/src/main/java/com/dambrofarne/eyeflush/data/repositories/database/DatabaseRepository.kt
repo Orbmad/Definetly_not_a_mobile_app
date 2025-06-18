@@ -1,5 +1,6 @@
 package com.dambrofarne.eyeflush.data.repositories.database
 
+import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.google.firebase.Timestamp
 import org.osmdroid.util.GeoPoint
 import java.time.LocalDateTime
@@ -49,7 +50,7 @@ interface DatabaseRepository {
     /**
      * @return A list of the users notifications
      */
-    suspend fun getNotifications(uId: String) : Unit
+    suspend fun getNotifications(uId: String) : List<NotificationItem>
 
     /**
      * @param uId

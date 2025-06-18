@@ -591,7 +591,33 @@ class FirestoreDatabaseRepository(
         }
     }
 
-    override suspend fun getNotifications(uId: String) {
-        TODO("Not yet implemented")
+    override suspend fun getNotifications(uId: String): List<NotificationItem> {
+        return try {
+            val notificationsRef = db.collection("users")
+                .document(uId)
+                .collection("notifications")
+                .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+
+            val snapshot = notificationsRef.get().await()
+
+            snapshot.documents.mapNotNull { doc ->
+                try {
+                    NotificationItem(
+                        id = doc.id,
+                        title = doc.getString("title") ?: "",
+                        message = doc.getString("message") ?: "",
+                        time = doc.getTimestamp("timestamp")?.let { getFormattedImageDate(it) } ?: "Unknown",
+                        isRead = doc.getBoolean("read") ?: false,
+                        type = doc.getString("type") ?: "",
+                        referredMarkerId = doc.getString("markerId") ?: ""
+                    )
+                } catch (e: Exception) {
+                    null
+                }
+            }
+
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 }
