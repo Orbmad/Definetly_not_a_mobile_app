@@ -100,7 +100,7 @@ data class NotificationItem(
     val type: String,
     val title: String,
     val message: String,
-    val time: LocalDateTime,
+    val time: String,
     val isRead: Boolean = false,
     val referredMarkerId: String?,
 )

@@ -27,8 +27,8 @@ class NotificationViewModel(
     private fun loadDummyNotifications() {
         _notifications.addAll(
             listOf(
-                NotificationItem("1", "LIKE", "Your photo received a like", "-Utente- ha messo like alla tua foto", time = LocalDateTime.now(), isRead = false, referredMarkerId = null),
-                NotificationItem("2", "RANK_ONE", "Your photo got first place", "One of your photo is now first place", time = LocalDateTime.now(), isRead = false, referredMarkerId = null)
+                NotificationItem("1", "LIKE", "Your photo received a like", "-Utente- ha messo like alla tua foto", time = LocalDateTime.now().toString(), isRead = false, referredMarkerId = null),
+                NotificationItem("2", "RANK_ONE", "Your photo got first place", "One of your photo is now first place", time = LocalDateTime.now().toString(), isRead = false, referredMarkerId = null)
             )
         )
     }
