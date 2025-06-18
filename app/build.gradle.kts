@@ -125,4 +125,5 @@ dependencies {
 
 // Material 3
     implementation (libs.material3)
+    implementation(libs.androidx.material)
 }

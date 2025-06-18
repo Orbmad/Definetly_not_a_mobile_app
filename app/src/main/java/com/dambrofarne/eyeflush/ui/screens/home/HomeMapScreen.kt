@@ -17,10 +17,9 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.R
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
-import com.dambrofarne.eyeflush.data.managers.location.LocationManagerImpl
 import com.dambrofarne.eyeflush.ui.composables.CameraButton
-import com.dambrofarne.eyeflush.ui.composables.CustomTopBar
-import com.dambrofarne.eyeflush.ui.composables.ProfileIcon
+import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
+import com.dambrofarne.eyeflush.ui.composables.NavScreen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.launch
@@ -154,42 +153,12 @@ fun HomeMapScreen(
     }
 
     // HomeScreen View
-        Scaffold(
-            topBar = {
-//                TopAppBar(
-//                    title = { "EyeFlush" },
-//                    navigationIcon = {
-//                        IconButton(
-//                            onClick = { navController.navigate(EyeFlushRoute.Profile) }
-//                        ) {
-//                            IconImage(
-//                                image = ACCOUNT_ICON,
-//                                modifier = Modifier
-//                            )
-//                        }
-//                    },
-//                    colors = TopAppBarDefaults.topAppBarColors(
-//                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-//                    )
-//                )
-                CustomTopBar(
-                    title = "EyeFlush",
-//                    navigationIcon = {
-//                        BackButton(
-//                            onClick = {navController.navigate(EyeFlushRoute.Home)}
-//                        )
-//                    },
-                    actions = {
-                        ProfileIcon(
-                            onClick = { navController.navigate(EyeFlushRoute.Profile) }
-                        )
-                    }
-                )
-            },
-            content = { innerPadding ->
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)) {
+        CustomScaffold(
+            showBackButton = false,
+            navController = navController,
+            currentScreen = NavScreen.HOME,
+            content = {
+                Box(modifier = Modifier.fillMaxSize()) {
 
                     AndroidView(
                         factory = { ctx ->

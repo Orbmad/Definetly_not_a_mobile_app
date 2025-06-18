@@ -26,7 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
+import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
 import com.dambrofarne.eyeflush.ui.composables.ImageGrid
+import com.dambrofarne.eyeflush.ui.composables.NavScreen
 import com.dambrofarne.eyeflush.ui.composables.PolaroidOverlayCard
 import com.dambrofarne.eyeflush.ui.composables.ProfileImage
 import com.dambrofarne.eyeflush.ui.composables.SettingsButton
@@ -70,62 +72,71 @@ fun ProfileScreen(
                     },
                 )
             }else{
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Spacer(Modifier.height(35.dp))
-                    StandardHeadline("Il tuo profilo")
-                    ProfileImage(
-                        url = uiState.profileImagePath,
-                        borderSize = 2.dp,
-                        borderColor = Color.Gray,
-                        borderShape = CircleShape
-                    )
-                    StandardText(uiState.username)
-                    SettingsButton(onClick = {
-                        navController.navigate(EyeFlushRoute.ProfileConfig)
-                    })
-                    SignOutText {
-                        viewModel.signOut()
-                        navController.navigate(EyeFlushRoute.SignIn){
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-
-                    if (uiState.isUpdating) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
+                CustomScaffold(
+                    title = "Your Profile",
+                    showBackButton = true,
+                    navController = navController,
+                    currentScreen = NavScreen.PROFILE,
+                    content = {
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 8.dp)
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .size(16.dp)
-                                    .padding(end = 8.dp),
-                                strokeWidth = 2.dp
+                            Spacer(Modifier.height(35.dp))
+                            StandardHeadline("Il tuo profilo")
+                            ProfileImage(
+                                url = uiState.profileImagePath,
+                                borderSize = 2.dp,
+                                borderColor = Color.Gray,
+                                borderShape = CircleShape
                             )
-                            Text("Aggiornamento...", style = MaterialTheme.typography.labelMedium)
+                            StandardText(uiState.username)
+                            SettingsButton(onClick = {
+                                navController.navigate(EyeFlushRoute.ProfileConfig)
+                            })
+                            SignOutText {
+                                viewModel.signOut()
+                                navController.navigate(EyeFlushRoute.SignIn){
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            }
+                            HorizontalDivider(
+                                modifier = Modifier.padding(vertical = 8.dp),
+                                thickness = 1.dp,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+
+                            if (uiState.isUpdating) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 8.dp)
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .size(16.dp)
+                                            .padding(end = 8.dp),
+                                        strokeWidth = 2.dp
+                                    )
+                                    Text("Aggiornamento...", style = MaterialTheme.typography.labelMedium)
+                                }
+                            }
+
+                            ImageGrid(
+                                pictures = uiState.picturesTaken,
+                                onImageClick = { clickedPicId ->
+                                    viewModel.showOverlay(clickedPicId)
+                                },
+                                onToggleLike = viewModel::toggleLike,
+                                enabled = !uiState.isUpdating
+                            )
                         }
                     }
+                )
 
-                    ImageGrid(
-                        pictures = uiState.picturesTaken,
-                        onImageClick = { clickedPicId ->
-                            viewModel.showOverlay(clickedPicId)
-                        },
-                        onToggleLike = viewModel::toggleLike,
-                        enabled = !uiState.isUpdating
-                    )
-                }
             }
         }
     }
