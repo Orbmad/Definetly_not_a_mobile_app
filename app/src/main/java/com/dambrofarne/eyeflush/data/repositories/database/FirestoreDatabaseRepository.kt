@@ -15,6 +15,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
+import java.util.Locale
 
 class FirestoreDatabaseRepository(
     private val db: FirebaseFirestore = Firebase.firestore
@@ -307,28 +308,44 @@ class FirestoreDatabaseRepository(
                 Timestamp(Date.from(timeStamp.atZone(ZoneId.systemDefault()).toInstant()))
             val pictureRef = db.collection("pictures").document()
 
-            val newPicture = Picture(
-                id = pictureRef.id,
-                uId = uId,
-                markerId = markerId,
-                url = imgURL,
-                timeStamp = timestamp,
-                likes = 0
-            )
-
-            val pictureData = mapOf(
-                "id" to pictureRef.id,
-                "url" to imgURL
-            )
             val userRef = db.collection("users").document(uId)
             val markerRef = db.collection("markers").document(markerId)
 
             db.runTransaction { transaction ->
-                //Letture
+                // Letture
+                val userSnap = transaction.get(userRef)
                 val markerSnap = transaction.get(markerRef)
+
+                val username = userSnap.getString("username") ?: "Unknown"
+                val authorImageUrl = userSnap.getString("profileImagePath") ?: ""
+
+                val markerName = markerSnap.getString("name")
+                    ?: run {
+                        val lat = markerSnap.getDouble("latitude")?.let { String.format(Locale.US,"%.4f", it) } ?: "0.0"
+                        val lng = markerSnap.getDouble("longitude")?.let { String.format(Locale.US,"%.4f", it) } ?: "0.0"
+                        "$lat, $lng"
+                    }
+
+                val newPicture = Picture(
+                    id = pictureRef.id,
+                    uId = uId,
+                    authorUsername = username,
+                    authorImageUrl = authorImageUrl,
+                    markerName = markerName,
+                    markerId = markerId,
+                    url = imgURL,
+                    timeStamp = timestamp,
+                    likes = 0
+                )
+
+                val pictureData = mapOf(
+                    "id" to pictureRef.id,
+                    "url" to imgURL
+                )
+
                 val existingPics = markerSnap.get("picturesTaken") as? List<*>
 
-                //Scritture
+                // Scritture
                 transaction.set(pictureRef, newPicture)
                 transaction.update(userRef, "picsCount", FieldValue.increment(1))
                 transaction.update(userRef, "picturesTaken", FieldValue.arrayUnion(pictureData))
@@ -342,7 +359,7 @@ class FirestoreDatabaseRepository(
                             "mostLikedPicURL" to imgURL,
                             "mostLikedPicUserId" to uId,
                             "mostLikedPicLikes" to 0,
-                            "mostLikedPicTimeStamp" to Timestamp(Date.from(timeStamp.atZone(ZoneId.systemDefault()).toInstant()))
+                            "mostLikedPicTimeStamp" to timestamp
                         )
                     )
                 } else {
@@ -354,7 +371,6 @@ class FirestoreDatabaseRepository(
                 }
             }.await()
 
-
             pictureRef.id
 
         } catch (e: Exception) {
@@ -362,6 +378,7 @@ class FirestoreDatabaseRepository(
             ""
         }
     }
+
 
     override suspend fun likeImage(uId: String, picId: String): Result<Boolean> {
         return try {
@@ -487,6 +504,46 @@ class FirestoreDatabaseRepository(
             } ?: "Data non disponibile"
         } catch (e: Exception) {
             "Data non disponibile"
+        }
+    }
+
+    override suspend fun getPictureExtendedInfo(picId : String) : Result<PictureFormatted> {
+        return try {
+            val snapshot = db.collection("pictures")
+                .document(picId)
+                .get()
+                .await()
+
+            if (!snapshot.exists()) {
+                return Result.failure(Exception("Picture with id $picId  picId"))
+            }
+
+            val id = snapshot.id?:""
+            val uId = snapshot.getString("uId")?:""
+            val markerId = snapshot.getString("markerId")?:""
+            val url = snapshot.getString("url")?:""
+            val timeStamp = snapshot.getTimestamp("timeStamp")?.let { getFormattedImageDate(it) }?:""
+            val likes : Int = snapshot.getLong("likes")?.toInt() ?: 0
+            val authorUsername = snapshot.getString("authorUsername")?:""
+            val authorImageUrl = snapshot.getString("authorImageUrl")?:""
+            val markerName = snapshot.getString("markerName")?:""
+
+
+            Result.success(
+                PictureFormatted(
+                    id = id,
+                    uId = uId,
+                    markerId = markerId,
+                    url = url,
+                    timeStamp = timeStamp,
+                    likes = likes,
+                    authorUsername = authorUsername,
+                    authorImageUrl = authorImageUrl,
+                    markerName = markerName
+                )
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 }

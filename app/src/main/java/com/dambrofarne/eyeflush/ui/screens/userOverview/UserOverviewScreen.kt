@@ -1,21 +1,15 @@
 package com.dambrofarne.eyeflush.ui.screens.userOverview
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -25,23 +19,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
 import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
-import com.dambrofarne.eyeflush.ui.composables.ImageCardSimple
 import com.dambrofarne.eyeflush.ui.composables.ImageGrid
 import com.dambrofarne.eyeflush.ui.composables.ImageLabel
 import com.dambrofarne.eyeflush.ui.composables.PageTitle
 import com.dambrofarne.eyeflush.ui.composables.ProfileImage
-import com.dambrofarne.eyeflush.ui.composables.StandardText
-import com.dambrofarne.eyeflush.ui.screens.markerOverview.MarkerOverviewViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun userOverviewScreen(
+fun UserOverviewScreen(
     navController: NavHostController,
     uId : String,
     viewModel: UserOverviewViewModel = koinViewModel<UserOverviewViewModel>()
@@ -66,7 +55,7 @@ fun userOverviewScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(WindowInsets.safeDrawing.asPaddingValues()) // Evita notch/cutouts
-                    .padding(16.dp) // Spaziatura interna extra
+                    .padding(16.dp)
             ) {
                 PageTitle(uiState.username)
                 if (uiState.isUpdating) {
@@ -102,7 +91,7 @@ fun userOverviewScreen(
                 ImageGrid(
                     pictures = uiState.picturesTaken,
                     onImageClick = { clickedPicId ->
-                        // navController.navigate("pictureDetail/$clickedPicId")
+                        viewModel.showOverlay(clickedPicId)
                     },
                     onToggleLike = viewModel::toggleLike,
                     enabled = !uiState.isUpdating
