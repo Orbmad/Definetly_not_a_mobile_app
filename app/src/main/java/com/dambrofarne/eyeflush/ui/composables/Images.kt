@@ -45,14 +45,12 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.dambrofarne.eyeflush.data.repositories.database.PicQuickRef
-import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileImage(
@@ -325,7 +323,7 @@ fun PolaroidOverlayCard(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(1f)
+                        .aspectRatio(0.8f)
                         .border(
                             width = 12.dp,
                             color = Color.White,

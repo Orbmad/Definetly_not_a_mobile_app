@@ -546,4 +546,52 @@ class FirestoreDatabaseRepository(
             Result.failure(e)
         }
     }
+
+    override suspend fun addNotification(
+        receiverUId: String,
+        title: String,
+        type: String,
+        message: String,
+        isRead: Boolean,
+        markerId: String?
+    ): Result<String> {
+        return try {
+            val notificationData = mapOf(
+                "title" to title,
+                "body" to message,
+                "timestamp" to System.currentTimeMillis(),
+                "read" to isRead,
+                "type" to type,
+                "markerId" to markerId
+            )
+
+            val notificationsRef = db.collection("users")
+                .document(receiverUId)
+                .collection("notifications")
+
+            val documentRef = notificationsRef.add(notificationData).await()
+
+            Result.success(documentRef.id)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun readNotification(uId: String, notificationId: String): Result<Boolean> {
+        return try {
+            val notificationRef = db.collection("users")
+                .document(uId)
+                .collection("notifications")
+                .document(notificationId)
+
+            notificationRef.update("read", true).await()
+            Result.success(true)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getNotifications(uId: String) {
+        TODO("Not yet implemented")
+    }
 }
