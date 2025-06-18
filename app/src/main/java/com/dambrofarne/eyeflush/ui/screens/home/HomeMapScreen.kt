@@ -20,6 +20,7 @@ import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.CameraButton
 import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
 import com.dambrofarne.eyeflush.ui.composables.NavScreen
+import com.dambrofarne.eyeflush.utils.locationMetersDistance
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.launch
@@ -28,6 +29,7 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.tileprovider.tilesource.XYTileSource
+import org.osmdroid.util.GeoPoint
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -56,6 +58,8 @@ fun HomeMapScreen(
     val polaroidMarkers by viewModel.polaroidMarkers.collectAsState()
     val currentLocation by viewModel.currentLocation.collectAsState()
     val locationUpdated by viewModel.locationUpdated.collectAsState()
+    //val locationDelta: Double = 0.3
+    //var lastLocation: GeoPoint? = currentLocation
 
     var mapView: MapView? by remember { mutableStateOf(null) }
     var currentLocationMarker by remember { mutableStateOf<Marker?>(null) }
@@ -82,7 +86,9 @@ fun HomeMapScreen(
             initialLocation?.let {
                 Log.w("HomeMapScreen", "Initial location acquired")
                 viewModel.updateCurrentLocation(it)
-                //mapView?.controller?.animateTo(it)
+                //lastLocation = currentLocation
+                mapView?.controller?.animateTo(currentLocation)
+                mapView?.invalidate()
             }
 
             // Get current location
@@ -116,7 +122,10 @@ fun HomeMapScreen(
                 currentLocationMarker?.position = location
             }
 
-            map.controller.animateTo(location)
+            //if (lastLocation != null && locationMetersDistance(location, lastLocation!!) > locationDelta) {
+                map.controller.animateTo(location)
+            //}
+            //lastLocation = location
             map.invalidate()
         }
     }
@@ -202,15 +211,16 @@ fun HomeMapScreen(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier
-                            .size(82.dp)
+                            .size(86.dp)
                             .align(Alignment.BottomCenter)
-                            .offset(x = (-70).dp)
+                            .offset(x = (-72).dp)
                             .padding(16.dp),
                         shape = CircleShape
                     ) {
                         Icon(
                             imageVector = Icons.Default.MyLocation,
-                            contentDescription = "Center to current position"
+                            contentDescription = "Center to current position",
+                            modifier = Modifier.size(32.dp)
                         )
                     }
 
