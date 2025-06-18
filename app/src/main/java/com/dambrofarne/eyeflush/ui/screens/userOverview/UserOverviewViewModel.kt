@@ -83,8 +83,6 @@ class UserOverviewViewModel(
                 return@launch
             }
 
-            Log.w("Testing", picId)
-            Log.w("Testing", currentUser)
             val result = db.likeImage(uId = currentUser, picId = picId)
 
             if (result.isSuccess) {

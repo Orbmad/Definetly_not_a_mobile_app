@@ -23,9 +23,7 @@ import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
 import com.dambrofarne.eyeflush.ui.composables.CustomStandardButton
 import com.dambrofarne.eyeflush.ui.composables.EyeFlushTextField
-import com.dambrofarne.eyeflush.ui.composables.GoogleButton
 import com.dambrofarne.eyeflush.ui.composables.SignUpText
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
