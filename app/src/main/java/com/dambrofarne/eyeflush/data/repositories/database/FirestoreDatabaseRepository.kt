@@ -6,6 +6,7 @@ import com.dambrofarne.eyeflush.utils.isWithinRange
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -591,12 +592,45 @@ class FirestoreDatabaseRepository(
         }
     }
 
+    override suspend fun getUserAchievements(uId: String): Result<UserAchievements> {
+        return try {
+            val userRef = db.collection("users").document(uId)
+            val userSnap = userRef.get().await()
+
+            val picsCount = userSnap.getLong("picsCount")?.toInt() ?: 0
+            val mostLikedPictures = userSnap.getLong("mostLikedPictures")?.toInt() ?: 0
+
+            val picsSnap = db.collection("pictures")
+                .whereEqualTo("uid", uId)
+                .get()
+                .await()
+
+            val likesReceived = picsSnap.documents.sumOf { it.getLong("likes") ?: 0L }.toInt()
+            val distinctMarkerIds = picsSnap.documents
+                .mapNotNull { it.getString("markerId") }
+                .toSet()
+            val markersPhotographed = distinctMarkerIds.size
+
+            Result.success(
+                UserAchievements(
+                    likesReceived = likesReceived,
+                    picturesTaken = picsCount,
+                    markersPhotographed = markersPhotographed,
+                    mostLikedPictures = mostLikedPictures
+                )
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
     override suspend fun getNotifications(uId: String): List<NotificationItem> {
         return try {
             val notificationsRef = db.collection("users")
                 .document(uId)
                 .collection("notifications")
-                .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
 
             val snapshot = notificationsRef.get().await()
 

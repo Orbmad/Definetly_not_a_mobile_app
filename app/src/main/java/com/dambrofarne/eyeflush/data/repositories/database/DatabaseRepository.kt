@@ -59,4 +59,12 @@ interface DatabaseRepository {
      * @return True if the notification is now marked as red
      */
     suspend fun readNotification(uId : String, notificationId: String) : Result<Boolean>
+
+
+    /**
+     * @param uId
+     *
+     * @return A data class with the level of user's achievements
+     */
+    suspend fun getUserAchievements(uId : String) : Result<UserAchievements>
 }
