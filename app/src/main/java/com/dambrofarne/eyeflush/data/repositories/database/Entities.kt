@@ -94,3 +94,13 @@ data class User (
     val imagesCount: Int,
     val picturesTaken : List<PicQuickRef>
 )
+
+data class NotificationItem(
+    val id: String,
+    val type: String,
+    val title: String,
+    val message: String,
+    val time: LocalDateTime,
+    val isRead: Boolean = false,
+    val referredMarkerId: String?,
+)
