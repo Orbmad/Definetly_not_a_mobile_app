@@ -1,8 +1,6 @@
 package com.dambrofarne.eyeflush.utils
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Handyman
-import androidx.compose.ui.graphics.vector.ImageVector
+import com.dambrofarne.eyeflush.R
 
 enum class AchievementType {
     LIKES,
@@ -99,8 +97,41 @@ fun getNextAchievementMaxPoints(achievementType: AchievementType, points: Int): 
     }
 }
 
-fun getAchievementIcon(achievementType: AchievementType, achievementRank: AchievementRank): ImageVector {
-    return Icons.Default.Handyman
+fun getAchievementIconId(achievementType: AchievementType, achievementRank: AchievementRank): Int {
+    when (achievementType) {
+        AchievementType.LIKES -> {
+            return when (achievementRank) {
+                AchievementRank.NONE -> R.drawable.likes_badge_bronze
+                AchievementRank.BRONZE -> R.drawable.likes_badge_bronze
+                AchievementRank.SILVER -> R.drawable.likes_badge_silver
+                AchievementRank.GOLD -> R.drawable.likes_badge_gold
+            }
+        }
+        AchievementType.PHOTO_TAKEN -> {
+            return when (achievementRank) {
+                AchievementRank.NONE -> R.drawable.photo_taken_badge_bronze
+                AchievementRank.BRONZE -> R.drawable.photo_taken_badge_bronze
+                AchievementRank.SILVER -> R.drawable.photo_taken_badge_silver
+                AchievementRank.GOLD -> R.drawable.photo_taken_badge_gold
+            }
+        }
+        AchievementType.FIRST_PLACE -> {
+            return when (achievementRank) {
+                AchievementRank.NONE -> R.drawable.first_place_badge_bronze
+                AchievementRank.BRONZE -> R.drawable.first_place_badge_bronze
+                AchievementRank.SILVER -> R.drawable.first_place_badge_silver
+                AchievementRank.GOLD -> R.drawable.first_place_badge_gold
+            }
+        }
+        AchievementType.LOCATION_VISITED -> {
+            return when (achievementRank) {
+                AchievementRank.NONE -> R.drawable.location_visited_badge_bronze
+                AchievementRank.BRONZE -> R.drawable.location_visited_badge_bronze
+                AchievementRank.SILVER -> R.drawable.location_visited_badge_silver
+                AchievementRank.GOLD -> R.drawable.location_visited_badge_gold
+            }
+        }
+    }
 }
 
 fun mapRankToLevel(achievementRank: AchievementRank): String {

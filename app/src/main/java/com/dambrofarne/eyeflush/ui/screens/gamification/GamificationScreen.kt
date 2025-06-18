@@ -1,5 +1,6 @@
 package com.dambrofarne.eyeflush.ui.screens.gamification
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,8 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,8 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -34,7 +32,7 @@ import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
 import com.dambrofarne.eyeflush.ui.composables.NavScreen
 import com.dambrofarne.eyeflush.utils.AchievementType
 import com.dambrofarne.eyeflush.utils.calcAchievementRank
-import com.dambrofarne.eyeflush.utils.getAchievementIcon
+import com.dambrofarne.eyeflush.utils.getAchievementIconId
 import com.dambrofarne.eyeflush.utils.getNextAchievementMaxPoints
 import com.dambrofarne.eyeflush.utils.getNextRank
 import com.dambrofarne.eyeflush.utils.mapRankToLevel
@@ -48,8 +46,8 @@ fun GamificationScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.loadDummyUserAchievements()
-        //viewModel.loadUserAchievements()
+        //viewModel.loadDummyUserAchievements()
+        viewModel.loadUserAchievements()
     }
 
     when {
@@ -91,7 +89,7 @@ fun AchievementScreen(achievementUiState: AchievementUiState) {
             title = "Photo Taken - LV ${mapRankToLevel(photoTakenRank)}",
             maxPoints = getNextAchievementMaxPoints(AchievementType.PHOTO_TAKEN, achievementUiState.picturesTaken),
             actualPoints = achievementUiState.picturesTaken,
-            icon = getAchievementIcon(AchievementType.PHOTO_TAKEN, getNextRank(photoTakenRank))
+            iconId = getAchievementIconId(AchievementType.PHOTO_TAKEN, getNextRank(photoTakenRank))
         )
 
         // Achievement likes
@@ -100,7 +98,7 @@ fun AchievementScreen(achievementUiState: AchievementUiState) {
             title = "Likes received - LV ${mapRankToLevel(likesRank)}",
             maxPoints = getNextAchievementMaxPoints(AchievementType.LIKES, achievementUiState.likesReceived),
             actualPoints = achievementUiState.likesReceived,
-            icon = getAchievementIcon(AchievementType.LIKES, getNextRank(likesRank))
+            iconId = getAchievementIconId(AchievementType.LIKES, getNextRank(likesRank))
         )
 
         // Achievement first place
@@ -109,7 +107,7 @@ fun AchievementScreen(achievementUiState: AchievementUiState) {
             title = "Most liked photos - LV ${mapRankToLevel(firstPlaceRank)}",
             maxPoints = getNextAchievementMaxPoints(AchievementType.FIRST_PLACE, achievementUiState.mostLikedPictures),
             actualPoints = achievementUiState.mostLikedPictures,
-            icon = getAchievementIcon(AchievementType.FIRST_PLACE, getNextRank(firstPlaceRank))
+            iconId = getAchievementIconId(AchievementType.FIRST_PLACE, getNextRank(firstPlaceRank))
         )
 
         // Achievement location visited
@@ -118,13 +116,13 @@ fun AchievementScreen(achievementUiState: AchievementUiState) {
             title = "Most liked photos - LV ${mapRankToLevel(locationRank)}",
             maxPoints = getNextAchievementMaxPoints(AchievementType.LOCATION_VISITED, achievementUiState.markersVisited),
             actualPoints = achievementUiState.markersVisited,
-            icon = getAchievementIcon(AchievementType.LOCATION_VISITED, getNextRank(locationRank))
+            iconId = getAchievementIconId(AchievementType.LOCATION_VISITED, getNextRank(locationRank))
         )
     }
 }
 
 @Composable
-fun AchievementItem(title: String, maxPoints: Int, actualPoints: Int, icon: ImageVector) {
+fun AchievementItem(title: String, maxPoints: Int, actualPoints: Int, iconId: Int) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = title,
@@ -153,9 +151,16 @@ fun AchievementItem(title: String, maxPoints: Int, actualPoints: Int, icon: Imag
                     goal = maxPoints
                 )
             }
-            Icon(
-                imageVector = icon,
-                contentDescription = title,
+//            Icon(
+//                imageVector = icon,
+//                contentDescription = title,
+//                modifier = Modifier
+//                    .size(46.dp)
+//                    .padding(start = 10.dp)
+//            )
+            Image(
+                painter = painterResource(iconId),
+                contentDescription = "badge",
                 modifier = Modifier
                     .size(46.dp)
                     .padding(start = 10.dp)
@@ -184,7 +189,7 @@ fun CustomAchievementProgressBarWithText(
             .clip(RoundedCornerShape(cornerRadius))
             .background(backgroundColor)
     ) {
-        // Barra di progresso
+        // Progress bar
         Box(
             modifier = Modifier
                 .fillMaxHeight()
@@ -193,7 +198,7 @@ fun CustomAchievementProgressBarWithText(
                 .background(progressColor)
         )
 
-        // Testo sopra la barra
+        // Progress ratio
         Box(
             modifier = Modifier
                 .fillMaxSize()
