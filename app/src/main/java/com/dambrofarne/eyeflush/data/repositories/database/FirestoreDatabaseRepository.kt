@@ -137,7 +137,6 @@ class FirestoreDatabaseRepository(
 
             val id = snapshot.id
             val username = snapshot.getString("username") ?: ""
-            val score = snapshot.getLong("score")?.toInt() ?: 0
             val imagesCount = snapshot.getLong("picsCount")?.toInt() ?: 0
             val profileImagePath = snapshot.getString("profileImagePath")  ?: ""
 
@@ -159,7 +158,6 @@ class FirestoreDatabaseRepository(
                     uId = id,
                     username = username,
                     profileImagePath = profileImagePath,
-                    score = score,
                     imagesCount = imagesCount,
                     picturesTaken = pictureRefs
                 )
@@ -598,12 +596,20 @@ class FirestoreDatabaseRepository(
             val userSnap = userRef.get().await()
 
             val picsCount = userSnap.getLong("picsCount")?.toInt() ?: 0
-            val mostLikedPictures = userSnap.getLong("mostLikedPictures")?.toInt() ?: 0
+
+            val markersSnap = db.collection("markers")
+                .whereEqualTo("mostLikedPicUserId", uId)
+                .get()
+                .await()
 
             val picsSnap = db.collection("pictures")
                 .whereEqualTo("uid", uId)
                 .get()
                 .await()
+            val distinctMarkerMostLiked = picsSnap.documents
+                .mapNotNull { it.getString("markerId") }
+                .toSet()
+            val mostLikedPictures = distinctMarkerMostLiked.size
 
             val likesReceived = picsSnap.documents.sumOf { it.getLong("likes") ?: 0L }.toInt()
             val distinctMarkerIds = picsSnap.documents
