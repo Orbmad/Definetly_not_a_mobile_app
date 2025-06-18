@@ -103,3 +103,10 @@ data class NotificationItem(
     val isRead: Boolean = false,
     val referredMarkerId: String?,
 )
+
+data class UserAchievements(
+    val likesReceived : Int,
+    val picturesTaken : Int,
+    val markersPhotographed : Int,
+    val mostLikedPictures : Int
+)
