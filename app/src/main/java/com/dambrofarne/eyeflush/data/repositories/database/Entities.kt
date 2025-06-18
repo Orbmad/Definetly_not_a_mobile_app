@@ -2,7 +2,6 @@ package com.dambrofarne.eyeflush.data.repositories.database
 
 import com.google.firebase.Timestamp
 import org.osmdroid.util.GeoPoint
-import java.time.LocalDateTime
 
 
 data class Marker(
@@ -103,4 +102,11 @@ data class NotificationItem(
     val time: String,
     val isRead: Boolean = false,
     val referredMarkerId: String?,
+)
+
+data class UserAchievements(
+    val likesReceived : Int,
+    val picturesTaken : Int,
+    val markersPhotographed : Int,
+    val mostLikedPictures : Int
 )
