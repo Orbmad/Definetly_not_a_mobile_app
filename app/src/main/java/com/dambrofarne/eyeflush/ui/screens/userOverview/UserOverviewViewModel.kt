@@ -61,7 +61,6 @@ class UserOverviewViewModel(
                     id = user.uId,
                     username = user.username,
                     profileImagePath = user.profileImagePath,
-                    score = user.score,
                     imagesCount = user.imagesCount,
                     picturesTaken = user.picturesTaken,
                     isLoading = false

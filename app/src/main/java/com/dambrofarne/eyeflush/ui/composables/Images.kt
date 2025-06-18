@@ -367,3 +367,19 @@ fun PolaroidOverlayCard(
     }
 }
 
+
+@Composable
+fun UserVerticalBadgeBar(
+    badges : List<String>, //Badges URLS
+    modifier : Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        badges.take(4).forEach { badge ->
+
+        }
+    }
+}
+
