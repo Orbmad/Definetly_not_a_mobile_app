@@ -144,4 +144,8 @@ class MarkerOverviewViewModel(
             }
         }
     }
+
+    fun hideOverlay() {
+        _uiState.update { it.copy(showOverlay = false) }
+    }
 }

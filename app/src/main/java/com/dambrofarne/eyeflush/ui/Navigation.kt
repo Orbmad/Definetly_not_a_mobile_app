@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.dambrofarne.eyeflush.data.repositories.database.User
 import com.dambrofarne.eyeflush.ui.screens.camera.CameraScreen
 import com.dambrofarne.eyeflush.ui.screens.home.HomeMapScreen
 import com.dambrofarne.eyeflush.ui.screens.markerOverview.MarkerOverviewScreen
@@ -13,7 +14,7 @@ import com.dambrofarne.eyeflush.ui.screens.profileconfig.ProfileConfigScreen
 import com.dambrofarne.eyeflush.ui.screens.signin.SignInScreen
 import com.dambrofarne.eyeflush.ui.screens.signup.SignUpScreen
 import com.dambrofarne.eyeflush.ui.screens.splash.SplashScreen
-import com.dambrofarne.eyeflush.ui.screens.userOverview.userOverviewScreen
+import com.dambrofarne.eyeflush.ui.screens.userOverview.UserOverviewScreen
 import kotlinx.serialization.Serializable
 
 sealed interface EyeFlushRoute {
@@ -76,7 +77,7 @@ fun EyeFlushNavGraph(navController: NavHostController) {
         composable<EyeFlushRoute.UserOverview>{ backStackEntry ->
             val route = backStackEntry.toRoute<EyeFlushRoute.UserOverview>()
             val uId =  route.uId
-            MarkerOverviewScreen(navController,uId)
+            UserOverviewScreen(navController,uId)
         }
     }
 

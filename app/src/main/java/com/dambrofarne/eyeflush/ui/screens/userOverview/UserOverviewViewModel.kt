@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.osmdroid.util.GeoPoint
 
 data class UserOverviewUiState(
     val id : String = "",
@@ -22,6 +21,15 @@ data class UserOverviewUiState(
     val isLoading: Boolean = false,
     val isUpdating: Boolean = false,
     val errorMessage: String? = null,
+
+    val showOverlay : Boolean = false,
+    val imageUrlOverlay: String = "",
+    val uIdvOverlay : String = "",
+    val usernameOverlay : String = "",
+    val userImageOverlay : String = "",
+    val markerNameOverlay : String = "",
+    val timestampOverlay: String = "",
+    val likeCountOverlay : Int = 0
 )
 
 
@@ -92,4 +100,33 @@ class UserOverviewViewModel(
         }
     }
 
+    fun showOverlay(picId : String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(showOverlay = true) }
+            val result = db.getPictureExtendedInfo(picId)
+            if (result.isSuccess) {
+                val picture = result.getOrNull()!!
+
+
+                _uiState.update {
+                    it.copy(
+                        imageUrlOverlay = picture.url,
+                        uIdvOverlay = picture.uId,
+                        usernameOverlay = picture.authorUsername,
+                        userImageOverlay = picture.authorImageUrl,
+                        markerNameOverlay = picture.markerName,
+                        timestampOverlay = picture.timeStamp,
+                        likeCountOverlay = picture.likes
+                    )
+                }
+
+            } else {
+                _uiState.update { it.copy(showOverlay = false) }
+            }
+        }
+    }
+
+    fun hideOverlay() {
+        _uiState.update { it.copy(showOverlay = false) }
+    }
 }

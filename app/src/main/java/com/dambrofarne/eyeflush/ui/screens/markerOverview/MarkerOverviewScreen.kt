@@ -80,7 +80,7 @@ fun MarkerOverviewScreen(
                     username = uiState.usernameOverlay,
                     timestamp = uiState.timestampOverlay,
                     likeCount = uiState.likeCountOverlay,
-                    onDismiss = { },
+                    onDismiss = viewModel :: hideOverlay,
                     uId = uiState.uIdvOverlay,
                     userImage = uiState.userImageOverlay,
                     onUserClick = { userId ->
@@ -92,7 +92,7 @@ fun MarkerOverviewScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(WindowInsets.safeDrawing.asPaddingValues()) // Evita notch/cutouts
-                        .padding(16.dp) // Spaziatura interna extra
+                        .padding(16.dp)
                 ) {
                     // Top section with most liked image
                     val markerTitle = uiState.name ?: "[%.6f, %.6f]".format(
@@ -132,7 +132,9 @@ fun MarkerOverviewScreen(
                                     url = uiState.mostLikedPicURL!!,
                                     likes = uiState.mostLikedPicLikes,
                                     liked = uiState.userLikesMostLiked,
-                                    onClick = { /* ... */ },
+                                    onClick = { clickedPicId ->
+                                        viewModel.showOverlay(clickedPicId)
+                                    },
                                     onToggleLike = viewModel::toggleLike,
                                     modifier = Modifier
                                         .width(200.dp)
