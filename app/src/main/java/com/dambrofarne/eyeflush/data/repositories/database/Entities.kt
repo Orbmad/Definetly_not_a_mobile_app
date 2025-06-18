@@ -1,5 +1,6 @@
 package com.dambrofarne.eyeflush.data.repositories.database
 
+import com.dambrofarne.eyeflush.utils.AchievementRank
 import com.google.firebase.Timestamp
 import org.osmdroid.util.GeoPoint
 
@@ -90,7 +91,11 @@ data class User (
     val username: String,
     val profileImagePath : String,
     val imagesCount: Int,
-    val picturesTaken : List<PicQuickRef>
+    val picturesTaken : List<PicQuickRef>,
+    val likesReceivedLvl : AchievementRank? = null,
+    val picturesTakenLvl : AchievementRank? = null,
+    val markersPhotographedLvl : AchievementRank? = null,
+    val mostLikedPicturesLvl : AchievementRank? = null
 )
 
 data class NotificationItem(

@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
+import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
 import com.dambrofarne.eyeflush.ui.composables.ImageGrid
 import com.dambrofarne.eyeflush.ui.composables.ImageLabel
 import com.dambrofarne.eyeflush.ui.composables.PageTitle
@@ -51,52 +52,59 @@ fun UserOverviewScreen(
             AuthenticationError(text = uiState.errorMessage!!)
         }
         else -> {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(WindowInsets.safeDrawing.asPaddingValues()) // Evita notch/cutouts
-                    .padding(16.dp)
-            ) {
-                PageTitle(uiState.username)
-                if (uiState.isUpdating) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+            CustomScaffold(
+                title = "User Overview",
+                showBackButton = true,
+                navController = navController,
+                currentScreen = null,
+                content = {
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp)
+                            .fillMaxSize()
+                            .padding(WindowInsets.safeDrawing.asPaddingValues()) // Evita notch/cutouts
+                            .padding(16.dp)
                     ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .size(16.dp)
-                                .padding(end = 8.dp),
-                            strokeWidth = 2.dp
+                        PageTitle(uiState.username)
+                        if (uiState.isUpdating) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp)
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .size(16.dp)
+                                        .padding(end = 8.dp),
+                                    strokeWidth = 2.dp
+                                )
+                                Text("Aggiornamento...", style = MaterialTheme.typography.labelMedium)
+                            }
+                        }
+                        Row(){
+                            ProfileImage(uiState.profileImagePath)
+                            Column {
+                                ImageLabel("🕒 ${uiState.imagesCount}")
+                                ImageLabel("❤️ ${uiState.score}")
+                            }
+                        }
+
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            thickness = 1.dp,
+                            color = MaterialTheme.colorScheme.outline
                         )
-                        Text("Aggiornamento...", style = MaterialTheme.typography.labelMedium)
-                    }
-                }
-                Row(){
-                    ProfileImage(uiState.profileImagePath)
-                    Column {
-                        ImageLabel("🕒 ${uiState.imagesCount}")
-                        ImageLabel("❤️ ${uiState.score}")
-                    }
-                }
 
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.outline
-                )
-
-                ImageGrid(
-                    pictures = uiState.picturesTaken,
-                    onImageClick = { clickedPicId ->
-                        viewModel.showOverlay(clickedPicId)
-                    },
-                    onToggleLike = viewModel::toggleLike,
-                    enabled = !uiState.isUpdating
-                )
-            }
+                        ImageGrid(
+                            pictures = uiState.picturesTaken,
+                            onImageClick = { clickedPicId ->
+                                viewModel.showOverlay(clickedPicId)
+                            },
+                            onToggleLike = viewModel::toggleLike,
+                            enabled = !uiState.isUpdating
+                        )
+                    }
+                })
         }
     }
 }

@@ -91,9 +91,10 @@ fun MarkerOverviewScreen(
                 )
             }else{
                 CustomScaffold(
-                    showBackButton = false,
+                    title = "Marker Overview",
+                    showBackButton = true,
                     navController = navController,
-                    currentScreen = NavScreen.HOME,
+                    currentScreen = null,
                     content = {
                         Column(
                             modifier = Modifier
