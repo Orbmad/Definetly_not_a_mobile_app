@@ -8,13 +8,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -61,11 +65,6 @@ fun CustomScaffold(
 ) {
     Scaffold(
         topBar = {
-//            CenteredTitleTopAppBar(
-//                title = "EyeFlush",
-//                showBackButton = showBackButton,
-//                onBackClick = { navController.popBackStack() }
-//            )
             CenteredTitleTopAppBar(
                 title = title,
                 showBackButton = showBackButton,
@@ -83,9 +82,12 @@ fun CustomScaffold(
         bottomBar = {
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
-                modifier = Modifier.height(86.dp)
+                modifier = Modifier
+                    .height(104.dp)
+                    .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
             ) {
                 val iconColor = MaterialTheme.colorScheme.primary
+                val iconSize = 64.dp
 
                 // Home button
                 NavigationBarItem(
@@ -93,7 +95,8 @@ fun CustomScaffold(
                         Icon(
                             imageVector = Icons.Default.Home,
                             contentDescription = "Home",
-                            tint = iconColor
+                            tint = iconColor,
+                            modifier = Modifier.size(iconSize)
                         )
                     },
                     selected = (currentScreen == NavScreen.HOME),
@@ -106,7 +109,8 @@ fun CustomScaffold(
                         Icon(
                             imageVector = Icons.Default.RemoveRedEye,
                             contentDescription = "Gamification",
-                            tint = iconColor
+                            tint = iconColor,
+                            modifier = Modifier.size(iconSize)
                         )
                     },
                     selected = (currentScreen == NavScreen.GAME),
@@ -119,7 +123,8 @@ fun CustomScaffold(
                         Icon(
                             imageVector = Icons.Default.Notifications,
                             contentDescription = "Notifications",
-                            tint = iconColor
+                            tint = iconColor,
+                            modifier = Modifier.size(iconSize)
                         )
                     },
                     selected = ( currentScreen == NavScreen.NOTIFICATIONS ),
@@ -132,7 +137,8 @@ fun CustomScaffold(
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = "Profile",
-                            tint = iconColor
+                            tint = iconColor,
+                            modifier = Modifier.size(iconSize)
                         )
                     },
                     selected = ( currentScreen == NavScreen.PROFILE ),
