@@ -65,37 +65,36 @@ fun MarkerOverviewScreen(
         viewModel.loadMarkerInfo(markerId)
     }
 
-
-    when {
-        uiState.isLoading -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        }
-        uiState.errorMessage != null -> {
-            AuthenticationError(text = uiState.errorMessage!!)
-        }
-        else -> {
-            if (uiState.showOverlay) {
-                PolaroidOverlayCard(
-                    imageUrl = uiState.imageUrlOverlay,
-                    username = uiState.usernameOverlay,
-                    timestamp = uiState.timestampOverlay,
-                    likeCount = uiState.likeCountOverlay,
-                    onDismiss = viewModel :: hideOverlay,
-                    uId = uiState.uIdvOverlay,
-                    userImage = uiState.userImageOverlay,
-                    onUserClick = { userId ->
-                        navController.navigate(EyeFlushRoute.UserOverview(userId))
-                    },
-                )
-            }else{
-                CustomScaffold(
-                    title = "Marker Overview",
-                    showBackButton = true,
-                    navController = navController,
-                    currentScreen = null,
-                    content = {
+    CustomScaffold(
+        title = "Marker Overview",
+        showBackButton = true,
+        navController = navController,
+        currentScreen = null,
+        content = {
+            when {
+                uiState.isLoading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+                uiState.errorMessage != null -> {
+                    AuthenticationError(text = uiState.errorMessage!!)
+                }
+                else -> {
+                    if (uiState.showOverlay) {
+                        PolaroidOverlayCard(
+                            imageUrl = uiState.imageUrlOverlay,
+                            username = uiState.usernameOverlay,
+                            timestamp = uiState.timestampOverlay,
+                            likeCount = uiState.likeCountOverlay,
+                            onDismiss = viewModel :: hideOverlay,
+                            uId = uiState.uIdvOverlay,
+                            userImage = uiState.userImageOverlay,
+                            onUserClick = { userId ->
+                                navController.navigate(EyeFlushRoute.UserOverview(userId))
+                            },
+                        )
+                    }else{
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -190,8 +189,8 @@ fun MarkerOverviewScreen(
                                 enabled = !uiState.isUpdating
                             )
                         }
-                    })
+                    }
+                }
             }
-        }
-    }
+        })
 }
