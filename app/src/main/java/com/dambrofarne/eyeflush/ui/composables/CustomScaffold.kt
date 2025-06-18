@@ -53,6 +53,7 @@ enum class NavScreen {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomScaffold(
+    title: String = "EyeFlush",
     showBackButton: Boolean,
     navController: NavHostController,
     content: @Composable () -> Unit,
@@ -66,7 +67,7 @@ fun CustomScaffold(
 //                onBackClick = { navController.popBackStack() }
 //            )
             CenteredTitleTopAppBar(
-                title = "EyeFlush",
+                title = title,
                 showBackButton = showBackButton,
                 onBackClick = { navController.popBackStack() }
             )

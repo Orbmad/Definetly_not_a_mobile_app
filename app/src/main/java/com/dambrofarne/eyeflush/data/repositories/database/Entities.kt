@@ -84,6 +84,7 @@ data class NotificationItem(
     val type: String,
     val title: String,
     val message: String,
-    val time: String,
-    val isRead: Boolean = false
+    val time: LocalDateTime,
+    val isRead: Boolean = false,
+    val referredMarkerId: String?,
 )

@@ -49,6 +49,7 @@ fun NotificationScreen(
 
 
     CustomScaffold(
+        title = "Notifications",
         showBackButton = false,
         navController = navController,
         currentScreen = NavScreen.NOTIFICATIONS,
@@ -105,7 +106,7 @@ fun NotificationCard(
             Spacer(modifier = Modifier.height(4.dp))
             Text(notification.message, style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(notification.time, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.tertiary)
+            Text(notification.time.toString(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.tertiary)
         }
     }
 }
