@@ -48,44 +48,45 @@ fun ProfileScreen(
         viewModel.loadUserInfo()
     }
 
-    when {
-        uiState.isLoading -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        }
-        uiState.errorMessage != null -> {
-            AuthenticationError(text = uiState.errorMessage!!)
-        }
-        else -> {
-            if (uiState.showOverlay) {
-                PolaroidOverlayCard(
-                    imageUrl = uiState.imageUrlOverlay,
-                    username = uiState.usernameOverlay,
-                    timestamp = uiState.timestampOverlay,
-                    likeCount = uiState.likeCountOverlay,
-                    onDismiss = viewModel :: hideOverlay,
-                    uId = uiState.uIdvOverlay,
-                    userImage = uiState.userImageOverlay,
-                    onUserClick = { userId ->
-                        navController.navigate(EyeFlushRoute.UserOverview(userId))
-                    },
-                )
-            }else{
-                CustomScaffold(
-                    title = "Your Profile",
-                    showBackButton = true,
-                    navController = navController,
-                    currentScreen = NavScreen.PROFILE,
-                    content = {
+    CustomScaffold(
+        title = "Your Profile",
+        showBackButton = true,
+        navController = navController,
+        currentScreen = NavScreen.PROFILE,
+        content = {
+
+            when {
+                uiState.isLoading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                uiState.errorMessage != null -> {
+                    AuthenticationError(text = uiState.errorMessage!!)
+                }
+
+                else -> {
+                    if (uiState.showOverlay) {
+                        PolaroidOverlayCard(
+                            imageUrl = uiState.imageUrlOverlay,
+                            username = uiState.usernameOverlay,
+                            timestamp = uiState.timestampOverlay,
+                            likeCount = uiState.likeCountOverlay,
+                            onDismiss = viewModel::hideOverlay,
+                            uId = uiState.uIdvOverlay,
+                            userImage = uiState.userImageOverlay,
+                            onUserClick = { userId ->
+                                navController.navigate(EyeFlushRoute.UserOverview(userId))
+                            },
+                        )
+                    } else {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Spacer(Modifier.height(35.dp))
-                            StandardHeadline("Il tuo profilo")
                             ProfileImage(
                                 url = uiState.profileImagePath,
                                 borderSize = 2.dp,
@@ -98,7 +99,7 @@ fun ProfileScreen(
                             })
                             SignOutText {
                                 viewModel.signOut()
-                                navController.navigate(EyeFlushRoute.SignIn){
+                                navController.navigate(EyeFlushRoute.SignIn) {
                                     popUpTo(0) { inclusive = true }
                                 }
                             }
@@ -121,7 +122,10 @@ fun ProfileScreen(
                                             .padding(end = 8.dp),
                                         strokeWidth = 2.dp
                                     )
-                                    Text("Aggiornamento...", style = MaterialTheme.typography.labelMedium)
+                                    Text(
+                                        "Aggiornamento...",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
                                 }
                             }
 
@@ -135,9 +139,8 @@ fun ProfileScreen(
                             )
                         }
                     }
-                )
-
+                }
             }
         }
-    }
+    )
 }

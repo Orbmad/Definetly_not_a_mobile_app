@@ -421,26 +421,42 @@ class FirestoreDatabaseRepository(
                     imageDocRef.update("likes", FieldValue.increment(-1)).await()
                     liked = false
                 } else {
-                    // Aggiungi like
+                    val likerUsername = getUsername(uId)
+                    val receiverId = imageSnap.getString("uid")
                     likes.add(picId)
                     userDocRef.update("likes", likes).await()
                     imageDocRef.update("likes", FieldValue.increment(1)).await()
+                    //Like notification
+                    receiverId?.let{
+                        addNotification(
+                            receiverUId = it,
+                            title = "New Like!",
+                            type = "like",
+                            message = "$likerUsername has liked your image ! Go and check your new spot" +
+                                    "in the marker scoreboard!",
+                            isRead = false,
+                            markerId = markerId
+                        )
+                    }
                     liked = true
                 }
             } else {
-                // Primo like per questo utente
                 userDocRef.set(mapOf("likes" to listOf(picId))).await()
                 imageDocRef.update("likes", FieldValue.increment(1)).await()
                 liked = true
             }
 
-            // Aggiorno il marker
+            //Marker update
             val imagesQuerySnap = db.collection("pictures")
                 .whereEqualTo("markerId", markerId)
                 .get()
                 .await()
 
-            // Trovo immagine con massimo like
+            //Old most liked user image
+            val oldTopUserId = markerDocRef.get().await()
+                .getString("mostLikedPicUserId")
+
+            //Search for the most liked image
             val mostLikedImage = imagesQuerySnap.documents.maxByOrNull {
                 it.getLong("likes") ?: 0L
             }
@@ -452,7 +468,18 @@ class FirestoreDatabaseRepository(
                 val mostLikedPicUserId = mostLikedImage.getString("uid") ?: ""
                 val mostLikedPicTimeStamp = mostLikedImage.getTimestamp("timeStamp") ?: Timestamp.now()
 
-                // Aggiorno documento marker
+                if (mostLikedPicUserId != oldTopUserId) {
+                    val newLeaderUsername = getUsername(mostLikedPicUserId)
+                    addNotification(
+                        receiverUId = mostLikedPicUserId,
+                        title = "You're on Top!",
+                        type = "leaderboard",
+                        message = "Your image is now the most liked for a Marker! Great job, $newLeaderUsername!",
+                        isRead = false,
+                        markerId = markerId
+                    )
+                }
+
                 markerDocRef.update(
                     mapOf(
                         "mostLikedPicId" to mostLikedPicId,
@@ -605,6 +632,23 @@ class FirestoreDatabaseRepository(
             Result.success(true)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    override suspend fun hasUnreadNotifications(uId: String): Boolean {
+        return try {
+            val notificationsRef = db.collection("users")
+                .document(uId)
+                .collection("notifications")
+
+            val unreadQuery = notificationsRef
+                .whereEqualTo("read", false)
+                .limit(1)
+
+            val result = unreadQuery.get().await()
+            !result.isEmpty
+        } catch (e: Exception) {
+            false
         }
     }
 

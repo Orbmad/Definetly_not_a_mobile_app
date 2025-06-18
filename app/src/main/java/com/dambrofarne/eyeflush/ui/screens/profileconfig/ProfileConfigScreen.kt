@@ -32,10 +32,12 @@ import com.dambrofarne.eyeflush.data.constants.IconPaths.GALLERY_CHOICE_ICON
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
 import com.dambrofarne.eyeflush.ui.composables.ChoicheProfileImage
+import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
 import com.dambrofarne.eyeflush.ui.composables.CustomStandardButton
 import com.dambrofarne.eyeflush.ui.composables.EyeFlushTextField
 import com.dambrofarne.eyeflush.ui.composables.IconImage
 import com.dambrofarne.eyeflush.ui.composables.ImagePickerDialog
+import com.dambrofarne.eyeflush.ui.composables.NavScreen
 import com.dambrofarne.eyeflush.ui.composables.StandardHeadline
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -63,83 +65,91 @@ fun ProfileConfigScreen(
         viewModel.loadUserProfileImage()
     }
 
-    ImagePickerDialog(
-        showDialog = showDialog,
-        onDismiss = { showDialog = false },
-        onConfirm = { uri ->
-            showDialog = false
-            uri?.let {
-                coroutineScope.launch {
-                    viewModel.onImageSelected(it)
+    CustomScaffold(
+        title = "Profile Configuration",
+        showBackButton = true,
+        navController = navController,
+        currentScreen = NavScreen.PROFILE,
+        content = {
+            ImagePickerDialog(
+                showDialog = showDialog,
+                onDismiss = { showDialog = false },
+                onConfirm = { uri ->
+                    showDialog = false
+                    uri?.let {
+                        coroutineScope.launch {
+                            viewModel.onImageSelected(it)
+                        }
+                    }
+                }
+            )
+
+
+            val imageSize = 240.dp
+            val padding = 8.dp // distanza interna tra immagine e bordo del Box
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if (uiState.isLoading) {
+                    AuthenticationError("Sto caricando...")
+                }
+
+                StandardHeadline("Configurazione Profilo")
+                Spacer(Modifier.height(16.dp))
+                val boxPadding = 8.dp
+
+                Box(
+                    modifier = Modifier
+                        .size(imageSize + boxPadding * 2)
+                ) {
+                    ChoicheProfileImage(
+                        url = uiState.profileImageUrl,
+                        borderSize = 2.dp,
+                        borderColor = Color.Gray,
+                        borderShape = CircleShape
+                    )
+
+                    IconImage(
+                        image = GALLERY_CHOICE_ICON,
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .offset(x = (-20).dp, y = (-20).dp)
+                            .clickable { viewModel.onPickPhotoClick() }
+                    )
+                }
+
+                EyeFlushTextField(
+                    value = uiState.username,
+                    onValueChange = viewModel::onUsernameChange,
+                    label = "Username",
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                )
+
+                uiState.connectionError?.let {
+                    if (it.isNotEmpty()) {
+                        AuthenticationError(it)
+                    }
+                }
+
+                uiState.usernameError?.let {
+                    if (it.isNotEmpty()) {
+                        AuthenticationError(it)
+                    }
+                }
+
+                CustomStandardButton("Conferma") {
+                    viewModel.setUsername {
+                        navController.navigate(EyeFlushRoute.Home) {
+                            //Fai qualcosa prima di accedere
+                        }
+                    }
                 }
             }
         }
     )
-
-
-    val imageSize = 240.dp
-    val padding = 8.dp // distanza interna tra immagine e bordo del Box
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        if (uiState.isLoading) {
-            AuthenticationError("Sto caricando...")
-        }
-
-        StandardHeadline("Configurazione Profilo")
-        Spacer(Modifier.height(16.dp))
-        val boxPadding = 8.dp
-
-        Box(
-            modifier = Modifier
-                .size(imageSize + boxPadding * 2)
-        ) {
-            ChoicheProfileImage(
-                url = uiState.profileImageUrl,
-                borderSize = 2.dp,
-                borderColor = Color.Gray,
-                borderShape = CircleShape
-            )
-
-            IconImage(
-                image = GALLERY_CHOICE_ICON,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .offset(x = (-20).dp, y = (-20).dp)
-                    .clickable { viewModel.onPickPhotoClick() }
-            )
-        }
-
-        EyeFlushTextField(
-            value = uiState.username,
-            onValueChange = viewModel::onUsernameChange,
-            label = "Username",
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
-
-        uiState.connectionError?.let {
-            if (it.isNotEmpty()) {
-                AuthenticationError(it)
-            }
-        }
-
-        uiState.usernameError?.let {
-            if (it.isNotEmpty()) {
-                AuthenticationError(it)
-            }
-        }
-
-        CustomStandardButton("Conferma") {
-            viewModel.setUsername {
-                navController.navigate(EyeFlushRoute.Home) {
-                    //Fai qualcosa prima di accedere
-                }
-            }
-        }
-    }
 }
