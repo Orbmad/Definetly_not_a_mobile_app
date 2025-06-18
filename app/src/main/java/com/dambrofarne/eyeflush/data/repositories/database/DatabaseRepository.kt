@@ -60,6 +60,11 @@ interface DatabaseRepository {
      */
     suspend fun readNotification(uId : String, notificationId: String) : Result<Boolean>
 
+    /**
+     * @return True if the user has notifications unread
+     */
+    suspend fun hasUnreadNotifications(uId:String) : Boolean
+
 
     /**
      * @param uId

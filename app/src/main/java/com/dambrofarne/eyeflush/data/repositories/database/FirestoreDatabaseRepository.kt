@@ -479,7 +479,7 @@ class FirestoreDatabaseRepository(
                         markerId = markerId
                     )
                 }
-                
+
                 markerDocRef.update(
                     mapOf(
                         "mostLikedPicId" to mostLikedPicId,
@@ -632,6 +632,23 @@ class FirestoreDatabaseRepository(
             Result.success(true)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    override suspend fun hasUnreadNotifications(uId: String): Boolean {
+        return try {
+            val notificationsRef = db.collection("users")
+                .document(uId)
+                .collection("notifications")
+
+            val unreadQuery = notificationsRef
+                .whereEqualTo("read", false)
+                .limit(1)
+
+            val result = unreadQuery.get().await()
+            !result.isEmpty
+        } catch (e: Exception) {
+            false
         }
     }
 
