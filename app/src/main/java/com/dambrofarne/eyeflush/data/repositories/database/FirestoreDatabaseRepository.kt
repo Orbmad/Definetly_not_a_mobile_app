@@ -1,6 +1,9 @@
 package com.dambrofarne.eyeflush.data.repositories.database
 
 import android.util.Log
+import com.dambrofarne.eyeflush.utils.AchievementRank
+import com.dambrofarne.eyeflush.utils.AchievementType
+import com.dambrofarne.eyeflush.utils.calcAchievementRank
 import com.dambrofarne.eyeflush.utils.getBoundingBox
 import com.dambrofarne.eyeflush.utils.isWithinRange
 import com.google.firebase.Timestamp
@@ -153,13 +156,28 @@ class FirestoreDatabaseRepository(
                 } else null
             }?.sortedByDescending { it.likes } ?: emptyList()
 
+            val userAchievements = getUserAchievements(uId).getOrNull()
+
+
             Result.success(
                 User(
                     uId = id,
                     username = username,
                     profileImagePath = profileImagePath,
                     imagesCount = imagesCount,
-                    picturesTaken = pictureRefs
+                    picturesTaken = pictureRefs,
+                    markersPhotographedLvl = userAchievements?.let {
+                        calcAchievementRank(AchievementType.LOCATION_VISITED, it.markersPhotographed)
+                    },
+                    picturesTakenLvl = userAchievements?.let {
+                        calcAchievementRank(AchievementType.PHOTO_TAKEN, it.picturesTaken)
+                    },
+                    likesReceivedLvl = userAchievements?.let {
+                        calcAchievementRank(AchievementType.LIKES, it.likesReceived)
+                    },
+                    mostLikedPicturesLvl = userAchievements?.let {
+                        calcAchievementRank(AchievementType.FIRST_PLACE, it.mostLikedPictures)
+                    },
                 )
             )
         } catch (e: Exception) {
