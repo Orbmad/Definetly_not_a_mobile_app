@@ -1,5 +1,7 @@
 package com.dambrofarne.eyeflush.utils
 
+import com.dambrofarne.eyeflush.R
+
 enum class AchievementType {
     LIKES,
     PHOTO_TAKEN,
@@ -67,5 +69,76 @@ fun calcAchievementRank(achievementType: AchievementType, points: Int): Achievem
         points >= checkpoint.silverCheckpoint -> AchievementRank.SILVER
         points >= checkpoint.bronzeCheckpoint -> AchievementRank.BRONZE
         else -> AchievementRank.NONE
+    }
+}
+
+fun getNextRank(achievementRank: AchievementRank): AchievementRank {
+    return when (achievementRank) {
+        AchievementRank.NONE -> AchievementRank.BRONZE
+        AchievementRank.BRONZE -> AchievementRank.SILVER
+        AchievementRank.SILVER -> AchievementRank.GOLD
+        AchievementRank.GOLD -> AchievementRank.GOLD
+    }
+}
+
+fun getNextAchievementMaxPoints(achievementType: AchievementType, points: Int): Int {
+    val checkpoint: AchievementCheckpoints = when (achievementType) {
+        AchievementType.LIKES -> likesAchievement
+        AchievementType.PHOTO_TAKEN -> photoTakenAchievement
+        AchievementType.FIRST_PLACE -> firstPlaceAchievement
+        AchievementType.LOCATION_VISITED -> locationVisitedAchievement
+    }
+
+    return when {
+        points >= checkpoint.goldCheckpoint -> checkpoint.goldCheckpoint
+        points >= checkpoint.silverCheckpoint -> checkpoint.goldCheckpoint
+        points >= checkpoint.bronzeCheckpoint -> checkpoint.silverCheckpoint
+        else -> checkpoint.bronzeCheckpoint
+    }
+}
+
+fun getAchievementIconId(achievementType: AchievementType, achievementRank: AchievementRank): Int {
+    when (achievementType) {
+        AchievementType.LIKES -> {
+            return when (achievementRank) {
+                AchievementRank.NONE -> R.drawable.likes_badge_bronze
+                AchievementRank.BRONZE -> R.drawable.likes_badge_bronze
+                AchievementRank.SILVER -> R.drawable.likes_badge_silver
+                AchievementRank.GOLD -> R.drawable.likes_badge_gold
+            }
+        }
+        AchievementType.PHOTO_TAKEN -> {
+            return when (achievementRank) {
+                AchievementRank.NONE -> R.drawable.photo_taken_badge_bronze
+                AchievementRank.BRONZE -> R.drawable.photo_taken_badge_bronze
+                AchievementRank.SILVER -> R.drawable.photo_taken_badge_silver
+                AchievementRank.GOLD -> R.drawable.photo_taken_badge_gold
+            }
+        }
+        AchievementType.FIRST_PLACE -> {
+            return when (achievementRank) {
+                AchievementRank.NONE -> R.drawable.first_place_badge_bronze
+                AchievementRank.BRONZE -> R.drawable.first_place_badge_bronze
+                AchievementRank.SILVER -> R.drawable.first_place_badge_silver
+                AchievementRank.GOLD -> R.drawable.first_place_badge_gold
+            }
+        }
+        AchievementType.LOCATION_VISITED -> {
+            return when (achievementRank) {
+                AchievementRank.NONE -> R.drawable.location_visited_badge_bronze
+                AchievementRank.BRONZE -> R.drawable.location_visited_badge_bronze
+                AchievementRank.SILVER -> R.drawable.location_visited_badge_silver
+                AchievementRank.GOLD -> R.drawable.location_visited_badge_gold
+            }
+        }
+    }
+}
+
+fun mapRankToLevel(achievementRank: AchievementRank): String {
+    return when (achievementRank) {
+        AchievementRank.NONE -> "0"
+        AchievementRank.BRONZE -> "1"
+        AchievementRank.SILVER -> "2"
+        AchievementRank.GOLD -> "MAX"
     }
 }

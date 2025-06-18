@@ -12,6 +12,7 @@ import com.dambrofarne.eyeflush.data.repositories.database.FirestoreDatabaseRepo
 import com.dambrofarne.eyeflush.data.repositories.imagestoring.ImageStoringRepository
 import com.dambrofarne.eyeflush.data.repositories.imagestoring.ImgurImageStoringRepository
 import com.dambrofarne.eyeflush.ui.screens.camera.CameraViewModel
+import com.dambrofarne.eyeflush.ui.screens.gamification.GamificationViewModel
 import com.dambrofarne.eyeflush.ui.screens.home.HomeMapViewModel
 import com.dambrofarne.eyeflush.ui.screens.profile.ProfileViewModel
 import com.dambrofarne.eyeflush.ui.screens.profileconfig.ProfileConfigViewModel
@@ -45,6 +46,7 @@ val appModule = module {
     viewModel { CameraViewModel(get(), get(), get(), get(), get()) }
     viewModel { MarkerOverviewViewModel(get(), get()) }
     viewModel { NotificationViewModel(get(), get()) }
+    viewModel { GamificationViewModel(get(), get()) }
     viewModel { UserOverviewViewModel(get(), get()) }
 
 }
