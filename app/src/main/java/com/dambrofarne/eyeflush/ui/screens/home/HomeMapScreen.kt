@@ -20,7 +20,6 @@ import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.CameraButton
 import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
 import com.dambrofarne.eyeflush.ui.composables.NavScreen
-import com.dambrofarne.eyeflush.utils.locationMetersDistance
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.launch
@@ -29,7 +28,6 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.tileprovider.tilesource.XYTileSource
-import org.osmdroid.util.GeoPoint
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable

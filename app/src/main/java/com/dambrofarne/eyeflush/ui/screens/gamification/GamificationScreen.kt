@@ -1,9 +1,211 @@
 package com.dambrofarne.eyeflush.ui.screens.gamification
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
+import com.dambrofarne.eyeflush.ui.composables.NavScreen
+import com.dambrofarne.eyeflush.utils.AchievementType
+import com.dambrofarne.eyeflush.utils.calcAchievementRank
+import com.dambrofarne.eyeflush.utils.getAchievementIcon
+import com.dambrofarne.eyeflush.utils.getNextAchievementMaxPoints
+import com.dambrofarne.eyeflush.utils.getNextRank
+import com.dambrofarne.eyeflush.utils.mapRankToLevel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun GamificationScreen(
-    navController: NavHostController
-) {}
+    navController: NavHostController,
+    viewModel: GamificationViewModel = koinViewModel<GamificationViewModel>()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadDummyUserAchievements()
+        //viewModel.loadUserAchievements()
+    }
+
+    when {
+        uiState.isLoading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        else -> {
+            CustomScaffold(
+                title = "Achievements",
+                showBackButton = false,
+                navController = navController,
+                currentScreen = NavScreen.GAME,
+                content = {
+                    AchievementScreen(uiState)
+                }
+            )
+        }
+    }
+
+}
+
+@Composable
+fun AchievementScreen(achievementUiState: AchievementUiState) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        // Achievement photo taken
+        val photoTakenRank = calcAchievementRank(AchievementType.PHOTO_TAKEN, achievementUiState.picturesTaken)
+        AchievementItem(
+            title = "Photo Taken - LV ${mapRankToLevel(photoTakenRank)}",
+            maxPoints = getNextAchievementMaxPoints(AchievementType.PHOTO_TAKEN, achievementUiState.picturesTaken),
+            actualPoints = achievementUiState.picturesTaken,
+            icon = getAchievementIcon(AchievementType.PHOTO_TAKEN, getNextRank(photoTakenRank))
+        )
+
+        // Achievement likes
+        val likesRank = calcAchievementRank(AchievementType.LIKES, achievementUiState.likesReceived)
+        AchievementItem(
+            title = "Likes received - LV ${mapRankToLevel(likesRank)}",
+            maxPoints = getNextAchievementMaxPoints(AchievementType.LIKES, achievementUiState.likesReceived),
+            actualPoints = achievementUiState.likesReceived,
+            icon = getAchievementIcon(AchievementType.LIKES, getNextRank(likesRank))
+        )
+
+        // Achievement first place
+        val firstPlaceRank = calcAchievementRank(AchievementType.FIRST_PLACE, achievementUiState.mostLikedPictures)
+        AchievementItem(
+            title = "Most liked photos - LV ${mapRankToLevel(firstPlaceRank)}",
+            maxPoints = getNextAchievementMaxPoints(AchievementType.FIRST_PLACE, achievementUiState.mostLikedPictures),
+            actualPoints = achievementUiState.mostLikedPictures,
+            icon = getAchievementIcon(AchievementType.FIRST_PLACE, getNextRank(firstPlaceRank))
+        )
+
+        // Achievement location visited
+        val locationRank = calcAchievementRank(AchievementType.LOCATION_VISITED, achievementUiState.markersVisited)
+        AchievementItem(
+            title = "Most liked photos - LV ${mapRankToLevel(locationRank)}",
+            maxPoints = getNextAchievementMaxPoints(AchievementType.LOCATION_VISITED, achievementUiState.markersVisited),
+            actualPoints = achievementUiState.markersVisited,
+            icon = getAchievementIcon(AchievementType.LOCATION_VISITED, getNextRank(locationRank))
+        )
+    }
+}
+
+@Composable
+fun AchievementItem(title: String, maxPoints: Int, actualPoints: Int, icon: ImageVector) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+//                LinearProgressIndicator(
+//                    progress = { actualPoints.toFloat() / maxPoints },
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .height(20.dp)
+//                        .clip(RoundedCornerShape(2.dp)),
+//                    strokeCap = StrokeCap.Butt
+//                )
+//                Text(
+//                    text = "$actualPoints / $maxPoints",
+//                    style = MaterialTheme.typography.bodySmall,
+//                    modifier = Modifier.align(Alignment.End)
+//                )
+                CustomAchievementProgressBarWithText(
+                    current = actualPoints,
+                    goal = maxPoints
+                )
+            }
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                modifier = Modifier
+                    .size(46.dp)
+                    .padding(start = 10.dp)
+            )
+        }
+    }
+
+}
+
+@Composable
+fun CustomAchievementProgressBarWithText(
+    current: Int,
+    goal: Int,
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = Color.LightGray,
+    progressColor: Color = MaterialTheme.colorScheme.primary,
+    height: Dp = 20.dp,
+    cornerRadius: Dp = 6.dp,
+    textColor: Color = Color.Black
+) {
+    val progress = current.coerceAtMost(goal).toFloat() / goal
+
+    Box(
+        modifier = modifier
+            .height(height)
+            .clip(RoundedCornerShape(cornerRadius))
+            .background(backgroundColor)
+    ) {
+        // Barra di progresso
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth(progress)
+                .clip(RoundedCornerShape(cornerRadius))
+                .background(progressColor)
+        )
+
+        // Testo sopra la barra
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp),
+            contentAlignment = Alignment.CenterEnd
+        ) {
+            Text(
+                text = "$current / $goal",
+                color = textColor,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 1
+            )
+        }
+    }
+}

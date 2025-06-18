@@ -1,5 +1,9 @@
 package com.dambrofarne.eyeflush.utils
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Handyman
+import androidx.compose.ui.graphics.vector.ImageVector
+
 enum class AchievementType {
     LIKES,
     PHOTO_TAKEN,
@@ -67,5 +71,43 @@ fun calcAchievementRank(achievementType: AchievementType, points: Int): Achievem
         points >= checkpoint.silverCheckpoint -> AchievementRank.SILVER
         points >= checkpoint.bronzeCheckpoint -> AchievementRank.BRONZE
         else -> AchievementRank.NONE
+    }
+}
+
+fun getNextRank(achievementRank: AchievementRank): AchievementRank {
+    return when (achievementRank) {
+        AchievementRank.NONE -> AchievementRank.BRONZE
+        AchievementRank.BRONZE -> AchievementRank.SILVER
+        AchievementRank.SILVER -> AchievementRank.GOLD
+        AchievementRank.GOLD -> AchievementRank.GOLD
+    }
+}
+
+fun getNextAchievementMaxPoints(achievementType: AchievementType, points: Int): Int {
+    val checkpoint: AchievementCheckpoints = when (achievementType) {
+        AchievementType.LIKES -> likesAchievement
+        AchievementType.PHOTO_TAKEN -> photoTakenAchievement
+        AchievementType.FIRST_PLACE -> firstPlaceAchievement
+        AchievementType.LOCATION_VISITED -> locationVisitedAchievement
+    }
+
+    return when {
+        points >= checkpoint.goldCheckpoint -> checkpoint.goldCheckpoint
+        points >= checkpoint.silverCheckpoint -> checkpoint.goldCheckpoint
+        points >= checkpoint.bronzeCheckpoint -> checkpoint.silverCheckpoint
+        else -> checkpoint.bronzeCheckpoint
+    }
+}
+
+fun getAchievementIcon(achievementType: AchievementType, achievementRank: AchievementRank): ImageVector {
+    return Icons.Default.Handyman
+}
+
+fun mapRankToLevel(achievementRank: AchievementRank): String {
+    return when (achievementRank) {
+        AchievementRank.NONE -> "0"
+        AchievementRank.BRONZE -> "1"
+        AchievementRank.SILVER -> "2"
+        AchievementRank.GOLD -> "MAX"
     }
 }
