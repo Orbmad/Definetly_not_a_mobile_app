@@ -1,15 +1,9 @@
 package com.dambrofarne.eyeflush.ui.screens.gamification
 
-import android.media.Image
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
 import com.dambrofarne.eyeflush.data.repositories.database.DatabaseRepository
 import com.dambrofarne.eyeflush.data.repositories.database.UserAchievements
-import com.dambrofarne.eyeflush.utils.AchievementRank
-import com.dambrofarne.eyeflush.utils.AchievementType
-import com.dambrofarne.eyeflush.utils.calcAchievementRank
-import com.dambrofarne.eyeflush.utils.getNextRank
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
