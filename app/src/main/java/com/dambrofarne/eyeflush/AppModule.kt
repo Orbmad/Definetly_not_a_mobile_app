@@ -22,6 +22,7 @@ import com.dambrofarne.eyeflush.ui.screens.splash.SplashViewModel
 import com.dambrofarne.eyeflush.ui.screens.markerOverview.MarkerOverviewViewModel
 import com.dambrofarne.eyeflush.ui.screens.notifications.NotificationViewModel
 import com.dambrofarne.eyeflush.ui.screens.userOverview.UserOverviewViewModel
+import com.dambrofarne.eyeflush.ui.theme.ThemeViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import org.koin.core.module.dsl.viewModel
@@ -49,4 +50,5 @@ val appModule = module {
     viewModel { GamificationViewModel(get(), get()) }
     viewModel { UserOverviewViewModel(get(), get()) }
 
+    viewModel { ThemeViewModel(get(),get()) }
 }

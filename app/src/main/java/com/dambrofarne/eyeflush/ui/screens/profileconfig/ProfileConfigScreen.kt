@@ -1,7 +1,5 @@
 package com.dambrofarne.eyeflush.ui.screens.profileconfig
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,18 +36,21 @@ import com.dambrofarne.eyeflush.ui.composables.EyeFlushTextField
 import com.dambrofarne.eyeflush.ui.composables.IconImage
 import com.dambrofarne.eyeflush.ui.composables.ImagePickerDialog
 import com.dambrofarne.eyeflush.ui.composables.NavScreen
-import com.dambrofarne.eyeflush.ui.composables.StandardHeadline
+import com.dambrofarne.eyeflush.ui.composables.ThemeToggle
+import com.dambrofarne.eyeflush.ui.theme.ThemeViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ProfileConfigScreen(
     navController: NavHostController,
-    viewModel: ProfileConfigViewModel = koinViewModel<ProfileConfigViewModel>()
+    viewModel: ProfileConfigViewModel = koinViewModel<ProfileConfigViewModel>(),
+    themeViewModel: ThemeViewModel = koinViewModel<ThemeViewModel>()
 ){
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     var showDialog by remember { mutableStateOf(false) }
+    val isDark by themeViewModel.isDarkTheme.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
@@ -86,7 +87,6 @@ fun ProfileConfigScreen(
 
 
             val imageSize = 240.dp
-            val padding = 8.dp // distanza interna tra immagine e bordo del Box
 
             Column(
                 modifier = Modifier
@@ -96,10 +96,9 @@ fun ProfileConfigScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 if (uiState.isLoading) {
-                    AuthenticationError("Sto caricando...")
+                    AuthenticationError("Loading ...")
                 }
 
-                StandardHeadline("Configurazione Profilo")
                 Spacer(Modifier.height(16.dp))
                 val boxPadding = 8.dp
 
@@ -142,13 +141,21 @@ fun ProfileConfigScreen(
                     }
                 }
 
-                CustomStandardButton("Conferma") {
+                CustomStandardButton("Confirm") {
                     viewModel.setUsername {
                         navController.navigate(EyeFlushRoute.Home) {
-                            //Fai qualcosa prima di accedere
                         }
                     }
                 }
+
+
+
+                ThemeToggle(
+                    isDark = isDark,
+                    onToggle = { enabled ->
+                        themeViewModel.setDarkTheme(enabled)
+                    }
+                )
             }
         }
     )

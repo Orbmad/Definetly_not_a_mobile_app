@@ -692,6 +692,21 @@ class FirestoreDatabaseRepository(
         }
     }
 
+    override suspend fun changeThemePreference(uid: String, isDark: Boolean) {
+        db.collection("users")
+            .document(uid)
+            .update("themeDarkMode", isDark)
+            .await()
+    }
+
+    override suspend fun getThemePreference(uid: String): Boolean? {
+        val snapshot = db.collection("users")
+            .document(uid)
+            .get()
+            .await()
+
+        return if (snapshot.exists()) snapshot.getBoolean("themeDarkMode") else null
+    }
 
     override suspend fun getNotifications(uId: String): List<NotificationItem> {
         return try {

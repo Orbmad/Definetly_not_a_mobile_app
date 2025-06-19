@@ -25,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -145,6 +146,29 @@ fun SettingsButton(
             Icons.Filled.Settings,
             contentDescription = "Back",
             tint = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+    }
+}
+
+@Composable
+fun ThemeToggle(
+    isDark: Boolean,
+    onToggle: (Boolean) -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        Text(
+            text = if (isDark) "Modalità Scura" else "Modalità Chiara",
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Switch(
+            checked = isDark,
+            onCheckedChange = onToggle
         )
     }
 }
