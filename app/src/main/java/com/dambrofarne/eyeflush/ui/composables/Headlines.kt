@@ -1,6 +1,5 @@
 package com.dambrofarne.eyeflush.ui.composables
 
-import android.content.res.Resources.Theme
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,8 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.dambrofarne.eyeflush.R
 
 @Composable
 fun StandardHeadline(text : String){
@@ -76,16 +78,30 @@ fun UserProfileRow(
             }
             .padding(4.dp)
     ) {
-        userImageUrl?.let { imageUrl ->
-            Image(
-                painter = rememberAsyncImagePainter(imageUrl),
-                contentDescription = "User Profile",
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(RoundedCornerShape(50))
+        val painter = if (userImageUrl != null) {
+            rememberAsyncImagePainter(
+                model = userImageUrl,
+                placeholder = painterResource(id = R.drawable.user_image_placeholder),
+                error = painterResource(id = R.drawable.user_image_placeholder)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+        } else {
+            painterResource(id = R.drawable.user_image_placeholder)
         }
-        ImageLabel(username ?: "Autore sconosciuto")
+
+        Image(
+            painter = painter,
+            contentDescription = "User Profile",
+            modifier = Modifier
+                .size(32.dp)
+                .clip(RoundedCornerShape(50))
+                .shadow(
+                    elevation = 8.dp,
+                    shape = RoundedCornerShape(50),
+                    clip = false
+                )
+        )
+            Spacer(modifier = Modifier.width(8.dp))
+
+        ImageLabel(username ?: "Unknown")
     }
 }

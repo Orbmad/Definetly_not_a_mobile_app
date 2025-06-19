@@ -1,55 +1,36 @@
 package com.dambrofarne.eyeflush.ui.screens.markerOverview
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
-import com.dambrofarne.eyeflush.data.repositories.database.PicQuickRef
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
 import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
-import com.dambrofarne.eyeflush.ui.composables.ImageCard
 import com.dambrofarne.eyeflush.ui.composables.ImageCardSimple
 import com.dambrofarne.eyeflush.ui.composables.ImageGrid
 import com.dambrofarne.eyeflush.ui.composables.ImageLabel
-import com.dambrofarne.eyeflush.ui.composables.NavScreen
 import com.dambrofarne.eyeflush.ui.composables.PageTitle
 import com.dambrofarne.eyeflush.ui.composables.PolaroidOverlayCard
-import com.dambrofarne.eyeflush.ui.composables.StandardHeadline
-import com.dambrofarne.eyeflush.ui.composables.StandardText
 import com.dambrofarne.eyeflush.ui.composables.UserProfileRow
 import org.koin.androidx.compose.koinViewModel
 
@@ -105,7 +86,7 @@ fun MarkerOverviewScreen(
                                 uiState.coordinates.longitude
                             )
                             PageTitle(markerTitle)
-                            StandardText("Immagini scattate qui: " + uiState.imagesCount.toString())
+                            //StandardText("Pics taken here: " + uiState.imagesCount.toString())
                             if (uiState.isUpdating) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
@@ -119,12 +100,12 @@ fun MarkerOverviewScreen(
                                             .padding(end = 8.dp),
                                         strokeWidth = 2.dp
                                     )
-                                    Text("Aggiornamento...", style = MaterialTheme.typography.labelMedium)
+                                    Text("Updating Scoreboard...", style = MaterialTheme.typography.labelMedium)
                                 }
                             }
                             Spacer(modifier = Modifier.height(20.dp))
 
-                            uiState.mostLikedPicURL?.let { url ->
+                            uiState.mostLikedPicURL?.let {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()

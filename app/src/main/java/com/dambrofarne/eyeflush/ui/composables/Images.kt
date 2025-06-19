@@ -52,11 +52,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.dambrofarne.eyeflush.R
 import com.dambrofarne.eyeflush.data.repositories.database.PicQuickRef
 
 @Composable
 fun ProfileImage(
-    url: String,
+    url: String?,
     size: Dp = 150.dp,
     borderSize: Dp = 2.dp,
     borderShape: Shape = CircleShape,
@@ -66,8 +67,8 @@ fun ProfileImage(
     val request = ImageRequest.Builder(context)
         .data(url)
         .crossfade(true)
-        //.placeholder(R.drawable.ic_placeholder)
-        //.error(R.drawable.ic_error)
+        .placeholder(R.drawable.user_image_placeholder)
+        .error(R.drawable.user_image_placeholder)
         .build()
 
     AsyncImage(
@@ -118,7 +119,7 @@ fun IconImage(
 
 @Composable
 fun ChoiceProfileImage(
-    url: String,
+    url: String?,
     borderSize: Dp = 2.dp,
     borderShape: Shape = CircleShape,
     borderColor: Color = MaterialTheme.colorScheme.primary

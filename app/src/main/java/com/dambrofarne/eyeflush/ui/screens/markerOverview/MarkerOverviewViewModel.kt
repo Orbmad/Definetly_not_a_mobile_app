@@ -1,7 +1,5 @@
 package com.dambrofarne.eyeflush.ui.screens.markerOverview
 
-import android.util.Log
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
@@ -12,7 +10,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
-import java.time.LocalDateTime
 
 data class MarkerOverviewUiState(
     val id: String = "",
@@ -57,7 +54,7 @@ class MarkerOverviewViewModel(
         ) }
         val userId = auth.getCurrentUserId()
         if (userId == null) {
-            _uiState.update { it.copy(isLoading = false, errorMessage = "Utente non autenticato") }
+            _uiState.update { it.copy(isLoading = false, errorMessage = "User not authenticated") }
             return
         }
 
@@ -89,7 +86,7 @@ class MarkerOverviewViewModel(
             }
 
         } else {
-            val errorMsg = result.exceptionOrNull()?.message ?: "Errore sconosciuto"
+            val errorMsg = result.exceptionOrNull()?.message ?: "Unknown error"
             _uiState.update { it.copy(isLoading = false, errorMessage = errorMsg) }
         }
     }
@@ -100,7 +97,7 @@ class MarkerOverviewViewModel(
 
             val currentUser = auth.getCurrentUserId()
             if (currentUser == null) {
-                _uiState.update { it.copy(isUpdating = false, errorMessage = "Utente non autenticato") }
+                _uiState.update { it.copy(isUpdating = false, errorMessage = "User not authenticated") }
                 return@launch
             }
 
@@ -112,7 +109,7 @@ class MarkerOverviewViewModel(
                     isInitialLoad = false
                 )
             } else {
-                _uiState.update { it.copy(errorMessage = "Errore nel toggle like") }
+                _uiState.update { it.copy(errorMessage = "Error in like toggle") }
             }
 
             _uiState.update { it.copy(isUpdating = false) }

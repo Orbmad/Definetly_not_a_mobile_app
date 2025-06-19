@@ -3,12 +3,9 @@ package com.dambrofarne.eyeflush.ui.screens.userOverview
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -23,11 +20,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
 import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
 import com.dambrofarne.eyeflush.ui.composables.ImageGrid
 import com.dambrofarne.eyeflush.ui.composables.ImageLabel
 import com.dambrofarne.eyeflush.ui.composables.PageTitle
+import com.dambrofarne.eyeflush.ui.composables.PolaroidOverlayCard
 import com.dambrofarne.eyeflush.ui.composables.ProfileImage
 import org.koin.androidx.compose.koinViewModel
 
@@ -53,64 +52,81 @@ fun UserOverviewScreen(
             AuthenticationError(text = uiState.errorMessage!!)
         }
         else -> {
-            CustomScaffold(
-                title = "User Overview",
-                showBackButton = true,
-                navController = navController,
-                currentScreen = null,
-                content = {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(WindowInsets.safeDrawing.asPaddingValues()) // Evita notch/cutouts
-                            .padding(16.dp)
-                    ) {
-                        PageTitle(uiState.username)
-                        if (uiState.isUpdating) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 8.dp)
-                            ) {
-                                CircularProgressIndicator(
+            if (uiState.showOverlay) {
+                PolaroidOverlayCard(
+                    imageUrl = uiState.imageUrlOverlay,
+                    username = uiState.usernameOverlay,
+                    timestamp = uiState.timestampOverlay,
+                    likeCount = uiState.likeCountOverlay,
+                    onDismiss = viewModel :: hideOverlay,
+                    uId = uiState.uIdvOverlay,
+                    userImage = uiState.userImageOverlay,
+                    onUserClick = { userId ->
+                        navController.navigate(EyeFlushRoute.UserOverview(userId))
+                    },
+                )
+            }else {
+                CustomScaffold(
+                    title = "User Overview",
+                    showBackButton = true,
+                    navController = navController,
+                    currentScreen = null,
+                    content = {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)
+                        ) {
+                            PageTitle(uiState.username)
+                            if (uiState.isUpdating) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier
-                                        .size(16.dp)
-                                        .padding(end = 8.dp),
-                                    strokeWidth = 2.dp
+                                        .fillMaxWidth()
+                                        .padding(bottom = 8.dp)
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .size(16.dp)
+                                            .padding(end = 8.dp),
+                                        strokeWidth = 2.dp
+                                    )
+                                    Text(
+                                        "Updating scoreboard...",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
+                            }
+                            Row {
+                                ProfileImage(
+                                    url = uiState.profileImagePath,
+                                    borderSize = 2.dp,
+                                    borderColor = MaterialTheme.colorScheme.primary,
+                                    borderShape = CircleShape
                                 )
-                                Text("Aggiornamento...", style = MaterialTheme.typography.labelMedium)
+                                Column {
+                                    ImageLabel("🕒 ${uiState.imagesCount}")
+                                    ImageLabel("❤️ ${uiState.score}")
+                                }
                             }
-                        }
-                        Row(){
-                            ProfileImage(
-                                url = uiState.profileImagePath,
-                                borderSize = 2.dp,
-                                borderColor = MaterialTheme.colorScheme.primary,
-                                borderShape = CircleShape
+
+                            HorizontalDivider(
+                                modifier = Modifier.padding(vertical = 8.dp),
+                                thickness = 1.dp,
+                                color = MaterialTheme.colorScheme.outline
                             )
-                            Column {
-                                ImageLabel("🕒 ${uiState.imagesCount}")
-                                ImageLabel("❤️ ${uiState.score}")
-                            }
+
+                            ImageGrid(
+                                pictures = uiState.picturesTaken,
+                                onImageClick = { clickedPicId ->
+                                    viewModel.showOverlay(clickedPicId)
+                                },
+                                onToggleLike = viewModel::toggleLike,
+                                enabled = !uiState.isUpdating
+                            )
                         }
-
-                        HorizontalDivider(
-                            modifier = Modifier.padding(vertical = 8.dp),
-                            thickness = 1.dp,
-                            color = MaterialTheme.colorScheme.outline
-                        )
-
-                        ImageGrid(
-                            pictures = uiState.picturesTaken,
-                            onImageClick = { clickedPicId ->
-                                viewModel.showOverlay(clickedPicId)
-                            },
-                            onToggleLike = viewModel::toggleLike,
-                            enabled = !uiState.isUpdating
-                        )
-                    }
-                })
+                    })
+            }
         }
     }
 }
