@@ -12,11 +12,16 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Collections
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,7 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
+import com.dambrofarne.eyeflush.ui.composables.ChoiceProfileImage
 import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
+import com.dambrofarne.eyeflush.ui.composables.IconButton
 import com.dambrofarne.eyeflush.ui.composables.ImageGrid
 import com.dambrofarne.eyeflush.ui.composables.NavScreen
 import com.dambrofarne.eyeflush.ui.composables.PolaroidOverlayCard
@@ -60,7 +67,7 @@ fun ProfileScreen(
 
     CustomScaffold(
         title = "Your Profile",
-        showBackButton = true,
+        showBackButton = false,
         navController = navController,
         currentScreen = NavScreen.PROFILE,
         content = {
@@ -105,18 +112,28 @@ fun ProfileScreen(
                             ) {
 
                                 // Left side - profile pic
+                                val imageSize = 150.dp
+
                                 Box(
                                     modifier = Modifier
-                                        .weight(1f)
-                                        //.fillMaxWidth()
+                                        .size(imageSize)
                                 ) {
                                     ProfileImage(
                                         url = uiState.profileImagePath,
                                         borderSize = 2.dp,
-                                        borderColor = Color.Gray,
-                                        borderShape = CircleShape
+                                        borderColor = MaterialTheme.colorScheme.primary,
+                                        borderShape = CircleShape,
+                                        size = imageSize,
+
                                     )
 
+                                    IconButton(
+                                        onClick = { navController.navigate(EyeFlushRoute.ProfileConfig) },
+                                        icon = Icons.Default.Settings,
+                                        modifier = Modifier
+                                            .align(Alignment.BottomEnd)
+
+                                    )
                                 }
 
                                 // Right side - name and badges
@@ -129,10 +146,10 @@ fun ProfileScreen(
                                     // Username
                                     Text(
                                         text = uiState.username,
-                                        style = MaterialTheme.typography.titleLarge,
+                                        style = MaterialTheme.typography.bodyLarge,
                                         modifier = Modifier
-                                            .align(Alignment.CenterHorizontally)
-                                            .padding(bottom = 12.dp)
+                                            .align(Alignment.Start)
+                                            .padding(start = 16.dp, bottom = 12.dp)
                                     )
 
                                     // Badges
@@ -149,13 +166,6 @@ fun ProfileScreen(
                                         firstPlace = uiState.firstPlace,
                                         locations = uiState.locations
                                     )
-
-                                    // Settings
-                                    SettingsButton(
-                                        onClick = { navController.navigate(EyeFlushRoute.ProfileConfig) },
-                                        modifier = Modifier
-                                            .align(Alignment.End)
-                                    )
                                 }
 
                             }
@@ -164,7 +174,7 @@ fun ProfileScreen(
                             HorizontalDivider(
                                 modifier = Modifier.padding(vertical = 8.dp),
                                 thickness = 1.dp,
-                                color = MaterialTheme.colorScheme.outline
+                                color = MaterialTheme.colorScheme.primary
                             )
 
                             if (uiState.isUpdating) {

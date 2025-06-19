@@ -132,7 +132,7 @@ fun AchievementItem(title: String, maxPoints: Int, actualPoints: Int, iconId: In
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.bodyLarge,
             //modifier = Modifier.padding(bottom = 4.dp)
         )
         Row(

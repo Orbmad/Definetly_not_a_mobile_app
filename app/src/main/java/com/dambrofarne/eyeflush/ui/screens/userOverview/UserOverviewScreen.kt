@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -82,7 +83,12 @@ fun UserOverviewScreen(
                             }
                         }
                         Row(){
-                            ProfileImage(uiState.profileImagePath)
+                            ProfileImage(
+                                url = uiState.profileImagePath,
+                                borderSize = 2.dp,
+                                borderColor = MaterialTheme.colorScheme.primary,
+                                borderShape = CircleShape
+                            )
                             Column {
                                 ImageLabel("🕒 ${uiState.imagesCount}")
                                 ImageLabel("❤️ ${uiState.score}")

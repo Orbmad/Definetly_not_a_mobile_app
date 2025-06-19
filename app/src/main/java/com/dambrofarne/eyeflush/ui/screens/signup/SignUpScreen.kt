@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -37,10 +39,10 @@ fun SignUpScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         if (uiState.isLoading) {
-            AuthenticationError("Sto caricando...")
+            AuthenticationError("Loading ...")
         }
 
-        Text("Registrati...", style = MaterialTheme.typography.headlineMedium)
+        Text("Welcome!", style = MaterialTheme.typography.titleLarge)
 
         Spacer(Modifier.height(16.dp))
 
@@ -75,7 +77,7 @@ fun SignUpScreen(
         EyeFlushTextField(
             value = uiState.passwordConfirmation,
             onValueChange = viewModel::onPasswordConfirmationChange,
-            label = "Conferma Password",
+            label = "Confirm password",
             isPassword = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             //visualTransformation = PasswordVisualTransformation()
@@ -90,11 +92,9 @@ fun SignUpScreen(
             }
         }
 
-        CustomStandardButton("Registrati") {
+        CustomStandardButton("Sign Up") {
             viewModel.signUp {
-                navController.navigate(EyeFlushRoute.ProfileConfig) {
-                    //Fai qualcosa prima di accedere
-                }
+                navController.navigate(EyeFlushRoute.ProfileConfig) {}
             }
         }
 

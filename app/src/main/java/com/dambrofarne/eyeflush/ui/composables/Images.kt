@@ -191,7 +191,7 @@ fun ImageCard(
                 Icon(
                     imageVector = if (liked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = null,
-                    tint = if (liked) Color.Red else Color.White,
+                    tint = if (liked) MaterialTheme.colorScheme.primary else Color.White,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
@@ -245,20 +245,20 @@ fun ImageCardSimple(
                         localLikes += if (localLiked) 1 else -1
                         onToggleLike(picId)
                     }
-                    .padding(4.dp),
+                    .padding(6.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     imageVector = if (localLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = null,
                     tint = if (localLiked) Color.Red else Color.White,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(24.dp)
                 )
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = "$localLikes",
                     color = Color.White,
-                    fontSize = 16.sp
+                    fontSize = 18.sp
                 )
             }
         }

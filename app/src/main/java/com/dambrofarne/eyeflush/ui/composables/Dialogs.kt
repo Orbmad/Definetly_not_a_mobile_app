@@ -21,19 +21,20 @@ fun ImagePickerDialog(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = onDismiss,
-            title = { Text("Seleziona immagine") },
-            text = { Text("L'app ti chiederà di scegliere una foto da caricare su Imgur.") },
+            title = { Text("Choose a Photo") },
+            text = { Text("You’ll be asked to pick an image from your gallery to upload to Imgur. It " +
+                    " will become your profile image and could be seen by everyone") },
             confirmButton = {
                 TextButton(onClick = {
                     launcher.launch("image/*")
                     onDismiss()
                 }) {
-                    Text("Continua")
+                    Text("Continue")
                 }
             },
             dismissButton = {
                 TextButton(onClick = onDismiss) {
-                    Text("Annulla")
+                    Text("Dismiss")
                 }
             }
         )

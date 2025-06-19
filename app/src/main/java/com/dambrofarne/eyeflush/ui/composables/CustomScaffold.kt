@@ -91,7 +91,7 @@ fun CustomScaffold(
                     .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
             ) {
                 val iconColor = MaterialTheme.colorScheme.primary
-                val iconSize = 36.dp
+                val iconSize = 42.dp
 
                 // Home button
                 NavigationBarItem(
@@ -161,7 +161,7 @@ fun CenteredTitleTopAppBar(
     onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
+    contentColor: Color = MaterialTheme.colorScheme.primary,
     height: Dp = 48.dp
 ) {
     val insets = WindowInsets.statusBars.asPaddingValues()
@@ -183,7 +183,7 @@ fun CenteredTitleTopAppBar(
                     .align(Alignment.CenterStart)
                     .padding(start = 12.dp)
                     .clickable(onClick = onBackClick)
-                    .size(24.dp)
+                    .size(42.dp)
             )
         }
 

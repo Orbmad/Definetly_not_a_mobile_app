@@ -98,8 +98,6 @@ fun MarkerOverviewScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(WindowInsets.safeDrawing.asPaddingValues()) // Evita notch/cutouts
-                                .padding(16.dp)
                         ) {
                             // Top section with most liked image
                             val markerTitle = uiState.name ?: "[%.6f, %.6f]".format(

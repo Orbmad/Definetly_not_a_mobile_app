@@ -56,7 +56,7 @@ fun PageTitle(text: String) {
 fun ImageLabel(text: String){
     Text(
         text = text,
-        style = MaterialTheme.typography.labelLarge
+        style = MaterialTheme.typography.bodyMedium
     )
 }
 
@@ -81,12 +81,11 @@ fun UserProfileRow(
                 painter = rememberAsyncImagePainter(imageUrl),
                 contentDescription = "User Profile",
                 modifier = Modifier
-                    .size(45.dp)
+                    .size(60.dp)
                     .clip(RoundedCornerShape(50))
             )
             Spacer(modifier = Modifier.width(8.dp))
         }
-
         ImageLabel(username ?: "Autore sconosciuto")
     }
 }

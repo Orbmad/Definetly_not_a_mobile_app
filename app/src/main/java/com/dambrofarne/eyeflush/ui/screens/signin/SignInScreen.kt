@@ -12,10 +12,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -32,8 +30,6 @@ fun SignInScreen(
     viewModel: SignInViewModel = koinViewModel<SignInViewModel>()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -44,10 +40,10 @@ fun SignInScreen(
     ) {
 
         if (uiState.isLoading) {
-            AuthenticationError("Sto caricando...")
+            AuthenticationError("Loading ...")
         }
 
-        Text("Bentornato...", style = MaterialTheme.typography.headlineMedium)
+        Text("Welcome back ! ", style = MaterialTheme.typography.titleLarge)
 
         Spacer(Modifier.height(16.dp))
 
@@ -82,7 +78,7 @@ fun SignInScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        CustomStandardButton("Accedi") {
+        CustomStandardButton("Sign In") {
             viewModel.signIn(
                 navToHome =  {navController.navigate(EyeFlushRoute.Home) },
                 navToProfileConfig = {navController.navigate((EyeFlushRoute.ProfileConfig))}
