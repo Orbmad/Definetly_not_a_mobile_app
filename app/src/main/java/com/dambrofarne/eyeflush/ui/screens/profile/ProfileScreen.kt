@@ -1,16 +1,21 @@
 package com.dambrofarne.eyeflush.ui.screens.profile
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -21,7 +26,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
@@ -35,6 +42,9 @@ import com.dambrofarne.eyeflush.ui.composables.SettingsButton
 import com.dambrofarne.eyeflush.ui.composables.SignOutText
 import com.dambrofarne.eyeflush.ui.composables.StandardHeadline
 import com.dambrofarne.eyeflush.ui.composables.StandardText
+import com.dambrofarne.eyeflush.utils.AchievementRank
+import com.dambrofarne.eyeflush.utils.AchievementType
+import com.dambrofarne.eyeflush.utils.getAchievementIconId
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -84,25 +94,73 @@ fun ProfileScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                                .padding(16.dp)
                         ) {
-                            ProfileImage(
-                                url = uiState.profileImagePath,
-                                borderSize = 2.dp,
-                                borderColor = Color.Gray,
-                                borderShape = CircleShape
-                            )
-                            StandardText(uiState.username)
-                            SettingsButton(onClick = {
-                                navController.navigate(EyeFlushRoute.ProfileConfig)
-                            })
-                            SignOutText {
-                                viewModel.signOut()
-                                navController.navigate(EyeFlushRoute.SignIn) {
-                                    popUpTo(0) { inclusive = true }
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(156.dp)
+                                    .padding(horizontal = 12.dp)
+                            ) {
+
+                                // Left side - profile pic
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        //.fillMaxWidth()
+                                ) {
+                                    ProfileImage(
+                                        url = uiState.profileImagePath,
+                                        borderSize = 2.dp,
+                                        borderColor = Color.Gray,
+                                        borderShape = CircleShape
+                                    )
+
                                 }
+
+                                // Right side - name and badges
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight()
+                                        //.background(MaterialTheme.colorScheme.primary)
+                                ) {
+                                    // Username
+                                    Text(
+                                        text = uiState.username,
+                                        style = MaterialTheme.typography.titleLarge,
+                                        modifier = Modifier
+                                            .align(Alignment.CenterHorizontally)
+                                            .padding(bottom = 12.dp)
+                                    )
+
+                                    // Badges
+                                    BadgesRow(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(48.dp)
+                                            .padding(horizontal = 8.dp)
+                                            //.border(0.dp, Color.Black, RoundedCornerShape(24.dp))
+                                            .clip(RoundedCornerShape(24.dp))
+                                            .background(MaterialTheme.colorScheme.secondaryContainer),
+                                        photoTaken = uiState.photoTaken,
+                                        likes = uiState.likes,
+                                        firstPlace = uiState.firstPlace,
+                                        locations = uiState.locations
+                                    )
+
+                                    // Settings
+                                    SettingsButton(
+                                        onClick = { navController.navigate(EyeFlushRoute.ProfileConfig) },
+                                        modifier = Modifier
+                                            .align(Alignment.End)
+                                    )
+                                }
+
                             }
+
+
                             HorizontalDivider(
                                 modifier = Modifier.padding(vertical = 8.dp),
                                 thickness = 1.dp,
@@ -123,7 +181,7 @@ fun ProfileScreen(
                                         strokeWidth = 2.dp
                                     )
                                     Text(
-                                        "Aggiornamento...",
+                                        "Loading...",
                                         style = MaterialTheme.typography.labelMedium
                                     )
                                 }
@@ -143,4 +201,38 @@ fun ProfileScreen(
             }
         }
     )
+}
+
+@Composable
+fun BadgesRow(
+    modifier: Modifier,
+    photoTaken: AchievementRank,
+    likes: AchievementRank,
+    firstPlace: AchievementRank,
+    locations: AchievementRank,
+) {
+    val badgesIdList: List<Int?> = listOf(
+        getAchievementIconId(AchievementType.PHOTO_TAKEN, photoTaken),
+        getAchievementIconId(AchievementType.LIKES, likes),
+        getAchievementIconId(AchievementType.FIRST_PLACE, firstPlace),
+        getAchievementIconId(AchievementType.LOCATION_VISITED, locations)
+    )
+
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        badgesIdList.forEach { iconId ->
+            if (iconId != null) {
+                Image(
+                    painter = painterResource(iconId),
+                    contentDescription = "badge",
+                    modifier = Modifier
+                        .weight(1f)
+                        .size(28.dp)
+                )
+            }
+        }
+    }
 }

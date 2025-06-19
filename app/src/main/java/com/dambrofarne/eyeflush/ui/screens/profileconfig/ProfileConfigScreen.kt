@@ -38,6 +38,7 @@ import com.dambrofarne.eyeflush.ui.composables.ImagePickerDialog
 import com.dambrofarne.eyeflush.ui.composables.NavScreen
 import com.dambrofarne.eyeflush.ui.composables.ThemePreferenceSelector
 import com.dambrofarne.eyeflush.ui.theme.ThemeViewModel
+import com.dambrofarne.eyeflush.ui.composables.SignOutText
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -85,7 +86,9 @@ fun ProfileConfigScreen(
                 }
             )
 
+
             val imageSize = 240.dp
+            val padding = 8.dp // distanza interna tra immagine e bordo del Box
 
             Column(
                 modifier = Modifier
@@ -141,10 +144,18 @@ fun ProfileConfigScreen(
                     }
                 }
 
-                CustomStandardButton("Confirm") {
+                CustomStandardButton("Conferma") {
                     viewModel.setUsername {
                         navController.navigate(EyeFlushRoute.Home) {
+                            //Fai qualcosa prima di accedere
                         }
+                    }
+                }
+
+                SignOutText {
+                    viewModel.signOut()
+                    navController.navigate(EyeFlushRoute.SignIn) {
+                        popUpTo(0) { inclusive = true }
                     }
                 }
 

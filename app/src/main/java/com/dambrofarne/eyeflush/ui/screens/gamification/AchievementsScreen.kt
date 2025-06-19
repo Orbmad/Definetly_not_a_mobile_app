@@ -90,7 +90,7 @@ fun AchievementScreen(achievementUiState: AchievementUiState) {
             title = "Photo Taken - LV ${mapRankToLevel(photoTakenRank)}",
             maxPoints = getNextAchievementMaxPoints(AchievementType.PHOTO_TAKEN, achievementUiState.picturesTaken),
             actualPoints = achievementUiState.picturesTaken,
-            iconId = getAchievementIconId(AchievementType.PHOTO_TAKEN, getNextRank(photoTakenRank))
+            iconId = getAchievementIconId(AchievementType.PHOTO_TAKEN, getNextRank(photoTakenRank))!!
         )
 
         // Achievement likes
@@ -99,7 +99,7 @@ fun AchievementScreen(achievementUiState: AchievementUiState) {
             title = "Likes received - LV ${mapRankToLevel(likesRank)}",
             maxPoints = getNextAchievementMaxPoints(AchievementType.LIKES, achievementUiState.likesReceived),
             actualPoints = achievementUiState.likesReceived,
-            iconId = getAchievementIconId(AchievementType.LIKES, getNextRank(likesRank))
+            iconId = getAchievementIconId(AchievementType.LIKES, getNextRank(likesRank))!!
         )
 
         // Achievement first place
@@ -108,7 +108,7 @@ fun AchievementScreen(achievementUiState: AchievementUiState) {
             title = "Most liked photos - LV ${mapRankToLevel(firstPlaceRank)}",
             maxPoints = getNextAchievementMaxPoints(AchievementType.FIRST_PLACE, achievementUiState.mostLikedPictures),
             actualPoints = achievementUiState.mostLikedPictures,
-            iconId = getAchievementIconId(AchievementType.FIRST_PLACE, getNextRank(firstPlaceRank))
+            iconId = getAchievementIconId(AchievementType.FIRST_PLACE, getNextRank(firstPlaceRank))!!
         )
 
         // Achievement location visited
@@ -117,7 +117,7 @@ fun AchievementScreen(achievementUiState: AchievementUiState) {
             title = "Most liked photos - LV ${mapRankToLevel(locationRank)}",
             maxPoints = getNextAchievementMaxPoints(AchievementType.LOCATION_VISITED, achievementUiState.markersVisited),
             actualPoints = achievementUiState.markersVisited,
-            iconId = getAchievementIconId(AchievementType.LOCATION_VISITED, getNextRank(locationRank))
+            iconId = getAchievementIconId(AchievementType.LOCATION_VISITED, getNextRank(locationRank))!!
         )
     }
 }

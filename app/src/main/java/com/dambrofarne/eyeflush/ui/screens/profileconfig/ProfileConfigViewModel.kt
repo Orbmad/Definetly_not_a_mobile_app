@@ -127,5 +127,9 @@ class ProfileConfigViewModel(
         }
     }
 
+    fun signOut() {
+        auth.signOut()
+    }
+
 
 }

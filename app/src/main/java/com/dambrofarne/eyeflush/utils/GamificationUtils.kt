@@ -97,11 +97,11 @@ fun getNextAchievementMaxPoints(achievementType: AchievementType, points: Int): 
     }
 }
 
-fun getAchievementIconId(achievementType: AchievementType, achievementRank: AchievementRank): Int {
+fun getAchievementIconId(achievementType: AchievementType, achievementRank: AchievementRank): Int? {
     when (achievementType) {
         AchievementType.LIKES -> {
             return when (achievementRank) {
-                AchievementRank.NONE -> R.drawable.likes_badge_bronze
+                AchievementRank.NONE -> null
                 AchievementRank.BRONZE -> R.drawable.likes_badge_bronze
                 AchievementRank.SILVER -> R.drawable.likes_badge_silver
                 AchievementRank.GOLD -> R.drawable.likes_badge_gold
@@ -109,7 +109,7 @@ fun getAchievementIconId(achievementType: AchievementType, achievementRank: Achi
         }
         AchievementType.PHOTO_TAKEN -> {
             return when (achievementRank) {
-                AchievementRank.NONE -> R.drawable.photo_taken_badge_bronze
+                AchievementRank.NONE -> null
                 AchievementRank.BRONZE -> R.drawable.photo_taken_badge_bronze
                 AchievementRank.SILVER -> R.drawable.photo_taken_badge_silver
                 AchievementRank.GOLD -> R.drawable.photo_taken_badge_gold
@@ -117,7 +117,7 @@ fun getAchievementIconId(achievementType: AchievementType, achievementRank: Achi
         }
         AchievementType.FIRST_PLACE -> {
             return when (achievementRank) {
-                AchievementRank.NONE -> R.drawable.first_place_badge_bronze
+                AchievementRank.NONE -> null
                 AchievementRank.BRONZE -> R.drawable.first_place_badge_bronze
                 AchievementRank.SILVER -> R.drawable.first_place_badge_silver
                 AchievementRank.GOLD -> R.drawable.first_place_badge_gold
@@ -125,7 +125,7 @@ fun getAchievementIconId(achievementType: AchievementType, achievementRank: Achi
         }
         AchievementType.LOCATION_VISITED -> {
             return when (achievementRank) {
-                AchievementRank.NONE -> R.drawable.location_visited_badge_bronze
+                AchievementRank.NONE -> null
                 AchievementRank.BRONZE -> R.drawable.location_visited_badge_bronze
                 AchievementRank.SILVER -> R.drawable.location_visited_badge_silver
                 AchievementRank.GOLD -> R.drawable.location_visited_badge_gold
