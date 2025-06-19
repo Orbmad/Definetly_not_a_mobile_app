@@ -709,8 +709,6 @@ class FirestoreDatabaseRepository(
     }
 
     override suspend fun getNotifications(uId: String): List<NotificationItem> {
-        val TAG = "Notifiche"
-        Log.d(TAG, "getNotifications: chiamato con uId=$uId")
         return try {
             val notificationsRef = db.collection("users")
                 .document(uId)
@@ -718,7 +716,6 @@ class FirestoreDatabaseRepository(
                 .orderBy("timestamp", Query.Direction.DESCENDING)
 
             val snapshot = notificationsRef.get().await()
-            Log.d(TAG, "Snapshot retrieved: ${snapshot.documents.size} documenti")
 
             val items = snapshot.documents.mapNotNull { doc ->
                 try {
@@ -731,11 +728,6 @@ class FirestoreDatabaseRepository(
                     val type = doc.getString("type") ?: ""
                     val referredMarkerId = doc.getString("markerId") ?: ""
 
-                    Log.d(
-                        TAG,
-                        "Parsing doc id=$id: title='$title', time='$timeFormatted', isRead=$isRead, type='$type', markerId='$referredMarkerId'"
-                    )
-
                     NotificationItem(
                         id = id,
                         title = title,
@@ -746,15 +738,12 @@ class FirestoreDatabaseRepository(
                         referredMarkerId = referredMarkerId
                     )
                 } catch (e: Exception) {
-                    Log.e(TAG, "Errore parsing documento ${doc.id}", e)
                     null
                 }
             }
 
-            Log.d(TAG, "Parsed notifications count: ${items.size}")
             items
         } catch (e: Exception) {
-            Log.e(TAG, "Errore fetching notifications per uId=$uId", e)
             emptyList()
         }
     }
