@@ -29,5 +29,5 @@ val Platinum = Color(0xFFDADADA)
 val EerieBlack = Color(0xFF262626)
 
 // Dark mode colors
-val MainBlack = Color(0xFF161118)
+val MainBlack = Color(0xFF0D0C11)
 val OnBlackBlack = Color(0xFF241E2B)

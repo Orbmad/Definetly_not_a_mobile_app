@@ -22,6 +22,8 @@ private val DarkColorScheme = darkColorScheme(
     secondaryContainer = OnBlackBlack,
     onSecondaryContainer = White,
 
+    onTertiaryContainer = Platinum,
+
     secondary = Link,
     tertiary = Danger
 )

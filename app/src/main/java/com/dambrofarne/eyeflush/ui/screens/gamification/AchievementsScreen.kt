@@ -194,7 +194,7 @@ fun CustomAchievementProgressBarWithText(
             .height(height)
             .clip(RoundedCornerShape(cornerRadius))
             .background(backgroundColor)
-            .border(width = 1.dp, Color.Black, RoundedCornerShape(cornerRadius))
+            .border(width = 1.dp, MaterialTheme.colorScheme.onPrimaryContainer, RoundedCornerShape(cornerRadius))
     ) {
         // Progress bar
         Box(

@@ -28,22 +28,22 @@ class NotificationViewModel(
     val uiState: StateFlow<NotificationUiState> = _uiState
 
     suspend fun loadNotifications() {
-        val userId = auth.getCurrentUserId()
-        if (userId != null) {
-            val loaded = db.getNotifications(userId)
-            //Log.w("Notifications", "loaded notifications: $loaded")
-            _uiState.update { 
-                it.copy(
-                    isLoading = false,
-                    notificationsList = loaded
-                )
-            }
-            //Log.w("Notifications", "notifications list: ${_uiState.value.notificationsList}")
-        }
-        //loadDummyNotifications()
+//        val userId = auth.getCurrentUserId()
+//        if (userId != null) {
+//            val loaded = db.getNotifications(userId)
+//            //Log.w("Notifications", "loaded notifications: $loaded")
+//            _uiState.update {
+//                it.copy(
+//                    isLoading = false,
+//                    notificationsList = loaded
+//                )
+//            }
+//            //Log.w("Notifications", "notifications list: ${_uiState.value.notificationsList}")
+//        }
+        loadDummyNotifications()
     }
 
-    private fun loadDummyNotifications() {
+    private suspend fun loadDummyNotifications() {
         _uiState.update {
             it.copy(
                 notificationsList = listOf(
@@ -65,7 +65,8 @@ class NotificationViewModel(
                         isRead = false,
                         referredMarkerId = null
                     )
-                )
+                ),
+                isLoading = false
             )
         }
     }
