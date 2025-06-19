@@ -77,10 +77,12 @@ interface DatabaseRepository {
      * @param uId
      * @param darkTheme Sets the user preference regarding the dark theme
      */
-    suspend fun changeThemePreference(uId : String, darkTheme : Boolean)
+    suspend fun changeThemePreferenceString(userId: String, pref: String)
 
     /**
      * @param uId
+     *
+     * @return "SYSTEM"/"LIGHT"/"DARK"
      */
-    suspend fun getThemePreference(uid: String): Boolean?
+    suspend fun getThemePreferenceString(userId: String): String?
 }

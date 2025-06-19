@@ -1,5 +1,6 @@
 package com.dambrofarne.eyeflush.ui.theme
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
@@ -14,27 +15,40 @@ class ThemeViewModel(
     private val auth: AuthRepository
 ) : ViewModel() {
 
-    private val _isDarkTheme = MutableStateFlow(false)
-    val isDarkTheme: StateFlow<Boolean> = _isDarkTheme.asStateFlow()
+    private val _themePreference = MutableStateFlow(ThemePreference.SYSTEM)
+    val themePreference: StateFlow<ThemePreference> = _themePreference.asStateFlow()
 
     private var themeInitialized = false
 
-    fun initTheme(systemDefault: Boolean) {
+    fun initThemePreference() {
         if (themeInitialized) return
         themeInitialized = true
 
         viewModelScope.launch {
             val userId = auth.getCurrentUserId()
-            val themeFromDb = userId?.let { db.getThemePreference(it) }
-            _isDarkTheme.value = themeFromDb ?: systemDefault
+            if (userId != null) {
+                try {
+                    val stored = db.getThemePreferenceString(userId)
+                    val pref = ThemePreference.fromString(stored)
+                    _themePreference.value = pref
+                } catch (e: Exception) {
+                    _themePreference.value = ThemePreference.SYSTEM
+                }
+            } else {
+                _themePreference.value = ThemePreference.SYSTEM
+            }
         }
     }
 
-    fun setDarkTheme(enabled: Boolean) {
-        _isDarkTheme.value = enabled
+    fun setThemePreference(pref: ThemePreference) {
+        _themePreference.value = pref
         viewModelScope.launch {
-            auth.getCurrentUserId()?.let {
-                db.changeThemePreference(it, enabled)
+            auth.getCurrentUserId()?.let { userId ->
+                try {
+                    db.changeThemePreferenceString(userId, pref.name)
+                } catch (e: Exception) {
+                    Log.e("ThemeViewModel", "setThemePreference: error while saving preference in DB", e)
+                }
             }
         }
     }

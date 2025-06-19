@@ -12,14 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,7 +29,7 @@ import com.dambrofarne.eyeflush.ui.composables.EyeFlushTextField
 import com.dambrofarne.eyeflush.ui.composables.IconImage
 import com.dambrofarne.eyeflush.ui.composables.ImagePickerDialog
 import com.dambrofarne.eyeflush.ui.composables.NavScreen
-import com.dambrofarne.eyeflush.ui.composables.ThemeToggle
+import com.dambrofarne.eyeflush.ui.composables.ThemePreferenceSelector
 import com.dambrofarne.eyeflush.ui.theme.ThemeViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -45,12 +38,12 @@ import org.koin.androidx.compose.koinViewModel
 fun ProfileConfigScreen(
     navController: NavHostController,
     viewModel: ProfileConfigViewModel = koinViewModel<ProfileConfigViewModel>(),
-    themeViewModel: ThemeViewModel = koinViewModel<ThemeViewModel>()
-){
+    themeViewModel: ThemeViewModel
+) {
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     var showDialog by remember { mutableStateOf(false) }
-    val isDark by themeViewModel.isDarkTheme.collectAsState()
+    val pref by themeViewModel.themePreference.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
@@ -85,7 +78,6 @@ fun ProfileConfigScreen(
                 }
             )
 
-
             val imageSize = 240.dp
 
             Column(
@@ -95,6 +87,7 @@ fun ProfileConfigScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
                 if (uiState.isLoading) {
                     AuthenticationError("Loading ...")
                 }
@@ -148,12 +141,12 @@ fun ProfileConfigScreen(
                     }
                 }
 
+                Spacer(Modifier.height(24.dp))
 
-
-                ThemeToggle(
-                    isDark = isDark,
-                    onToggle = { enabled ->
-                        themeViewModel.setDarkTheme(enabled)
+                ThemePreferenceSelector(
+                    currentPref = pref,
+                    onPreferenceChange = { newPref ->
+                        themeViewModel.setThemePreference(newPref)
                     }
                 )
             }

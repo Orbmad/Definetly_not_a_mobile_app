@@ -17,6 +17,7 @@ import com.dambrofarne.eyeflush.ui.screens.signin.SignInScreen
 import com.dambrofarne.eyeflush.ui.screens.signup.SignUpScreen
 import com.dambrofarne.eyeflush.ui.screens.splash.SplashScreen
 import com.dambrofarne.eyeflush.ui.screens.userOverview.UserOverviewScreen
+import com.dambrofarne.eyeflush.ui.theme.ThemeViewModel
 import kotlinx.serialization.Serializable
 
 sealed interface EyeFlushRoute {
@@ -37,10 +38,13 @@ sealed interface EyeFlushRoute {
 }
 
 @Composable
-fun EyeFlushNavGraph(navController: NavHostController) {
+fun EyeFlushNavGraph(
+    navController: NavHostController,
+    themeViewModel : ThemeViewModel
+) {
     NavHost(
         navController = navController,
-        startDestination = EyeFlushRoute.Splash //Default destination
+        startDestination = EyeFlushRoute.Splash, //Default destination
     ){
         composable<EyeFlushRoute.Splash> {
             SplashScreen(navController)
@@ -61,7 +65,7 @@ fun EyeFlushNavGraph(navController: NavHostController) {
         }
 
         composable<EyeFlushRoute.ProfileConfig> {
-            ProfileConfigScreen(navController)
+            ProfileConfigScreen(navController, themeViewModel = themeViewModel)
         }
 
         composable<EyeFlushRoute.Profile> {

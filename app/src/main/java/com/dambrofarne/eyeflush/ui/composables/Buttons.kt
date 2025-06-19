@@ -2,19 +2,16 @@ package com.dambrofarne.eyeflush.ui.composables
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material3.Button
@@ -24,21 +21,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dambrofarne.eyeflush.data.constants.IconPaths.ACCOUNT_ICON
+import com.dambrofarne.eyeflush.ui.theme.ThemePreference
 
 @Composable
 fun CustomStandardButton(
-    text: String = "Accedi",
+    text: String = "Sign in",
     onClickFun: () -> Unit = {}
 ){
     Button(
@@ -57,7 +52,7 @@ fun CustomStandardButton(
 @Composable
 fun SignUpText(onClick: () -> Unit) {
     Text(
-        text = "Non hai un account? Registrati",
+        text = "Don't have an account ? Sign up",
         color = MaterialTheme.colorScheme.primary,
         fontSize = 14.sp,
         modifier = Modifier
@@ -69,7 +64,7 @@ fun SignUpText(onClick: () -> Unit) {
 @Composable
 fun SignInText(onClick: () -> Unit) {
     Text(
-        text = "Hai già un account? Accedi",
+        text = "Already have an account ? Sign in",
         color = MaterialTheme.colorScheme.onBackground ,
         fontSize = 14.sp,
         modifier = Modifier
@@ -81,7 +76,7 @@ fun SignInText(onClick: () -> Unit) {
 @Composable
 fun SignOutText(onClick: () -> Unit) {
     Text(
-        text = "Esci dall'account...",
+        text = "Log out ...",
         color = MaterialTheme.colorScheme.onBackground ,
         fontSize = 14.sp,
         modifier = Modifier
@@ -150,26 +145,77 @@ fun SettingsButton(
     }
 }
 
+val radioButtonRowHeight = 24.dp
 @Composable
-fun ThemeToggle(
-    isDark: Boolean,
-    onToggle: (Boolean) -> Unit
+fun ThemePreferenceSelector(
+    currentPref: ThemePreference,
+    onPreferenceChange: (ThemePreference) -> Unit
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         Text(
-            text = if (isDark) "Modalità Scura" else "Modalità Chiara",
-            style = MaterialTheme.typography.bodyLarge
+            text = "Theme preference:",
+            modifier = Modifier.padding(bottom = 4.dp),
+            style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 18.sp)
         )
-        Switch(
-            checked = isDark,
-            onCheckedChange = onToggle
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onPreferenceChange(ThemePreference.SYSTEM) }
+                .padding(vertical = 2.dp)
+                .height(radioButtonRowHeight)
+        ) {
+            RadioButton(
+                selected = currentPref == ThemePreference.SYSTEM,
+                onClick = { onPreferenceChange(ThemePreference.SYSTEM) }
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = "System theme",
+                style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 16.sp)
+            )
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onPreferenceChange(ThemePreference.LIGHT) }
+                .padding(vertical = 2.dp)
+                .height(radioButtonRowHeight)
+        ) {
+            RadioButton(
+                selected = currentPref == ThemePreference.LIGHT,
+                onClick = { onPreferenceChange(ThemePreference.LIGHT) }
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = "Light Theme",
+                style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 16.sp)
+            )
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onPreferenceChange(ThemePreference.DARK) }
+                .padding(vertical = 2.dp)
+                .height(radioButtonRowHeight)
+        ) {
+            RadioButton(
+                selected = currentPref == ThemePreference.DARK,
+                onClick = { onPreferenceChange(ThemePreference.DARK) }
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = "Dark Theme",
+                style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 16.sp)
+            )
+        }
     }
 }
 

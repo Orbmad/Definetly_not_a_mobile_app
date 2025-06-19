@@ -37,6 +37,23 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+enum class ThemePreference {
+    SYSTEM,
+    LIGHT,
+    DARK;
+
+    companion object {
+        fun fromString(value: String?): ThemePreference {
+            return try {
+                if (value == null) SYSTEM
+                else valueOf(value)
+            } catch (e: Exception) {
+                SYSTEM
+            }
+        }
+    }
+}
+
 @Composable
 fun EyeFlushTheme(
     darkTheme: Boolean,
