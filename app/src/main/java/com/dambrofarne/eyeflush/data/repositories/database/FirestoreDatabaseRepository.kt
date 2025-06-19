@@ -426,12 +426,13 @@ class FirestoreDatabaseRepository(
                     userDocRef.update("likes", likes).await()
                     imageDocRef.update("likes", FieldValue.increment(1)).await()
                     //Like notification
+
                     receiverId?.let{
                         addNotification(
-                            receiverUId = it,
+                            receiverUId = receiverId,
                             title = "New Like!",
                             type = "like",
-                            message = "$likerUsername has liked your image ! Go and check your new spot" +
+                            message = "$likerUsername has liked your image ! Go and check your new spot " +
                                     "in the marker scoreboard!",
                             isRead = false,
                             markerId = markerId
@@ -601,8 +602,8 @@ class FirestoreDatabaseRepository(
         return try {
             val notificationData = mapOf(
                 "title" to title,
-                "body" to message,
-                "timestamp" to System.currentTimeMillis(),
+                "message" to message,
+                "timestamp" to Timestamp.now(),
                 "read" to isRead,
                 "type" to type,
                 "markerId" to markerId
@@ -708,6 +709,8 @@ class FirestoreDatabaseRepository(
     }
 
     override suspend fun getNotifications(uId: String): List<NotificationItem> {
+        val TAG = "Notifiche"
+        Log.d(TAG, "getNotifications: chiamato con uId=$uId")
         return try {
             val notificationsRef = db.collection("users")
                 .document(uId)
@@ -715,24 +718,43 @@ class FirestoreDatabaseRepository(
                 .orderBy("timestamp", Query.Direction.DESCENDING)
 
             val snapshot = notificationsRef.get().await()
+            Log.d(TAG, "Snapshot retrieved: ${snapshot.documents.size} documenti")
 
-            snapshot.documents.mapNotNull { doc ->
+            val items = snapshot.documents.mapNotNull { doc ->
                 try {
+                    val id = doc.id
+                    val title = doc.getString("title") ?: ""
+                    val message = doc.getString("message") ?: ""
+                    val timestamp = doc.getTimestamp("timestamp")
+                    val timeFormatted = timestamp?.let { getFormattedImageDate(it) } ?: "Unknown"
+                    val isRead = doc.getBoolean("read") ?: false
+                    val type = doc.getString("type") ?: ""
+                    val referredMarkerId = doc.getString("markerId") ?: ""
+
+                    Log.d(
+                        TAG,
+                        "Parsing doc id=$id: title='$title', time='$timeFormatted', isRead=$isRead, type='$type', markerId='$referredMarkerId'"
+                    )
+
                     NotificationItem(
-                        id = doc.id,
-                        title = doc.getString("title") ?: "",
-                        message = doc.getString("message") ?: "",
-                        time = doc.getTimestamp("timestamp")?.let { getFormattedImageDate(it) } ?: "Unknown",
-                        isRead = doc.getBoolean("read") ?: false,
-                        type = doc.getString("type") ?: "",
-                        referredMarkerId = doc.getString("markerId") ?: ""
+                        id = id,
+                        title = title,
+                        message = message,
+                        time = timeFormatted,
+                        isRead = isRead,
+                        type = type,
+                        referredMarkerId = referredMarkerId
                     )
                 } catch (e: Exception) {
+                    Log.e(TAG, "Errore parsing documento ${doc.id}", e)
                     null
                 }
             }
 
+            Log.d(TAG, "Parsed notifications count: ${items.size}")
+            items
         } catch (e: Exception) {
+            Log.e(TAG, "Errore fetching notifications per uId=$uId", e)
             emptyList()
         }
     }
