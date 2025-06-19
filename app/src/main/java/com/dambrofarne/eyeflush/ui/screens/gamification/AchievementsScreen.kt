@@ -162,7 +162,7 @@ fun AchievementItem(title: String, maxPoints: Int, actualPoints: Int, iconId: In
                 painter = painterResource(iconId),
                 contentDescription = "badge",
                 modifier = Modifier
-                    .size(46.dp)
+                    .size(52.dp)
                     .padding(start = 10.dp)
             )
         }
@@ -177,7 +177,7 @@ fun CustomAchievementProgressBarWithText(
     modifier: Modifier = Modifier,
     backgroundColor: Color = Color.LightGray,
     progressColor: Color = MaterialTheme.colorScheme.primary,
-    height: Dp = 20.dp,
+    height: Dp = 24.dp,
     cornerRadius: Dp = 6.dp,
     textColor: Color = Color.Black
 ) {

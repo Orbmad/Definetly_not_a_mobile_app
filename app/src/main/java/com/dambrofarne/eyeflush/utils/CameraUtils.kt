@@ -1,11 +1,7 @@
 package com.dambrofarne.eyeflush.utils
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import androidx.exifinterface.media.ExifInterface
-import java.io.File
-import java.io.FileOutputStream
 
 private const val TARGET_ASPECT_RATIO = 4f/5f
 
@@ -39,38 +35,38 @@ fun rotateBitmap(bitmap: Bitmap, degrees: Float): Bitmap {
     return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
 }
 
-fun fixImageOrientationAndCrop(photoFile: File, aspectRatio: Float = 4f / 5f): File {
-    val exif = ExifInterface(photoFile.absolutePath)
-    val orientation = exif.getAttributeInt(
-        ExifInterface.TAG_ORIENTATION,
-        ExifInterface.ORIENTATION_NORMAL
-    )
-
-    val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
-    val rotatedBitmap = when (orientation) {
-        ExifInterface.ORIENTATION_ROTATE_90 -> rotateBitmap(bitmap, 90f)
-        ExifInterface.ORIENTATION_ROTATE_180 -> rotateBitmap(bitmap, 180f)
-        ExifInterface.ORIENTATION_ROTATE_270 -> rotateBitmap(bitmap, 270f)
-        else -> bitmap
-    }
-
-    val croppedBitmap = cropToCenterAspectRatio(rotatedBitmap, aspectRatio)
-
-    // Salva l'immagine corretta nello stesso file
-    FileOutputStream(photoFile).use { out ->
-        croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
-    }
-
-    // Reset EXIF orientation
-    val newExif = ExifInterface(photoFile.absolutePath)
-    newExif.setAttribute(
-        ExifInterface.TAG_ORIENTATION,
-        ExifInterface.ORIENTATION_NORMAL.toString()
-    )
-    newExif.saveAttributes()
-
-    return photoFile
-}
+//fun fixImageOrientationAndCrop(photoFile: File, aspectRatio: Float = 4f / 5f): File {
+//    val exif = ExifInterface(photoFile.absolutePath)
+//    val orientation = exif.getAttributeInt(
+//        ExifInterface.TAG_ORIENTATION,
+//        ExifInterface.ORIENTATION_NORMAL
+//    )
+//
+//    val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+//    val rotatedBitmap = when (orientation) {
+//        ExifInterface.ORIENTATION_ROTATE_90 -> rotateBitmap(bitmap, 90f)
+//        ExifInterface.ORIENTATION_ROTATE_180 -> rotateBitmap(bitmap, 180f)
+//        ExifInterface.ORIENTATION_ROTATE_270 -> rotateBitmap(bitmap, 270f)
+//        else -> bitmap
+//    }
+//
+//    val croppedBitmap = cropToCenterAspectRatio(rotatedBitmap, aspectRatio)
+//
+//    // Salva l'immagine corretta nello stesso file
+//    FileOutputStream(photoFile).use { out ->
+//        croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+//    }
+//
+//    // Reset EXIF orientation
+//    val newExif = ExifInterface(photoFile.absolutePath)
+//    newExif.setAttribute(
+//        ExifInterface.TAG_ORIENTATION,
+//        ExifInterface.ORIENTATION_NORMAL.toString()
+//    )
+//    newExif.saveAttributes()
+//
+//    return photoFile
+//}
 
 fun cropRelativeToOverlay(bitmap: Bitmap): Bitmap {
     val originalWidth = bitmap.width
