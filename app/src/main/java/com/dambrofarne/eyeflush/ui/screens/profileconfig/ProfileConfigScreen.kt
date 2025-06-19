@@ -1,17 +1,23 @@
 package com.dambrofarne.eyeflush.ui.screens.profileconfig
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Collections
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -22,18 +28,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.dambrofarne.eyeflush.data.constants.IconPaths.GALLERY_CHOICE_ICON
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
-import com.dambrofarne.eyeflush.ui.composables.ChoicheProfileImage
+import com.dambrofarne.eyeflush.ui.composables.ChoiceProfileImage
 import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
 import com.dambrofarne.eyeflush.ui.composables.CustomStandardButton
 import com.dambrofarne.eyeflush.ui.composables.EyeFlushTextField
-import com.dambrofarne.eyeflush.ui.composables.IconImage
+import com.dambrofarne.eyeflush.ui.composables.IconButton
 import com.dambrofarne.eyeflush.ui.composables.ImagePickerDialog
 import com.dambrofarne.eyeflush.ui.composables.NavScreen
 import com.dambrofarne.eyeflush.ui.composables.ThemePreferenceSelector
@@ -41,6 +45,7 @@ import com.dambrofarne.eyeflush.ui.theme.ThemeViewModel
 import com.dambrofarne.eyeflush.ui.composables.SignOutText
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+
 
 @Composable
 fun ProfileConfigScreen(
@@ -87,75 +92,75 @@ fun ProfileConfigScreen(
             )
 
 
-            val imageSize = 240.dp
-            val padding = 8.dp // distanza interna tra immagine e bordo del Box
-
+            val imageSize = 200.dp
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+                    .padding(start = 16.dp)
+                ) {
 
                 if (uiState.isLoading) {
                     AuthenticationError("Loading ...")
                 }
-
-                Spacer(Modifier.height(16.dp))
                 val boxPadding = 8.dp
 
                 Box(
                     modifier = Modifier
                         .size(imageSize + boxPadding * 2)
                 ) {
-                    ChoicheProfileImage(
+                    ChoiceProfileImage(
                         url = uiState.profileImageUrl,
                         borderSize = 2.dp,
-                        borderColor = Color.Gray,
                         borderShape = CircleShape
                     )
 
-                    IconImage(
-                        image = GALLERY_CHOICE_ICON,
+                    IconButton(
+                        onClick = { viewModel.onPickPhotoClick() },
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .offset(x = (-20).dp, y = (-20).dp)
-                            .clickable { viewModel.onPickPhotoClick() }
                     )
                 }
 
-                EyeFlushTextField(
-                    value = uiState.username,
-                    onValueChange = viewModel::onUsernameChange,
-                    label = "Username",
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-                )
 
-                uiState.connectionError?.let {
-                    if (it.isNotEmpty()) {
-                        AuthenticationError(it)
-                    }
-                }
 
-                uiState.usernameError?.let {
-                    if (it.isNotEmpty()) {
-                        AuthenticationError(it)
-                    }
-                }
+                Column {
+                    Row(
+                        verticalAlignment = Alignment.Bottom,
+                        horizontalArrangement = Arrangement.Absolute.Left
+                    ){
+                        EyeFlushTextField(
+                            value = uiState.username,
+                            onValueChange = viewModel::onUsernameChange,
+                            label = "Username",
+                            width = 240.dp,
+                            height = 70.dp,
+                            placeholder = uiState.username,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                        )
 
-                CustomStandardButton("Conferma") {
-                    viewModel.setUsername {
-                        navController.navigate(EyeFlushRoute.Home) {
-                            //Fai qualcosa prima di accedere
+                        Spacer(
+                            Modifier.width(16.dp)
+                        )
+                        CustomStandardButton(
+                            text = "Edit") {
+                            viewModel.setUsername {
+                                navController.navigate(EyeFlushRoute.Home) {
+                                }
+                            }
                         }
                     }
-                }
 
-                SignOutText {
-                    viewModel.signOut()
-                    navController.navigate(EyeFlushRoute.SignIn) {
-                        popUpTo(0) { inclusive = true }
+                    uiState.connectionError?.let {
+                        if (it.isNotEmpty()) {
+                            AuthenticationError(it)
+                        }
+                    }
+
+                    uiState.usernameError?.let {
+                        if (it.isNotEmpty()) {
+                            AuthenticationError(it)
+                        }
                     }
                 }
 
@@ -166,6 +171,19 @@ fun ProfileConfigScreen(
                     onPreferenceChange = { newPref ->
                         themeViewModel.setThemePreference(newPref)
                     }
+                )
+
+                Spacer(Modifier.height(24.dp))
+
+                CustomStandardButton(
+                    text = "Sign out",
+                    onClickFun = {
+                        viewModel.signOut()
+                        navController.navigate(EyeFlushRoute.SignIn) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+
                 )
             }
         }

@@ -26,6 +26,7 @@ private val LightColorScheme = lightColorScheme(
     secondary = Link, // Darker app color
     tertiary = Error // Error color
 
+
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),

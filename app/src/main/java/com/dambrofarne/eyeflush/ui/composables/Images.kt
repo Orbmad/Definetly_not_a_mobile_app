@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
@@ -74,6 +76,7 @@ fun ProfileImage(
         contentScale = ContentScale.Crop,
         modifier = Modifier
             .size(size)
+            .shadow(elevation = 10.dp, shape = borderShape, clip = false) // aggiunta ombra
             .clip(borderShape)
             .border(borderSize, borderColor, borderShape)
     )
@@ -114,15 +117,15 @@ fun IconImage(
 
 
 @Composable
-fun ChoicheProfileImage(
+fun ChoiceProfileImage(
     url: String,
     borderSize: Dp = 2.dp,
     borderShape: Shape = CircleShape,
-    borderColor: Color = Color.Gray
+    borderColor: Color = MaterialTheme.colorScheme.primary
 ) {
     ProfileImage(
         url = url,
-        size =  240.dp,
+        size =  200.dp,
         borderSize = borderSize,
         borderShape = borderShape,
         borderColor = borderColor
@@ -130,7 +133,7 @@ fun ChoicheProfileImage(
 }
 
 @Composable
-fun ChoicheSmallProfileImage(
+fun ChoiceSmallProfileImage(
     url: String,
     borderSize: Dp = 2.dp,
     borderShape: Shape = CircleShape,

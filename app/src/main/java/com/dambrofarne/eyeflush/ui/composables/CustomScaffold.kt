@@ -187,7 +187,6 @@ fun CenteredTitleTopAppBar(
             )
         }
 
-        // Titolo centrato
         Text(
             text = title,
             color = contentColor,

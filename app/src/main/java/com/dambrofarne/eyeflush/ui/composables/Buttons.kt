@@ -1,10 +1,13 @@
 package com.dambrofarne.eyeflush.ui.composables
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -22,10 +26,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dambrofarne.eyeflush.data.constants.IconPaths.ACCOUNT_ICON
@@ -39,12 +49,21 @@ fun CustomStandardButton(
     Button(
         onClick = onClickFun,
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-
-        )
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
+        ),
+        modifier = Modifier
+            .height(60.dp),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 6.dp,
+            pressedElevation = 12.dp,
+            disabledElevation = 0.dp
+        ),
     ) {
-        Text(text)
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyLarge
+        )
     }
 }
 
@@ -214,6 +233,50 @@ fun ThemePreferenceSelector(
             Text(
                 text = "Dark Theme",
                 style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 16.sp)
+            )
+        }
+    }
+}
+
+@Composable
+fun IconButton(
+    onClick: () -> Unit,
+    icon: ImageVector = Icons.Default.Collections,
+    modifier: Modifier = Modifier,
+    size: Dp = 50.dp,
+    iconTint: Color = MaterialTheme.colorScheme.primary,
+    backgroundColor: Color = MaterialTheme.colorScheme.surface,
+    borderColor: Color = MaterialTheme.colorScheme.primary,
+    shadowElevation: Dp = 10.dp,
+    borderWidth: Dp = 2.dp,
+    shape: Shape = CircleShape
+) {
+    Box(
+        modifier = modifier
+            .size(size)
+            .clip(shape)
+            .border(
+                width = borderWidth,
+                color = borderColor,
+                shape = shape
+            )
+            .clickable { onClick() }
+    ) {
+        Surface(
+            shape = shape,
+            shadowElevation = shadowElevation,
+            color = backgroundColor,
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(shape)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = "Pick Photo",
+                tint = iconTint,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxSize()
             )
         }
     }
