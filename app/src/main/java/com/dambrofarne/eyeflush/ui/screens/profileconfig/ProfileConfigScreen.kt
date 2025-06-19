@@ -45,7 +45,8 @@ import org.koin.androidx.compose.koinViewModel
 fun ProfileConfigScreen(
     navController: NavHostController,
     viewModel: ProfileConfigViewModel = koinViewModel<ProfileConfigViewModel>(),
-    themeViewModel: ThemeViewModel
+    themeViewModel: ThemeViewModel,
+    isFirstConfig: Boolean = true
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -136,10 +137,20 @@ fun ProfileConfigScreen(
                         Spacer(
                             Modifier.width(16.dp)
                         )
-                        CustomStandardButton(
-                            text = "Edit") {
-                            viewModel.setUsername {
-                                navController.navigate(EyeFlushRoute.Home) {
+
+                        if(!isFirstConfig){
+                            CustomStandardButton(
+                                text = "Edit") {
+                                viewModel.setUsername {
+                                    navController.popBackStack()
+                                }
+                            }
+                        }else{
+                            CustomStandardButton(
+                                text = "Confirm") {
+                                viewModel.setUsername {
+                                    navController.navigate(EyeFlushRoute.Home) {
+                                    }
                                 }
                             }
                         }
@@ -158,26 +169,28 @@ fun ProfileConfigScreen(
                     }
                 }
 
-                Spacer(Modifier.height(24.dp))
+                if(!isFirstConfig){
+                    Spacer(Modifier.height(24.dp))
 
-                ThemePreferenceSelector(
-                    currentPref = pref,
-                    onPreferenceChange = { newPref ->
-                        themeViewModel.setThemePreference(newPref)
-                    }
-                )
-
-                Spacer(Modifier.height(24.dp))
-
-                CustomStandardButton(
-                    text = "Sign out",
-                    onClickFun = {
-                        viewModel.signOut()
-                        navController.navigate(EyeFlushRoute.SignIn) {
-                            popUpTo(0) { inclusive = true }
+                    ThemePreferenceSelector(
+                        currentPref = pref,
+                        onPreferenceChange = { newPref ->
+                            themeViewModel.setThemePreference(newPref)
                         }
-                    }
-                )
+                    )
+
+                    Spacer(Modifier.height(24.dp))
+
+                    CustomStandardButton(
+                        text = "Sign out",
+                        onClickFun = {
+                            viewModel.signOut()
+                            navController.navigate(EyeFlushRoute.SignIn) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    )
+                }
             }
         }
     )

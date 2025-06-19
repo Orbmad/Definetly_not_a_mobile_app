@@ -1,6 +1,5 @@
 package com.dambrofarne.eyeflush.ui.screens.splash
 
-import android.widget.Space
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -61,7 +60,7 @@ fun SplashScreen(navController: NavHostController) {
         }
 
         Text(
-            text = "Created by: Michele Farneti and Manuele D'Ambrosio",
+            text = "Created by Michele Farneti and Manuele D'Ambrosio",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
             modifier = Modifier

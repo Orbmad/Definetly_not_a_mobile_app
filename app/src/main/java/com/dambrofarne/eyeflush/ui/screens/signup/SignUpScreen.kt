@@ -94,7 +94,7 @@ fun SignUpScreen(
 
         CustomStandardButton("Sign Up") {
             viewModel.signUp {
-                navController.navigate(EyeFlushRoute.ProfileConfig) {}
+                navController.navigate(EyeFlushRoute.ProfileConfig()) {}
             }
         }
 

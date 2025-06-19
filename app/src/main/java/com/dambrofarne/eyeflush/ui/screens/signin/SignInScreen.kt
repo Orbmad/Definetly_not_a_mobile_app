@@ -81,7 +81,7 @@ fun SignInScreen(
         CustomStandardButton("Sign In") {
             viewModel.signIn(
                 navToHome =  {navController.navigate(EyeFlushRoute.Home) },
-                navToProfileConfig = {navController.navigate((EyeFlushRoute.ProfileConfig))}
+                navToProfileConfig = {navController.navigate((EyeFlushRoute.ProfileConfig()))}
             )
         }
 

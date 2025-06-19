@@ -19,16 +19,11 @@ class SplashViewModel(
     val navigation = _navigation.asSharedFlow()
 
     init {
-        //auth.signOut();
         navigateAfterDelay()
     }
-
-    /* i due secondi d'attesa, se lutente è già autenticato ed il suo account è presente nel db
-    * viene reindirizzato dierttamente alla home, se è autenticato ma ancora non ha uno username configurato
-    * va alla configurazione del profilo, se invece non è nessuno dei deu va al signi*/
     private fun navigateAfterDelay() {
         viewModelScope.launch {
-            delay(2000) // Caricamento SplashScreen
+            delay(2000)
 
             val userId = auth.getCurrentUserId()
             val route = when {
@@ -36,7 +31,7 @@ class SplashViewModel(
                     EyeFlushRoute.Home
                 }
                 userId != null && auth.isUserLoggedIn() -> {
-                    EyeFlushRoute.ProfileConfig
+                    EyeFlushRoute.ProfileConfig()
                 }
                 else -> {
                     EyeFlushRoute.SignIn

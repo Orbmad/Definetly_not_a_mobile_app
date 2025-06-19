@@ -1,7 +1,6 @@
 package com.dambrofarne.eyeflush.ui.screens.profileconfig
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
@@ -22,8 +21,7 @@ data class ProfileConfigUiState(
 )
 
 sealed class UiEvent {
-    object OpenGallery : UiEvent()
-    // data class ShowSnackbar(val message: String) : UiEvent()
+    data object OpenGallery : UiEvent()
 }
 
 class ProfileConfigViewModel(
@@ -55,18 +53,15 @@ class ProfileConfigViewModel(
 
         result.fold(
             onSuccess = { newImageAddress ->
-                Log.d("ImgurUpload", "Immagine caricata: $newImageAddress")
                 auth.getCurrentUserId()?.let { userId ->
                     db.changeProfileImage(userId, newImageAddress)
                     _uiState.value = _uiState.value.copy(profileImageUrl = newImageAddress)
                 } ?: run {
-                    Log.e("ProfileUpdate", "Utente non autenticato, non posso aggiunger l'immagine ")
-                    _uiState.value = _uiState.value.copy(connectionError =  "Non è stato possibile caricare l'immagine")
+                    _uiState.value = _uiState.value.copy(connectionError =  "We are sorry, we couldn't upload the image")
                 }
             },
-            onFailure = { error ->
-                Log.e("ImgurUpload", "Errore nel caricamento immagine", error)
-                _uiState.value = _uiState.value.copy(connectionError =  "Non è stato possibile caricare l'immagine")
+            onFailure = {
+                _uiState.value = _uiState.value.copy(connectionError =  "We are sorry, we couldn't upload the image")
             }
         )
     }
@@ -78,7 +73,6 @@ class ProfileConfigViewModel(
                 val imagePath = db.getUserImagePath(userId)
                 _uiState.value = _uiState.value.copy(profileImageUrl = imagePath)
             } catch (e: Exception) {
-                Log.e("ProfileConfigVM", "Errore caricando immagine", e)
                 _uiState.value = _uiState.value.copy(profileImageUrl = "")
             }
         }
@@ -89,7 +83,12 @@ class ProfileConfigViewModel(
 
         if (username.length < 5) {
             _uiState.value = _uiState.value.copy(
-                usernameError = "Lo username deve avere almeno 5 caratteri"
+                usernameError = "Username must be at least 5 characters long"
+            )
+            return
+        }else if (username.length > 12) {
+            _uiState.value = _uiState.value.copy(
+                usernameError = "Username shouldn't be longer than 12 characters"
             )
             return
         }
@@ -105,7 +104,7 @@ class ProfileConfigViewModel(
             if (userId == null) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    connectionError = "Utente non autenticato"
+                    connectionError = "User not authenticated"
                 )
                 return@launch
             }
@@ -114,7 +113,7 @@ class ProfileConfigViewModel(
             if (taken) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    usernameError = "Username non disponibile"
+                    usernameError = "Username unavailable, somebody already has it"
                 )
             } else {
                 db.addUser(userId, username)

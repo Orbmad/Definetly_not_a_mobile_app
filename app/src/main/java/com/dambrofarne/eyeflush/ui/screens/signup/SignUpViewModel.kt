@@ -55,14 +55,12 @@ class SignUpViewModel(
         }
 
         if (password.isBlank()) {
-            //Log.d("SignUp", "Password Vuota")
             _uiState.value = _uiState.value.copy(passwordError = "Password field cannot be empty")
             return
         }
 
         if (password != passwordConfirmation) {
-            //Log.d("SignUp", "Le password non coincidono")
-            _uiState.value = _uiState.value.copy(passwordError = "Le password non corrispondono")
+            _uiState.value = _uiState.value.copy(passwordError = "Passwords aren't matching")
             return
         }
 
@@ -78,23 +76,23 @@ class SignUpViewModel(
                 val exception = result.exceptionOrNull()
                 if (exception != null) {
                     Log.d("Log",exception.message.toString())
-                };
+                }
                 _uiState.value = _uiState.value.copy(isLoading = false)
                 when (exception) {
                     is FirebaseAuthUserCollisionException -> {
-                        _uiState.value = _uiState.value.copy(emailError = "Email già registrata.")
+                        _uiState.value = _uiState.value.copy(emailError = "Email already taken")
                     }
                     is FirebaseAuthWeakPasswordException -> {
-                        _uiState.value = _uiState.value.copy(passwordError = "Password troppo debole.")
+                        _uiState.value = _uiState.value.copy(passwordError = "Password is too weak")
                     }
                     is FirebaseAuthInvalidCredentialsException -> {
-                        _uiState.value = _uiState.value.copy(emailError = "Formato email non valido.")
+                        _uiState.value = _uiState.value.copy(emailError = "Invalid mail format")
                     }
                     is FirebaseNetworkException -> {
-                        _uiState.value = _uiState.value.copy(connectionError = "Problemi di rete, riprova.")
+                        _uiState.value = _uiState.value.copy(connectionError = "Network problems.. retry!")
                     }
                     else -> {
-                        _uiState.value = _uiState.value.copy(connectionError = "Errore sconosciuto, riprova.")
+                        _uiState.value = _uiState.value.copy(connectionError = "Unknown error.. retry!")
                     }
                 }
             }

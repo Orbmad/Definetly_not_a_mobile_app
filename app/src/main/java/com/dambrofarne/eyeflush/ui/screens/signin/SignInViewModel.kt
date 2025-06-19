@@ -46,11 +46,11 @@ class SignInViewModel(
         val password = _uiState.value.password
 
         if (email.isBlank()) {
-            _uiState.value = _uiState.value.copy(emailError = "Email non può essere vuota")
+            _uiState.value = _uiState.value.copy(emailError = "Email field can't be empty")
             return
         }
         if (password.isBlank()) {
-            _uiState.value = _uiState.value.copy(passwordError = "Password non può essere vuota")
+            _uiState.value = _uiState.value.copy(passwordError = "Password field can't be empty")
             return
         }
 
@@ -71,10 +71,10 @@ class SignInViewModel(
                 val exception = result.exceptionOrNull()
                 _uiState.value = _uiState.value.copy(isLoading = false)
                 when (exception) {
-                    is FirebaseAuthInvalidUserException -> _uiState.value = _uiState.value.copy(emailError = "Email non esiste.")
-                    is FirebaseAuthInvalidCredentialsException -> _uiState.value = _uiState.value.copy(passwordError = "Password errata.")
-                    is FirebaseNetworkException -> _uiState.value = _uiState.value.copy(connectionError = "Problemi di rete, ritenta.")
-                    else -> _uiState.value = _uiState.value.copy(connectionError = "Errore sconosciuto, riprova.")
+                    is FirebaseAuthInvalidUserException -> _uiState.value = _uiState.value.copy(emailError = "Email not exists")
+                    is FirebaseAuthInvalidCredentialsException -> _uiState.value = _uiState.value.copy(passwordError = "Wrong password")
+                    is FirebaseNetworkException -> _uiState.value = _uiState.value.copy(connectionError = "Network problems.. retry")
+                    else -> _uiState.value = _uiState.value.copy(connectionError = "Unknown error.. retry")
                 }
             }
         }

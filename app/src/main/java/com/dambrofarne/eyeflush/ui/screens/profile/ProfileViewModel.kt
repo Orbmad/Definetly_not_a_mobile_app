@@ -1,12 +1,10 @@
 package com.dambrofarne.eyeflush.ui.screens.profile
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
 import com.dambrofarne.eyeflush.data.repositories.database.DatabaseRepository
 import com.dambrofarne.eyeflush.data.repositories.database.PicQuickRef
-import com.dambrofarne.eyeflush.ui.screens.profileconfig.ProfileConfigUiState
 import com.dambrofarne.eyeflush.utils.AchievementRank
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -58,7 +56,7 @@ class ProfileViewModel(
         val requesterUId = auth.getCurrentUserId()
         if (requesterUId == null) {
             _uiState.update {
-                it.copy(isLoading = false, errorMessage = "Utente non autenticato")
+                it.copy(isLoading = false, errorMessage = "User not authenticated")
             }
             return
         }
@@ -84,7 +82,7 @@ class ProfileViewModel(
                 )
             }
         } else {
-            val errorMsg = result.exceptionOrNull()?.message ?: "Errore sconosciuto"
+            val errorMsg = result.exceptionOrNull()?.message ?: "Unknown error"
             _uiState.update {
                 it.copy(isLoading = false, errorMessage = errorMsg)
             }
@@ -97,7 +95,7 @@ class ProfileViewModel(
 
             val currentUser = auth.getCurrentUserId()
             if (currentUser == null) {
-                _uiState.update { it.copy(isUpdating = false, errorMessage = "Utente non autenticato") }
+                _uiState.update { it.copy(isUpdating = false, errorMessage = "User not authenticated") }
                 return@launch
             }
 
@@ -109,7 +107,7 @@ class ProfileViewModel(
                     isInitialLoad = false
                 )
             } else {
-                _uiState.update { it.copy(errorMessage = "Errore nel toggle like") }
+                _uiState.update { it.copy(errorMessage = "Error in like toggle") }
             }
 
             _uiState.update { it.copy(isUpdating = false) }

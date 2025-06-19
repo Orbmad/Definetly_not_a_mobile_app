@@ -5,7 +5,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.dambrofarne.eyeflush.data.repositories.database.User
 import com.dambrofarne.eyeflush.ui.screens.camera.CameraScreen
 import com.dambrofarne.eyeflush.ui.screens.gamification.GamificationScreen
 import com.dambrofarne.eyeflush.ui.screens.home.HomeMapScreen
@@ -27,7 +26,7 @@ sealed interface EyeFlushRoute {
     @Serializable data object SignIn : EyeFlushRoute
     @Serializable data object SignUp : EyeFlushRoute
     @Serializable data object Home : EyeFlushRoute
-    @Serializable data object ProfileConfig : EyeFlushRoute
+    @Serializable data class ProfileConfig(val isFirstConfig: Boolean = true) : EyeFlushRoute
     @Serializable data object Profile : EyeFlushRoute
     @Serializable data object Camera: EyeFlushRoute
     @Serializable data object Game: EyeFlushRoute
@@ -58,14 +57,12 @@ fun EyeFlushNavGraph(
         }
 
         composable<EyeFlushRoute.Home> {
-            //ProfileScreen(navController)
-            //MarkerOverviewScreen(navController,"NrzOJYoy3RfCUFxkMoOX")
-            HomeMapScreen(navController)
-            //UserOverviewScreen(navController,"uYyDPYNRuHZXVogRVwYXMIraRZF3")
-        }
+            HomeMapScreen(navController) }
 
-        composable<EyeFlushRoute.ProfileConfig> {
-            ProfileConfigScreen(navController, themeViewModel = themeViewModel)
+        composable<EyeFlushRoute.ProfileConfig> { backStackEntry ->
+            val route = backStackEntry.toRoute<EyeFlushRoute.ProfileConfig>()
+            val isFirstConfig = route.isFirstConfig
+            ProfileConfigScreen(navController, themeViewModel = themeViewModel, isFirstConfig = isFirstConfig)
         }
 
         composable<EyeFlushRoute.Profile> {
