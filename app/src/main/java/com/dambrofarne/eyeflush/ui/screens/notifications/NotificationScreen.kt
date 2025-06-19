@@ -40,6 +40,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -99,7 +100,14 @@ fun NotificationScreen(
                                         SwipeBackground(isRead = notification.isRead)
                                     },
                                     dismissContent = {
-                                        NotificationCard(notification = notification, onClick = {})
+                                        NotificationCard(
+                                            notification = notification,
+                                            onClick = {
+                                                val markerId = notification.referredMarkerId
+                                                if (markerId != null) {
+                                                    navController.navigate(EyeFlushRoute.MarkerOverview(markerId))
+                                                }
+                                            })
                                     }
                                 )
                             }

@@ -11,20 +11,35 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color.DarkGray,
+    primary = Flame,
+    onPrimary = White,
+
+    background = MainBlack,
+    onBackground = White,
+
+    primaryContainer = MainBlack,
+    onPrimaryContainer = White,
+    secondaryContainer = OnBlackBlack,
+    onSecondaryContainer = White,
+
     secondary = Link,
-    tertiary = Error
+    tertiary = Danger
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Flame, // App color
     onPrimary = White, // Text and icons on app color
+
     background = White, // Main background color
     onBackground = EerieBlack, // Text on background color
+
     primaryContainer = White, // Container on background color
     onPrimaryContainer = EerieBlack, // Text on container
+    secondaryContainer = Platinum,
+    onSecondaryContainer = EerieBlack,
+
     secondary = Link, // Darker app color
-    tertiary = Error // Error color
+    tertiary = Danger // Error color
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
