@@ -38,6 +38,7 @@ import com.dambrofarne.eyeflush.ui.composables.EyeFlushTextField
 import com.dambrofarne.eyeflush.ui.composables.IconImage
 import com.dambrofarne.eyeflush.ui.composables.ImagePickerDialog
 import com.dambrofarne.eyeflush.ui.composables.NavScreen
+import com.dambrofarne.eyeflush.ui.composables.SignOutText
 import com.dambrofarne.eyeflush.ui.composables.StandardHeadline
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -99,8 +100,6 @@ fun ProfileConfigScreen(
                     AuthenticationError("Sto caricando...")
                 }
 
-                StandardHeadline("Configurazione Profilo")
-                Spacer(Modifier.height(16.dp))
                 val boxPadding = 8.dp
 
                 Box(
@@ -147,6 +146,13 @@ fun ProfileConfigScreen(
                         navController.navigate(EyeFlushRoute.Home) {
                             //Fai qualcosa prima di accedere
                         }
+                    }
+                }
+
+                SignOutText {
+                    viewModel.signOut()
+                    navController.navigate(EyeFlushRoute.SignIn) {
+                        popUpTo(0) { inclusive = true }
                     }
                 }
             }
