@@ -37,9 +37,12 @@ import com.dambrofarne.eyeflush.ui.composables.NavScreen
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.draw.clip
+import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -75,7 +78,10 @@ fun NotificationScreen(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(text = "You have no notifications for now...")
+                            Text(
+                                text = "You have no notifications for now...",
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
                         }
                     } else {
                         LazyColumn {
@@ -99,7 +105,14 @@ fun NotificationScreen(
                                         SwipeBackground(isRead = notification.isRead)
                                     },
                                     dismissContent = {
-                                        NotificationCard(notification = notification, onClick = {})
+                                        NotificationCard(
+                                            notification = notification,
+                                            onClick = {
+                                                val markerId = notification.referredMarkerId
+                                                if (markerId != null) {
+                                                    navController.navigate(EyeFlushRoute.MarkerOverview(markerId))
+                                                }
+                                            })
                                     }
                                 )
                             }
@@ -121,20 +134,27 @@ fun NotificationCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            //.padding(8.dp)
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (notification.isRead) MaterialTheme.colorScheme.primaryContainer
-                else MaterialTheme.colorScheme.secondaryContainer
+            containerColor = if (notification.isRead) MaterialTheme.colorScheme.secondaryContainer
+                else MaterialTheme.colorScheme.primaryContainer
         )
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(notification.title, style = MaterialTheme.typography.titleMedium)
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                notification.title,
+                style = MaterialTheme.typography.titleMedium,
+                color = if (notification.isRead) MaterialTheme.colorScheme.onPrimaryContainer
+                else MaterialTheme.colorScheme.primary
+            )
             Spacer(modifier = Modifier.height(4.dp))
             Text(notification.message, style = MaterialTheme.typography.bodyMedium)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(notification.time, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.tertiary)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(notification.time, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onTertiaryContainer)
         }
     }
 }
@@ -142,10 +162,11 @@ fun NotificationCard(
 @Composable
 fun SwipeBackground(isRead: Boolean) {
     val backgroundColor by animateColorAsState(
-        targetValue = if (isRead) Color(0xAAAAAAAA) else Color(0xFFDFF0D8),
+        targetValue = if (isRead) MaterialTheme.colorScheme.onTertiaryContainer else MaterialTheme.colorScheme.tertiary,
         label = "SwipeBackgroundColor"
     )
 
+    // Bin Icon
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -154,9 +175,9 @@ fun SwipeBackground(isRead: Boolean) {
         contentAlignment = Alignment.CenterStart
     ) {
         Icon(
-            imageVector = Icons.Default.Check,
+            imageVector = Icons.Default.Delete,
             contentDescription = "read",
-            tint = Color(0xBBBBBBBB)
+            tint = MaterialTheme.colorScheme.onTertiaryContainer
         )
     }
 }

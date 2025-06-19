@@ -1,5 +1,6 @@
 package com.dambrofarne.eyeflush.ui.screens.notifications
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,20 +28,22 @@ class NotificationViewModel(
     val uiState: StateFlow<NotificationUiState> = _uiState
 
     suspend fun loadNotifications() {
-        val userId = auth.getCurrentUserId()
-        if (userId != null) {
-            val loaded = db.getNotifications(userId)
-            _uiState.update { 
-                it.copy(
-                    isLoading = false,
-                    notificationsList = loaded
-                )
-            }
-        }
-        //loadDummyNotifications()
+//        val userId = auth.getCurrentUserId()
+//        if (userId != null) {
+//            val loaded = db.getNotifications(userId)
+//            //Log.w("Notifications", "loaded notifications: $loaded")
+//            _uiState.update {
+//                it.copy(
+//                    isLoading = false,
+//                    notificationsList = loaded
+//                )
+//            }
+//            //Log.w("Notifications", "notifications list: ${_uiState.value.notificationsList}")
+//        }
+        loadDummyNotifications()
     }
 
-    private fun loadDummyNotifications() {
+    private suspend fun loadDummyNotifications() {
         _uiState.update {
             it.copy(
                 notificationsList = listOf(
@@ -62,7 +65,8 @@ class NotificationViewModel(
                         isRead = false,
                         referredMarkerId = null
                     )
-                )
+                ),
+                isLoading = false
             )
         }
     }

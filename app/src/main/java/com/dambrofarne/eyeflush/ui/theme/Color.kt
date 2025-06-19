@@ -20,10 +20,14 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 val Flame = Color(0xFFE4572E)
-val Error = Color(0xFFFF0033)
+val Danger = Color(0xFFFF0033)
 val Link = Color(0xFF4286F4)
 
 // Light mode colors
 val White = Color(0xFFFFFFFF)
 val Platinum = Color(0xFFDADADA)
 val EerieBlack = Color(0xFF262626)
+
+// Dark mode colors
+val MainBlack = Color(0xFF0D0C11)
+val OnBlackBlack = Color(0xFF241E2B)
