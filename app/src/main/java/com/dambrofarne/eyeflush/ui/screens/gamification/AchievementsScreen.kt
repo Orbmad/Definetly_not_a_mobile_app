@@ -2,6 +2,7 @@ package com.dambrofarne.eyeflush.ui.screens.gamification
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -123,11 +124,16 @@ fun AchievementScreen(achievementUiState: AchievementUiState) {
 
 @Composable
 fun AchievementItem(title: String, maxPoints: Int, actualPoints: Int, iconId: Int) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 4.dp)
+            style = MaterialTheme.typography.titleLarge,
+            //modifier = Modifier.padding(bottom = 4.dp)
         )
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -162,8 +168,8 @@ fun AchievementItem(title: String, maxPoints: Int, actualPoints: Int, iconId: In
                 painter = painterResource(iconId),
                 contentDescription = "badge",
                 modifier = Modifier
-                    .size(46.dp)
-                    .padding(start = 10.dp)
+                    .size(82.dp)
+                    .padding(start = 24.dp)
             )
         }
     }
@@ -177,7 +183,7 @@ fun CustomAchievementProgressBarWithText(
     modifier: Modifier = Modifier,
     backgroundColor: Color = Color.LightGray,
     progressColor: Color = MaterialTheme.colorScheme.primary,
-    height: Dp = 20.dp,
+    height: Dp = 32.dp,
     cornerRadius: Dp = 6.dp,
     textColor: Color = Color.Black
 ) {
@@ -188,6 +194,7 @@ fun CustomAchievementProgressBarWithText(
             .height(height)
             .clip(RoundedCornerShape(cornerRadius))
             .background(backgroundColor)
+            .border(width = 1.dp, Color.Black, RoundedCornerShape(cornerRadius))
     ) {
         // Progress bar
         Box(
@@ -208,7 +215,7 @@ fun CustomAchievementProgressBarWithText(
             Text(
                 text = "$current / $goal",
                 color = textColor,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1
             )
         }
