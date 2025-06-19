@@ -1,7 +1,6 @@
 package com.dambrofarne.eyeflush.data.repositories.database
 
 import android.util.Log
-import com.dambrofarne.eyeflush.utils.AchievementRank
 import com.dambrofarne.eyeflush.utils.AchievementType
 import com.dambrofarne.eyeflush.utils.calcAchievementRank
 import com.dambrofarne.eyeflush.utils.getBoundingBox
@@ -692,6 +691,21 @@ class FirestoreDatabaseRepository(
         }
     }
 
+    override suspend fun changeThemePreferenceString(userId: String, pref : String) {
+        db.collection("users")
+            .document(userId)
+            .update("themePreference", pref)
+            .await()
+    }
+
+    override suspend fun getThemePreferenceString(userId: String): String? {
+        val snapshot = db.collection("users")
+            .document(userId)
+            .get()
+            .await()
+
+        return if (snapshot.exists()) snapshot.getString("themePreference") else "SYSTEM"
+    }
 
     override suspend fun getNotifications(uId: String): List<NotificationItem> {
         return try {

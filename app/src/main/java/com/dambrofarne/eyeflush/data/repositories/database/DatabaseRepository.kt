@@ -72,4 +72,17 @@ interface DatabaseRepository {
      * @return A data class with the level of user's achievements
      */
     suspend fun getUserAchievements(uId : String) : Result<UserAchievements>
+
+    /**
+     * @param uId
+     * @param darkTheme Sets the user preference regarding the dark theme
+     */
+    suspend fun changeThemePreferenceString(userId: String, pref: String)
+
+    /**
+     * @param uId
+     *
+     * @return "SYSTEM"/"LIGHT"/"DARK"
+     */
+    suspend fun getThemePreferenceString(userId: String): String?
 }
