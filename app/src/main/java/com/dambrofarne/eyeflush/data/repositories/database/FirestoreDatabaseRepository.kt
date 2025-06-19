@@ -426,12 +426,13 @@ class FirestoreDatabaseRepository(
                     userDocRef.update("likes", likes).await()
                     imageDocRef.update("likes", FieldValue.increment(1)).await()
                     //Like notification
+
                     receiverId?.let{
                         addNotification(
-                            receiverUId = it,
+                            receiverUId = receiverId,
                             title = "New Like!",
                             type = "like",
-                            message = "$likerUsername has liked your image ! Go and check your new spot" +
+                            message = "$likerUsername has liked your image ! Go and check your new spot " +
                                     "in the marker scoreboard!",
                             isRead = false,
                             markerId = markerId
@@ -601,8 +602,8 @@ class FirestoreDatabaseRepository(
         return try {
             val notificationData = mapOf(
                 "title" to title,
-                "body" to message,
-                "timestamp" to System.currentTimeMillis(),
+                "message" to message,
+                "timestamp" to Timestamp.now(),
                 "read" to isRead,
                 "type" to type,
                 "markerId" to markerId
@@ -716,22 +717,32 @@ class FirestoreDatabaseRepository(
 
             val snapshot = notificationsRef.get().await()
 
-            snapshot.documents.mapNotNull { doc ->
+            val items = snapshot.documents.mapNotNull { doc ->
                 try {
+                    val id = doc.id
+                    val title = doc.getString("title") ?: ""
+                    val message = doc.getString("message") ?: ""
+                    val timestamp = doc.getTimestamp("timestamp")
+                    val timeFormatted = timestamp?.let { getFormattedImageDate(it) } ?: "Unknown"
+                    val isRead = doc.getBoolean("read") ?: false
+                    val type = doc.getString("type") ?: ""
+                    val referredMarkerId = doc.getString("markerId") ?: ""
+
                     NotificationItem(
-                        id = doc.id,
-                        title = doc.getString("title") ?: "",
-                        message = doc.getString("message") ?: "",
-                        time = doc.getTimestamp("timestamp")?.let { getFormattedImageDate(it) } ?: "Unknown",
-                        isRead = doc.getBoolean("read") ?: false,
-                        type = doc.getString("type") ?: "",
-                        referredMarkerId = doc.getString("markerId") ?: ""
+                        id = id,
+                        title = title,
+                        message = message,
+                        time = timeFormatted,
+                        isRead = isRead,
+                        type = type,
+                        referredMarkerId = referredMarkerId
                     )
                 } catch (e: Exception) {
                     null
                 }
             }
 
+            items
         } catch (e: Exception) {
             emptyList()
         }
