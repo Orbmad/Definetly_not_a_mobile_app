@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION")
 package com.dambrofarne.eyeflush.ui.screens.home
 
 import android.util.Log
@@ -28,6 +29,11 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.tileprovider.tilesource.XYTileSource
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.events.MapListener
+import org.osmdroid.events.ScrollEvent
+import org.osmdroid.events.ZoomEvent
+import kotlin.math.*
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -56,15 +62,18 @@ fun HomeMapScreen(
     val polaroidMarkers by viewModel.polaroidMarkers.collectAsState()
     val currentLocation by viewModel.currentLocation.collectAsState()
     val locationUpdated by viewModel.locationUpdated.collectAsState()
-    //val locationDelta: Double = 0.3
-    //var lastLocation: GeoPoint? = currentLocation
 
     var mapView: MapView? by remember { mutableStateOf(null) }
     var currentLocationMarker by remember { mutableStateOf<Marker?>(null) }
+    var lastLocation by remember { mutableStateOf<GeoPoint?>(null) }
+    var userHasMovedMap by remember { mutableStateOf(false) }
+    var lastUserInteractionTime by remember { mutableLongStateOf(0L) }
 
     val polaroidMarkersRefs = remember { mutableListOf<PolaroidMarker>() }
 
     val defaultZoom = 20.0
+    val movementThreshold = 4.0 // meters - move threshold
+    val userInteractionTimeout = 15000L // milli-seconds - reposition timeout
 
     val userLocationIcon = ContextCompat.getDrawable(context, R.drawable.diamond_man_3)
 
@@ -74,28 +83,38 @@ fun HomeMapScreen(
         arrayOf("https://tile.openstreetmap.org/")
     )
 
+    // Two points distance in meters
+    fun calculateDistance(point1: GeoPoint, point2: GeoPoint): Double {
+        val lat1Rad = Math.toRadians(point1.latitude)
+        val lat2Rad = Math.toRadians(point2.latitude)
+        val deltaLatRad = Math.toRadians(point2.latitude - point1.latitude)
+        val deltaLonRad = Math.toRadians(point2.longitude - point1.longitude)
+
+        val a = sin(deltaLatRad / 2).pow(2) + cos(lat1Rad) * cos(lat2Rad) * sin(deltaLonRad / 2).pow(2)
+        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+        return 6371000 * c // Earth radius
+    }
+
     // Requesting permissions
     LaunchedEffect(Unit) {
         if (!permissionsState.allPermissionsGranted) {
             permissionsState.launchMultiplePermissionRequest()
         } else {
-            // ✅ 1. Recupera subito la posizione iniziale
+            // Retrieve initial position
             val initialLocation = viewModel.locationManager.getCurrentLocation()
             initialLocation?.let {
                 Log.w("HomeMapScreen", "Initial location acquired")
                 viewModel.updateCurrentLocation(it)
-                //lastLocation = currentLocation
-                mapView?.controller?.animateTo(currentLocation)
+                lastLocation = it
+                mapView?.controller?.animateTo(it)
                 mapView?.invalidate()
             }
 
             // Get current location
             viewModel.locationManager.startLocationUpdates { geoPoint ->
                 viewModel.updateCurrentLocation(geoPoint)
-                //viewModel.loadPolaroidMarkers()
-                //mapView?.controller?.animateTo(geoPoint)
                 mapView?.invalidate()
-
                 Log.w("HomeMapScreen", "Routine location update")
             }
         }
@@ -106,133 +125,160 @@ fun HomeMapScreen(
         val map = mapView
 
         if (map != null && location != null) {
+            // Update or create current position marker
             if (currentLocationMarker == null) {
-                // Crea nuovo marker se non esiste
                 currentLocationMarker = Marker(map).apply {
                     icon = userLocationIcon
                     position = location
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                    title = "La tua posizione"
+                    title = "Your location"
                 }
                 map.overlays.add(currentLocationMarker)
             } else {
-                // Aggiorna posizione del marker esistente
                 currentLocationMarker?.position = location
             }
 
-            //if (lastLocation != null && locationMetersDistance(location, lastLocation!!) > locationDelta) {
+            // check movement
+            val hasUserMoved = lastLocation?.let { lastLoc ->
+                calculateDistance(lastLoc, location) > movementThreshold
+            } ?: true
+
+            val currentTime = System.currentTimeMillis()
+            val timeSinceLastInteraction = currentTime - lastUserInteractionTime
+
+            // Reposition if:
+            // 1. User changed location
+            // 2. Interaction timeout expire
+            if (hasUserMoved || (!userHasMovedMap && timeSinceLastInteraction > userInteractionTimeout)) {
                 map.controller.animateTo(location)
-            //}
-            //lastLocation = location
+                userHasMovedMap = false // Reset interaction flag
+                //Log.w("HomeMapScreen", "Map centered - User moved: $hasUserMoved, Time since interaction: $timeSinceLastInteraction")
+            }
+
+            lastLocation = location
             map.invalidate()
         }
     }
 
     // Update markers when photoMarkers change
     LaunchedEffect(polaroidMarkers) {
-        //Log.w("Test", "Updating photo markers, count: ${photoMarkers.size}")
-
         try {
-            // Rimuovi i vecchi marker delle foto
+            // Remove old markers
             polaroidMarkersRefs.forEach { marker ->
                 mapView?.overlays?.remove(marker)
             }
             polaroidMarkersRefs.clear()
 
-            //viewModel.createDummyMarkers()
-
-            // Aggiungi i nuovi marker delle foto
+            // Add new markers
             polaroidMarkers.forEach { marker ->
-                //Log.w("Test", "Creating photo marker at ${photoMarker.position}")
-                val polaroidMarker = marker
-                polaroidMarker.setMarkerClickedAction { navController.navigate(EyeFlushRoute.MarkerOverview(polaroidMarker.getID())) }
-                polaroidMarkersRefs.add(polaroidMarker)
-                mapView?.overlays?.add(polaroidMarker)
-                //Log.w("Test", "Photo marker added successfully")
+                marker.setMarkerClickedAction {
+                    navController.navigate(
+                        EyeFlushRoute.MarkerOverview(
+                            marker.getID()
+                        )
+                    )
+                }
+                polaroidMarkersRefs.add(marker)
+                mapView?.overlays?.add(marker)
             }
 
             mapView?.invalidate()
-            //Log.w("Test", "Map invalidated, total overlays: ${mapView?.overlays?.size}")
-
         } catch (e: Exception) {
-            //Log.e("Test", "Error updating photo markers", e)
+            Log.e("HomeMapScreen", "Error updating photo markers", e)
         }
     }
 
     // HomeScreen View
-        CustomScaffold(
-            showBackButton = false,
-            navController = navController,
-            currentScreen = NavScreen.HOME,
-            content = {
-                Box(modifier = Modifier.fillMaxSize()) {
+    CustomScaffold(
+        showBackButton = false,
+        navController = navController,
+        currentScreen = NavScreen.HOME,
+        content = {
+            Box(modifier = Modifier.fillMaxSize()) {
 
-                    AndroidView(
-                        factory = { ctx ->
-                            MapView(ctx).apply {
-                                setTileSource(openStreetMapTileSource)
-                                setMultiTouchControls(true)
-                                setBuiltInZoomControls(false)
-                                controller.setZoom(defaultZoom)
-                                controller.setCenter(currentLocation)
-                                mapView = this
-                            }
-                        },
-                        modifier = Modifier.fillMaxSize()
-                    ) { map ->
-                        mapView = map
-                    }
+                AndroidView(
+                    factory = { ctx ->
+                        MapView(ctx).apply {
+                            setTileSource(openStreetMapTileSource)
+                            setMultiTouchControls(true)
+                            setBuiltInZoomControls(false)
+                            controller.setZoom(defaultZoom)
+                            controller.setCenter(currentLocation)
+                            mapView = this
 
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .align(Alignment.TopCenter)
-                            .zIndex(1f),
-                        text = currentLocation?.let {
-                            "Lat: ${it.latitude}\nLong: ${it.longitude}"
-                        } ?: "Posizione non disponibile"
-                    )
-
-                    // Reposition Button
-                    FloatingActionButton(
-                        onClick = {
-                            scope.launch {
-                                val location = viewModel.locationManager.getCurrentLocation()
-                                location?.let {
-                                    viewModel.updateCurrentLocation(it)
-                                    mapView?.controller?.animateTo(it)
-                                    mapView?.controller?.setZoom(defaultZoom)
+                            // Add listener for user interactions
+                            addMapListener(object : MapListener {
+                                override fun onScroll(event: ScrollEvent?): Boolean {
+                                    userHasMovedMap = true
+                                    lastUserInteractionTime = System.currentTimeMillis()
+                                    Log.d("HomeMapScreen", "User scrolled map")
+                                    return false
                                 }
-                            }
-                        },
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier
-                            .size(86.dp)
-                            .align(Alignment.BottomCenter)
-                            .offset(x = (-72).dp)
-                            .padding(16.dp),
-                        shape = CircleShape
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.MyLocation,
-                            contentDescription = "Center to current position",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
 
-                    // Camera Button
-                    CameraButton(
-                        onClick = {navController.navigate(EyeFlushRoute.Camera)},
-                        modifier = Modifier
-                            .size(124.dp)
-                            .align(Alignment.BottomCenter)
-                            .padding(16.dp)
+                                override fun onZoom(event: ZoomEvent?): Boolean {
+                                    userHasMovedMap = true
+                                    lastUserInteractionTime = System.currentTimeMillis()
+                                    Log.d("HomeMapScreen", "User zoomed map")
+                                    return false
+                                }
+                            })
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize()
+                ) { map ->
+                    mapView = map
+                }
+
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.TopCenter)
+                        .zIndex(1f),
+                    text = currentLocation?.let {
+                        "Lat: ${it.latitude}\nLong: ${it.longitude}"
+                    } ?: "Position unavailable"
+                )
+
+                // Reposition Button
+                FloatingActionButton(
+                    onClick = {
+                        scope.launch {
+                            val location = viewModel.locationManager.getCurrentLocation()
+                            location?.let {
+                                viewModel.updateCurrentLocation(it)
+                                mapView?.controller?.animateTo(it)
+                                mapView?.controller?.setZoom(defaultZoom)
+                                userHasMovedMap = false // Reset interaction map
+                                lastUserInteractionTime = System.currentTimeMillis()
+                            }
+                        }
+                    },
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier
+                        .size(86.dp)
+                        .align(Alignment.BottomCenter)
+                        .offset(x = (-72).dp)
+                        .padding(16.dp),
+                    shape = CircleShape
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MyLocation,
+                        contentDescription = "Center to current position",
+                        modifier = Modifier.size(32.dp)
                     )
                 }
+
+                // Camera Button
+                CameraButton(
+                    onClick = {navController.navigate(EyeFlushRoute.Camera)},
+                    modifier = Modifier
+                        .size(124.dp)
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp)
+                )
             }
-        )
-
-    }
-
+        }
+    )
+}
