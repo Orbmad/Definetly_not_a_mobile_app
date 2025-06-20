@@ -680,7 +680,8 @@ class FirestoreDatabaseRepository(
                     likesReceived = likesReceived,
                     picturesTaken = picsCount,
                     markersPhotographed = markersPhotographed,
-                    mostLikedPictures = mostLikedPictures
+                    mostLikedPictures = mostLikedPictures,
+                    score = calcScore(likesReceived, picsCount)
                 )
             )
         } catch (e: Exception) {

@@ -186,7 +186,6 @@ fun ProfileScreen(
                                             modifier = Modifier.size(iconSize)
                                         )
 
-                                        //Score
                                         Text(
                                             text = uiState.imagesCount.toString(),
                                             style = MaterialTheme.typography.bodyMedium,
