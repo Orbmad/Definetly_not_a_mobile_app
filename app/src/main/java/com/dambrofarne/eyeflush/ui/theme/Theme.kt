@@ -10,18 +10,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Flame,
-    onPrimary = White,
+    primary = Flame, // Primary Orange
+    onPrimary = White, // Color on Primary Orange
 
-    background = OnBlackBlack,
+    background = OnBlackBlack, // Background color for screens
     onBackground = White,
 
-    primaryContainer = MainBlack,
+    primaryContainer = MainBlack, // CustomScaffold Color
     onPrimaryContainer = White,
-    secondaryContainer = OnBlackBlack,
+    secondaryContainer = EerieBlack, // On Background container color
     onSecondaryContainer = White,
 
-    onTertiaryContainer = Platinum,
+    surfaceVariant = Platinum, // Scaffold gradient
+
+
+    onTertiaryContainer = Platinum, // Useful details
 
     secondary = Link,
     tertiary = Danger
@@ -31,13 +34,16 @@ private val LightColorScheme = lightColorScheme(
     primary = Flame, // App color
     onPrimary = White, // Text and icons on app color
 
-    background = LightOrange, // Main background color
+    background = LightBackground, // Background color for screens
     onBackground = EerieBlack, // Text on background color
 
-    primaryContainer = White, // Container on background color
+    primaryContainer = White, // CustomScaffold Color
     onPrimaryContainer = EerieBlack, // Text on container
-    secondaryContainer = Platinum,
+
+    secondaryContainer = Platinum, // On Background container color
     onSecondaryContainer = EerieBlack,
+
+    surfaceVariant = Platinum, // Scaffold gradient
 
     onTertiaryContainer = Platinum,
 

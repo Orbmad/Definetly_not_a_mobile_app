@@ -17,7 +17,7 @@ val Link = Color(0xFF4286F4)
 
 // Light mode colors
 val White = Color(0xFFFFFFFF)
-val LightOrange = Color(0xFFFFF7ED)
+val LightBackground = Color(0xFFFFFCF2)
 val Platinum = Color(0xFFDADADA)
 val EerieBlack = Color(0xFF262626)
 

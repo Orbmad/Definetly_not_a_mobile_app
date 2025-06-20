@@ -1,17 +1,13 @@
 package com.dambrofarne.eyeflush.ui.screens.notifications
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
 import com.dambrofarne.eyeflush.data.repositories.database.DatabaseRepository
 import com.dambrofarne.eyeflush.data.repositories.database.NotificationItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 data class NotificationUiState(
@@ -28,18 +24,18 @@ class NotificationViewModel(
     val uiState: StateFlow<NotificationUiState> = _uiState
 
     suspend fun loadNotifications() {
-        loadDummyNotifications() // For debug
+//        loadDummyNotifications() // For debug
 
-//        val userId = auth.getCurrentUserId()
-//        if (userId != null) {
-//            val loaded = db.getNotifications(userId)
-//            _uiState.update {
-//                it.copy(
-//                    isLoading = false,
-//                    notificationsList = loaded
-//                )
-//            }
-//        }
+        val userId = auth.getCurrentUserId()
+        if (userId != null) {
+            val loaded = db.getNotifications(userId)
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    notificationsList = loaded
+                )
+            }
+        }
     }
 
     private suspend fun loadDummyNotifications() {

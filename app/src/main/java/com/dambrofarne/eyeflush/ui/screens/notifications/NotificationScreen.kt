@@ -98,7 +98,7 @@ fun NotificationScreen(
                             verticalArrangement = Arrangement.spacedBy(1.dp),
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .background(MaterialTheme.colorScheme.background)
                         ) {
                             items(uiState.notificationsList, key = { it.id }) { notification ->
                                 val dismissState = rememberDismissState()
