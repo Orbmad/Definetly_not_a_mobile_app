@@ -18,7 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cyclone
 import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -37,13 +36,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
-import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
 import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
+import com.dambrofarne.eyeflush.ui.composables.ErrorMessage
 import com.dambrofarne.eyeflush.ui.composables.IconButton
 import com.dambrofarne.eyeflush.ui.composables.ImageGrid
 import com.dambrofarne.eyeflush.ui.composables.NavScreen
 import com.dambrofarne.eyeflush.ui.composables.PolaroidOverlayCard
 import com.dambrofarne.eyeflush.ui.composables.ProfileImage
+import com.dambrofarne.eyeflush.ui.composables.UpdatingMessage
 import com.dambrofarne.eyeflush.utils.AchievementRank
 import com.dambrofarne.eyeflush.utils.AchievementType
 import com.dambrofarne.eyeflush.utils.getAchievementIconId
@@ -75,7 +75,7 @@ fun ProfileScreen(
                 }
 
                 uiState.errorMessage != null -> {
-                    AuthenticationError(text = uiState.errorMessage!!)
+                   ErrorMessage(uiState.errorMessage!!)
                 }
 
                 else -> {
@@ -213,25 +213,7 @@ fun ProfileScreen(
                                 color = MaterialTheme.colorScheme.primary
                             )
 
-                            if (uiState.isUpdating) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(bottom = 8.dp)
-                                ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier
-                                            .size(16.dp)
-                                            .padding(end = 8.dp),
-                                        strokeWidth = 2.dp
-                                    )
-                                    Text(
-                                        "Loading...",
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                }
-                            }
+                            UpdatingMessage(uiState.isUpdating)
 
                             ImageGrid(
                                 pictures = uiState.picturesTaken,

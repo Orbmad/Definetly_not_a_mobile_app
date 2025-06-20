@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,10 +19,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
-import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
 import com.dambrofarne.eyeflush.ui.composables.CustomStandardButton
+import com.dambrofarne.eyeflush.ui.composables.ErrorMessage
 import com.dambrofarne.eyeflush.ui.composables.EyeFlushTextField
 import com.dambrofarne.eyeflush.ui.composables.SignInText
+import com.dambrofarne.eyeflush.ui.composables.UpdatingMessage
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -38,10 +40,6 @@ fun SignUpScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        if (uiState.isLoading) {
-            AuthenticationError("Loading ...")
-        }
-
         Text("Welcome!", style = MaterialTheme.typography.titleLarge)
 
         Spacer(Modifier.height(16.dp))
@@ -53,11 +51,7 @@ fun SignUpScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
 
-        uiState.emailError?.let {
-            if (it.isNotEmpty()) {
-                AuthenticationError(it)
-            }
-        }
+        ErrorMessage(uiState.emailError)
 
         EyeFlushTextField(
             value = uiState.password,
@@ -68,11 +62,7 @@ fun SignUpScreen(
             //visualTransformation = PasswordVisualTransformation()
         )
 
-        uiState.passwordError?.let {
-            if (it.isNotEmpty()) {
-                AuthenticationError(it)
-            }
-        }
+        ErrorMessage(uiState.passwordError)
 
         EyeFlushTextField(
             value = uiState.passwordConfirmation,
@@ -83,16 +73,11 @@ fun SignUpScreen(
             //visualTransformation = PasswordVisualTransformation()
         )
 
+        ErrorMessage(uiState.connectionError)
+        UpdatingMessage(uiState.isLoading, text = "Loading...",  modifier = Modifier.fillMaxWidth() )
+        Spacer(Modifier.height(18.dp))
 
-        Spacer(Modifier.height(16.dp))
-
-        uiState.connectionError?.let {
-            if (it.isNotEmpty()) {
-                AuthenticationError(it)
-            }
-        }
-
-        CustomStandardButton("Sign Up") {
+        CustomStandardButton("SIGN UP") {
             viewModel.signUp {
                 navController.navigate(EyeFlushRoute.ProfileConfig()) {}
             }

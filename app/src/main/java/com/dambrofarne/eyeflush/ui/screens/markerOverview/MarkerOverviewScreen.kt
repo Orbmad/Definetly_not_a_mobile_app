@@ -1,6 +1,5 @@
 package com.dambrofarne.eyeflush.ui.screens.markerOverview
 
-import android.service.notification.NotificationListenerService.Ranking
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,15 +38,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.data.repositories.database.PicQuickRef
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
-import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
 import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
-import com.dambrofarne.eyeflush.ui.composables.ImageCard
+import com.dambrofarne.eyeflush.ui.composables.ErrorMessage
 import com.dambrofarne.eyeflush.ui.composables.ImageCardSimple
 import com.dambrofarne.eyeflush.ui.composables.ImageCardSimplified
-import com.dambrofarne.eyeflush.ui.composables.ImageGrid
 import com.dambrofarne.eyeflush.ui.composables.ImageLabel
 import com.dambrofarne.eyeflush.ui.composables.PageTitle
 import com.dambrofarne.eyeflush.ui.composables.PolaroidOverlayCard
+import com.dambrofarne.eyeflush.ui.composables.UpdatingMessage
 import com.dambrofarne.eyeflush.ui.composables.UserProfileRow
 import org.koin.androidx.compose.koinViewModel
 
@@ -167,8 +165,9 @@ fun MarkerOverviewScreen(
                     }
                 }
                 uiState.errorMessage != null -> {
-                    AuthenticationError(text = uiState.errorMessage!!)
+                    ErrorMessage(uiState.errorMessage!!)
                 }
+
                 else -> {
                     if (uiState.showOverlay) {
                         PolaroidOverlayCard(
@@ -196,22 +195,7 @@ fun MarkerOverviewScreen(
                             )
                             PageTitle(markerTitle)
                             //StandardText("Pics taken here: " + uiState.imagesCount.toString())
-                            if (uiState.isUpdating) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(bottom = 8.dp)
-                                ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier
-                                            .size(16.dp)
-                                            .padding(end = 8.dp),
-                                        strokeWidth = 2.dp
-                                    )
-                                    Text("Updating Scoreboard...", style = MaterialTheme.typography.labelMedium)
-                                }
-                            }
+
                             Spacer(modifier = Modifier.height(20.dp))
 
                             uiState.mostLikedPicURL?.let {
@@ -265,6 +249,8 @@ fun MarkerOverviewScreen(
                                     thickness = 1.dp,
                                     color = MaterialTheme.colorScheme.primary
                                 )
+
+                                UpdatingMessage(uiState.isUpdating)
                             }
 
                             // Rest of the ranking
