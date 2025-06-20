@@ -1,25 +1,39 @@
 package com.dambrofarne.eyeflush.ui.screens.markerOverview
 
+import android.service.notification.NotificationListenerService.Ranking
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -29,6 +43,7 @@ import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
 import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
 import com.dambrofarne.eyeflush.ui.composables.ImageCard
 import com.dambrofarne.eyeflush.ui.composables.ImageCardSimple
+import com.dambrofarne.eyeflush.ui.composables.ImageCardSimplified
 import com.dambrofarne.eyeflush.ui.composables.ImageGrid
 import com.dambrofarne.eyeflush.ui.composables.ImageLabel
 import com.dambrofarne.eyeflush.ui.composables.PageTitle
@@ -46,6 +61,97 @@ fun MarkerOverviewScreen(
 
     LaunchedEffect(Unit) {
         viewModel.loadMarkerInfo(markerId)
+    }
+
+    // Ranking Elem
+    @Composable
+    fun RankingRowElem(
+        rank: Int,
+        picInfo: PicQuickRef,
+        onImageClick: (String) -> Unit,
+        enabled: Boolean
+    ) {
+        var localLike by remember(picInfo.liked) { mutableStateOf(picInfo.liked) }
+        var localLikeCount by remember(picInfo.likes, picInfo.liked) { mutableIntStateOf(picInfo.likes) }
+
+        Row(
+            modifier = Modifier
+                .height(112.dp)
+                .padding(horizontal = 16.dp)
+        ) {
+            // Ranking
+            Text(
+                text = "$rank#",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(end = 12.dp, top = 14.dp)
+                    .align(Alignment.CenterVertically)
+            )
+
+            // Image
+            ImageCardSimplified(
+                picture = picInfo,
+                onClick = onImageClick,
+                enabled = enabled,
+                modifier = Modifier
+                    .size(104.dp)
+                    .padding(
+                        start = 8.dp,
+                        top = 8.dp,
+                        bottom = 8.dp,
+                        end = 16.dp)
+            )
+
+            // Info
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(18.dp),
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                UserProfileRow(
+                    userId = picInfo.userId,
+                    username = picInfo.username,
+                    userImageUrl = picInfo.userImageUrl,
+                    onUserClick = { navController.navigate(EyeFlushRoute.UserOverview(picInfo.userId)) }
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(start = 4.dp)
+                ) {
+                    Icon(
+                        imageVector = if (localLike) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = "likes",
+                        tint = if (localLike) Color.Red else Color.White,
+                        modifier = Modifier
+                            .size(36.dp)
+                            .padding(end = 12.dp)
+                            .clickable {
+                                viewModel.toggleLike(picInfo.picId)
+                                localLike = !localLike
+                                if (localLike) {
+                                    localLikeCount += 1
+                                } else {
+                                    localLikeCount -= 1
+                                }
+                            }
+                    )
+
+                    Text(
+                        text = "$localLikeCount",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+
+            }
+
+        }
     }
 
     CustomScaffold(
@@ -162,14 +268,21 @@ fun MarkerOverviewScreen(
                             }
 
                             // Rest of the ranking
-                            ImageGrid(
-                                pictures = uiState.picturesTaken,
-                                onImageClick = { clickedPicId ->
-                                    viewModel.showOverlay(clickedPicId)
-                                },
-                                onToggleLike = viewModel::toggleLike,
-                                enabled = !uiState.isUpdating
-                            )
+                            LazyColumn {
+                                itemsIndexed(uiState.picturesTaken) { index, picInfo ->
+                                    RankingRowElem(
+                                        rank = index + 2,
+                                        picInfo = picInfo,
+                                        onImageClick = { viewModel.showOverlay(picInfo.picId) },
+                                        enabled = !uiState.isUpdating
+                                    )
+                                    HorizontalDivider(
+                                        thickness = 1.dp,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.padding(bottom = 4.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -177,40 +290,3 @@ fun MarkerOverviewScreen(
         })
 }
 
-@Composable
-fun rankingRowElem(
-    rank: Int,
-    picInfo: PicQuickRef,
-    onImageClick: (String) -> Unit,
-    onToggleLike: (String) -> Unit,
-    enabled: Boolean = true
-) {
-    Row(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-    ) {
-        // Ranking
-        Text(
-            text = "$rank#",
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier
-                .padding(end = 12.dp)
-        )
-
-        // Image
-        ImageCard(
-            picture = picInfo,
-            onClick = onImageClick,
-            onToggleLike = onToggleLike,
-            modifier = Modifier
-                .size(124.dp)
-        )
-
-        // Info
-        Column {
-
-
-        }
-
-    }
-}

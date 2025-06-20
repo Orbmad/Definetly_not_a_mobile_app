@@ -45,7 +45,9 @@ data class PicQuickRef(
     val liked : Boolean = false,
     val likes : Int = 0,
     val userId: String = "",
-    val username: String = ""
+    val username: String = "",
+    val userImageUrl: String = "",
+    val timeStamp: String = "",
 )
 
 data class ExtendedMarker(
