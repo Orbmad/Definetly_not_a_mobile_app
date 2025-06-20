@@ -23,9 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.dambrofarne.eyeflush.data.repositories.database.PicQuickRef
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
 import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
+import com.dambrofarne.eyeflush.ui.composables.ImageCard
 import com.dambrofarne.eyeflush.ui.composables.ImageCardSimple
 import com.dambrofarne.eyeflush.ui.composables.ImageGrid
 import com.dambrofarne.eyeflush.ui.composables.ImageLabel
@@ -79,6 +81,7 @@ fun MarkerOverviewScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
+                                .padding(16.dp)
                         ) {
                             // Top section with most liked image
                             val markerTitle = uiState.name ?: "[%.6f, %.6f]".format(
@@ -158,7 +161,7 @@ fun MarkerOverviewScreen(
                                 )
                             }
 
-
+                            // Rest of the ranking
                             ImageGrid(
                                 pictures = uiState.picturesTaken,
                                 onImageClick = { clickedPicId ->
@@ -172,4 +175,42 @@ fun MarkerOverviewScreen(
                 }
             }
         })
+}
+
+@Composable
+fun rankingRowElem(
+    rank: Int,
+    picInfo: PicQuickRef,
+    onImageClick: (String) -> Unit,
+    onToggleLike: (String) -> Unit,
+    enabled: Boolean = true
+) {
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+    ) {
+        // Ranking
+        Text(
+            text = "$rank#",
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier
+                .padding(end = 12.dp)
+        )
+
+        // Image
+        ImageCard(
+            picture = picInfo,
+            onClick = onImageClick,
+            onToggleLike = onToggleLike,
+            modifier = Modifier
+                .size(124.dp)
+        )
+
+        // Info
+        Column {
+
+
+        }
+
+    }
 }

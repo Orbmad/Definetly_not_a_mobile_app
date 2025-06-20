@@ -346,6 +346,7 @@ fun PolaroidOverlayCard(
                             userId = uId,
                             username = username,
                             userImageUrl = userImage,
+                            onWhite = true,
                             onUserClick = onUserClick
                         )
                         Text(
