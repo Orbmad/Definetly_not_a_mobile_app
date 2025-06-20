@@ -13,10 +13,10 @@ private val DarkColorScheme = darkColorScheme(
     primary = Flame,
     onPrimary = White,
 
-    background = MainBlack,
+    background = OnBlackBlack,
     onBackground = White,
 
-    primaryContainer = OnBlackBlack,
+    primaryContainer = MainBlack,
     onPrimaryContainer = White,
     secondaryContainer = OnBlackBlack,
     onSecondaryContainer = White,
@@ -31,7 +31,7 @@ private val LightColorScheme = lightColorScheme(
     primary = Flame, // App color
     onPrimary = White, // Text and icons on app color
 
-    background = White, // Main background color
+    background = LightOrange, // Main background color
     onBackground = EerieBlack, // Text on background color
 
     primaryContainer = White, // Container on background color

@@ -85,9 +85,9 @@ fun CustomScaffold(
         },
         bottomBar = {
             NavigationBar(
-                containerColor = MaterialTheme.colorScheme.background,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
                 modifier = Modifier
-                    .height(104.dp)
+                    .height(98.dp)
                     .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
             ) {
                 val iconColor = MaterialTheme.colorScheme.primary
@@ -160,7 +160,7 @@ fun CenteredTitleTopAppBar(
     showBackButton: Boolean = true,
     onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colorScheme.background,
+    backgroundColor: Color = MaterialTheme.colorScheme.primaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.primary,
     height: Dp = 48.dp
 ) {
@@ -171,7 +171,7 @@ fun CenteredTitleTopAppBar(
             .fillMaxWidth()
             .height(height + insets.calculateTopPadding())
             .background(backgroundColor)
-            .padding(top = insets.calculateTopPadding())
+            .padding(top = insets.calculateTopPadding(), bottom = 8.dp)
     ) {
         // Back arrow
         if (showBackButton) {
