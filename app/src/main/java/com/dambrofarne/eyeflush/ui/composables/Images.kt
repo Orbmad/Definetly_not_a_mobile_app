@@ -1,6 +1,6 @@
 package com.dambrofarne.eyeflush.ui.composables
 
-import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
@@ -34,9 +33,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,7 +76,7 @@ fun ProfileImage(
         contentScale = ContentScale.Crop,
         modifier = Modifier
             .size(size)
-            .shadow(elevation = 10.dp, shape = borderShape, clip = false) // aggiunta ombra
+            .shadow(elevation = 10.dp, shape = borderShape, clip = false)
             .clip(borderShape)
             .border(borderSize, borderColor, borderShape)
     )
@@ -85,7 +84,7 @@ fun ProfileImage(
 
 @Composable
 fun IconImage(
-    image: Any,  // può essere String o Int
+    image: Any,
     modifier: Modifier = Modifier,
     size: Dp = 50.dp,
     borderSize: Dp = 1.dp,
@@ -133,21 +132,6 @@ fun ChoiceProfileImage(
     )
 }
 
-@Composable
-fun ChoiceSmallProfileImage(
-    url: String,
-    borderSize: Dp = 2.dp,
-    borderShape: Shape = CircleShape,
-    borderColor: Color = Color.Gray
-) {
-    ProfileImage(
-        url = url,
-        size = 50.dp,
-        borderSize = borderSize,
-        borderShape = borderShape,
-        borderColor = borderColor
-    )
-}
 
 @Composable
 fun ImageCard(
@@ -158,16 +142,17 @@ fun ImageCard(
     enabled: Boolean = true
 ) {
     var liked by remember(picture.picId, picture.liked) { mutableStateOf(picture.liked) }
-    var likeCount by remember(picture.picId, picture.likes) { mutableStateOf(picture.likes) }
+    var likeCount by remember(picture.picId, picture.likes) { mutableIntStateOf(picture.likes) }
 
     Card(
         onClick = { if (enabled) onClick(picture.picId) },
         modifier = modifier
             .padding(8.dp)
             .aspectRatio(0.8f)
-            .sizeIn(maxWidth = 120.dp, maxHeight = 150.dp),
+            .sizeIn(maxWidth = 120.dp, maxHeight = 150.dp)
+            .shadow(elevation = 8.dp),
         elevation = CardDefaults.cardElevation(4.dp),
-        shape = RectangleShape
+        shape = RectangleShape,
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             AsyncImage(
@@ -218,16 +203,17 @@ fun ImageCardSimple(
     enabled: Boolean = true
 ) {
     var localLiked by remember(picId, liked) { mutableStateOf(liked) }
-    var localLikes by remember(picId, likes) { mutableStateOf(likes) }
+    var localLikes by remember(picId, likes) { mutableIntStateOf(likes) }
 
     Card(
         onClick = { if (enabled) onClick(picId) },
         modifier = modifier
             .padding(8.dp)
             .aspectRatio(0.8f)
-            .sizeIn(maxWidth = 120.dp, maxHeight = 150.dp),
+            .sizeIn(maxWidth = 120.dp, maxHeight = 150.dp)
+            .shadow(elevation = 8.dp),
         elevation = CardDefaults.cardElevation(4.dp),
-        shape = RectangleShape
+        shape = RectangleShape,
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             AsyncImage(
@@ -306,7 +292,7 @@ fun PolaroidOverlayCard(
         modifier = modifier
             .fillMaxSize()
             .background(Color.Black.copy(alpha = 0.6f))
-            .clickable { onDismiss?.invoke() }, // dismiss al tocco sull’overlay
+            .clickable { onDismiss?.invoke() },
         contentAlignment = Alignment.Center
     ) {
         Card(
@@ -367,22 +353,6 @@ fun PolaroidOverlayCard(
                     }
                 }
             }
-        }
-    }
-}
-
-
-@Composable
-fun UserVerticalBadgeBar(
-    badges : List<String>, //Badges URLS
-    modifier : Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        badges.take(4).forEach { badge ->
-
         }
     }
 }

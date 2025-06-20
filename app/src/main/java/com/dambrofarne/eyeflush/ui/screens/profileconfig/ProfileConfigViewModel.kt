@@ -72,9 +72,11 @@ class ProfileConfigViewModel(
             try {
                 val imagePath = db.getUserImagePath(userId)
                 _uiState.value = _uiState.value.copy(profileImageUrl = imagePath)
+
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(profileImageUrl = "")
             }
+            _uiState.value = _uiState.value.copy(username = db.getUsername(userId))
         }
     }
 
