@@ -67,7 +67,8 @@ dependencies {
     implementation(platform(libs.firebase.bom))  // Import the BoM for the Firebase platform
     implementation(libs.koin.androidx.compose.v340) //Dipendenza per richiamare Koin da composable
     implementation(libs.coil.compose) //Coil per la visualizzazione di immagini
-    implementation(libs.kotlinx.coroutines.android) //Courtuin for imgur
+    implementation(libs.kotlinx.coroutines.android) //Coroutine for imgur
+    implementation(libs.androidx.datastore.preferences) //Datastore for preferencies
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)

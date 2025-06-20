@@ -1,5 +1,6 @@
 package com.dambrofarne.eyeflush.ui.screens.signup
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -35,12 +36,13 @@ fun SignUpScreen(
     val uiState by viewModel.uiState.collectAsState()
     Column(
         modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        Text("Welcome!", style = MaterialTheme.typography.titleLarge)
+        Text("Welcome!", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
 
         Spacer(Modifier.height(16.dp))
 

@@ -8,7 +8,9 @@ import com.dambrofarne.eyeflush.data.managers.location.LocationManagerImpl
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
 import com.dambrofarne.eyeflush.data.repositories.auth.FirebaseAuthRepository
 import com.dambrofarne.eyeflush.data.repositories.database.DatabaseRepository
+import com.dambrofarne.eyeflush.data.repositories.database.DatastoreRepository
 import com.dambrofarne.eyeflush.data.repositories.database.FirestoreDatabaseRepository
+import com.dambrofarne.eyeflush.data.repositories.database.LocalSettingsManager
 import com.dambrofarne.eyeflush.data.repositories.imagestoring.ImageStoringRepository
 import com.dambrofarne.eyeflush.data.repositories.imagestoring.ImgurImageStoringRepository
 import com.dambrofarne.eyeflush.ui.screens.camera.CameraViewModel
@@ -30,6 +32,7 @@ import org.koin.dsl.module
 
 val appModule = module {
 
+    single { DatastoreRepository(get()) }
     single { FirebaseAuth.getInstance() }
     single { FirebaseFirestore.getInstance() }
     single<AuthRepository> { FirebaseAuthRepository(get()) }
@@ -37,6 +40,7 @@ val appModule = module {
     single<ImageStoringRepository> { ImgurImageStoringRepository(get()) }
     single<CameraManager> { CameraManagerImpl(get()) }
     single<LocationManager> { LocationManagerImpl(get()) }
+    single<LocalSettingsManager> {DatastoreRepository(get())}
 
     viewModel { SignInViewModel(get(), get()) }
     viewModel { SignUpViewModel(get(), get()) }
@@ -50,5 +54,5 @@ val appModule = module {
     viewModel { GamificationViewModel(get(), get()) }
     viewModel { UserOverviewViewModel(get(), get()) }
 
-    viewModel { ThemeViewModel(get(),get()) }
+    viewModel { ThemeViewModel(get()) }
 }

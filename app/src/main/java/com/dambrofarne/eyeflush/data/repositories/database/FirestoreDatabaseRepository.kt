@@ -191,7 +191,6 @@ class FirestoreDatabaseRepository(
 
     override suspend fun getMarkersInRange(point: GeoPoint, rangeMeters: Int): List<Marker> {
         return try {
-            val db = FirebaseFirestore.getInstance()
 
             val boundingBox = getBoundingBox(point.latitude, point.longitude, rangeMeters)
 
@@ -696,22 +695,6 @@ class FirestoreDatabaseRepository(
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
-
-    override suspend fun changeThemePreferenceString(userId: String, pref : String) {
-        db.collection("users")
-            .document(userId)
-            .update("themePreference", pref)
-            .await()
-    }
-
-    override suspend fun getThemePreferenceString(userId: String): String? {
-        val snapshot = db.collection("users")
-            .document(userId)
-            .get()
-            .await()
-
-        return if (snapshot.exists()) snapshot.getString("themePreference") else "SYSTEM"
     }
 
     override suspend fun getNotifications(uId: String): List<NotificationItem> {
