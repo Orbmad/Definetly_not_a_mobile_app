@@ -192,6 +192,35 @@ fun ImageCard(
 }
 
 @Composable
+fun ImageCardSimplified(
+    picture: PicQuickRef,
+    onClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    var liked by remember(picture.picId, picture.liked) { mutableStateOf(picture.liked) }
+
+    Card(
+        onClick = { if (enabled) onClick(picture.picId) },
+        modifier = modifier
+            .padding(8.dp)
+            .aspectRatio(0.8f)
+            .sizeIn(maxWidth = 120.dp, maxHeight = 150.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        shape = RectangleShape
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            AsyncImage(
+                model = picture.url,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    }
+}
+
+@Composable
 fun ImageCardSimple(
     picId: String,
     url: String,
@@ -332,6 +361,7 @@ fun PolaroidOverlayCard(
                             userId = uId,
                             username = username,
                             userImageUrl = userImage,
+                            onWhite = true,
                             onUserClick = onUserClick
                         )
                         Text(
@@ -349,7 +379,11 @@ fun PolaroidOverlayCard(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "$likeCount", fontSize = 14.sp)
+                        Text(
+                            text = "$likeCount",
+                            color = Color.Black,
+                            fontSize = 14.sp
+                        )
                     }
                 }
             }

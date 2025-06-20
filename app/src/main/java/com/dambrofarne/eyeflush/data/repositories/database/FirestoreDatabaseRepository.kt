@@ -280,12 +280,21 @@ class FirestoreDatabaseRepository(
             val rawList = snapshot.get("picturesTaken") as? List<*>
             val pictureRefs = rawList?.mapNotNull { item ->
                 if (item is Map<*, *>) {
-                    val itId = item["id"] as? String
-                    val itUrl = item["url"] as? String
-                    if (itId != null && itUrl != null) {
-                        val liked = hasUserLiked(requesterUId, itId)
-                        val likes = getPictureLikes(itId)
-                        PicQuickRef(picId = itId, url = itUrl, liked = liked, likes = likes)
+                    val picInfo = getPictureExtendedInfo(item["id"] as String).getOrNull()
+
+                    if (picInfo != null) {
+                        val liked = hasUserLiked(requesterUId, picInfo.id)
+                        val likes = getPictureLikes(picInfo.id)
+                        PicQuickRef(
+                            picId = picInfo.id,
+                            url = picInfo.url,
+                            liked = liked,
+                            likes = likes,
+                            userId = picInfo.uId,
+                            username = picInfo.authorUsername,
+                            userImageUrl = picInfo.authorImageUrl,
+                            timeStamp = picInfo.timeStamp
+                        )
                     } else null
                 } else null
             }?.filter { it.picId != mostLikedPicId }

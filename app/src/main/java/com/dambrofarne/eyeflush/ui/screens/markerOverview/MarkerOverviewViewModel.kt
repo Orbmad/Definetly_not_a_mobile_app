@@ -117,28 +117,22 @@ class MarkerOverviewViewModel(
     }
 
     fun showOverlay(picId : String) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(showOverlay = true) }
-            val result = db.getPictureExtendedInfo(picId)
-            if (result.isSuccess) {
-                val picture = result.getOrNull()!!
-
-
-                _uiState.update {
-                    it.copy(
-                        imageUrlOverlay = picture.url,
-                        uIdvOverlay = picture.uId,
-                        usernameOverlay = picture.authorUsername,
-                        userImageOverlay = picture.authorImageUrl,
-                        markerNameOverlay = picture.markerName,
-                        timestampOverlay = picture.timeStamp,
-                        likeCountOverlay = picture.likes
-                    )
-                }
-
-            } else {
-                _uiState.update { it.copy(showOverlay = false) }
+        _uiState.update { it.copy(showOverlay = true) }
+        val picture = _uiState.value.picturesTaken.find { it.picId == picId }
+        if (picture != null) {
+              _uiState.update {
+                it.copy(
+                    imageUrlOverlay = picture.url,
+                    uIdvOverlay = picture.userId,
+                    usernameOverlay = picture.username,
+                    userImageOverlay = picture.userImageUrl,
+                    timestampOverlay = picture.timeStamp,
+                    likeCountOverlay = picture.likes
+                )
             }
+
+        } else {
+            _uiState.update { it.copy(showOverlay = false) }
         }
     }
 

@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
@@ -67,6 +68,7 @@ fun UserProfileRow(
     userId: String?,
     username: String?,
     userImageUrl: String?,
+    onWhite: Boolean = false,
     onUserClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -102,6 +104,10 @@ fun UserProfileRow(
         )
             Spacer(modifier = Modifier.width(8.dp))
 
-        ImageLabel(username ?: "Unknown")
+        Text(
+            text = username ?: "Unknown",
+            style = MaterialTheme.typography.titleMedium,
+            color = if (onWhite) Color.Black else MaterialTheme.colorScheme.onBackground
+        )
     }
 }
