@@ -73,9 +73,9 @@ class UserOverviewViewModel(
                     photoTaken = user.picturesTakenLvl ?: AchievementRank.NONE,
                     likes = user.likesReceivedLvl ?: AchievementRank.NONE,
                     firstPlace = user.mostLikedPicturesLvl ?: AchievementRank.NONE,
-                    locations = user.markersPhotographedLvl ?: AchievementRank.NONE
+                    locations = user.markersPhotographedLvl ?: AchievementRank.NONE,
 
-
+                    score = user.score,
                 )
             }
         } else {

@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -27,11 +26,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Cyclone
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.RemoveRedEye
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -61,7 +59,6 @@ enum class NavScreen {
     PROFILE
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomScaffold(
     title: String = "EyeFlush",
@@ -132,7 +129,7 @@ fun CustomScaffold(
                     NavigationBarItem(
                         icon = {
                             Icon(
-                                imageVector = Icons.Default.RemoveRedEye,
+                                imageVector = Icons.Default.Cyclone,
                                 contentDescription = "Gamification",
                                 tint = iconColor,
                                 modifier = Modifier.size(iconSize)
