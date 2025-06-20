@@ -31,3 +31,5 @@ val EerieBlack = Color(0xFF262626)
 // Dark mode colors
 val MainBlack = Color(0xFF0D0C11)
 val OnBlackBlack = Color(0xFF241E2B)
+
+val LightOrange = Color(0xFFFFF7ED)
