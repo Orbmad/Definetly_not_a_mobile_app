@@ -14,7 +14,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cyclone
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,8 +57,9 @@ fun GamificationScreen(
     when {
         uiState.isLoading -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
+                contentAlignment = Alignment.Center,
             ) {
                 CircularProgressIndicator()
             }
@@ -84,6 +88,31 @@ fun AchievementScreen(achievementUiState: AchievementUiState) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
+        //Score
+        Row(
+            modifier = Modifier
+                .padding(start = 10.dp, top=8.dp, bottom = 6.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+
+            Icon(
+                imageVector = Icons.Default.Cyclone,
+                contentDescription = "Achievements",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(60.dp)
+            )
+
+            Text(
+                text = achievementUiState.score.toString() + " FlushPoints",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .padding(start = 6.dp)
+                    .align(Alignment.CenterVertically)
+            )
+        }
+
         // Achievement photo taken
         val photoTakenRank = calcAchievementRank(AchievementType.PHOTO_TAKEN, achievementUiState.picturesTaken)
         AchievementItem(
@@ -128,7 +157,7 @@ fun AchievementItem(title: String, maxPoints: Int, actualPoints: Int, iconId: In
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
+        //verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         Text(
             text = title,

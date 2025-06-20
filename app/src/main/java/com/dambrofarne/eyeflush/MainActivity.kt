@@ -23,10 +23,6 @@ class MainActivity : ComponentActivity() {
             val systemTheme = isSystemInDarkTheme()
             val themeViewModel: ThemeViewModel = koinViewModel()
 
-            LaunchedEffect(Unit) {
-                themeViewModel.initThemePreference()
-            }
-
             val themePref by themeViewModel.themePreference.collectAsState()
 
             val isDark = when (themePref) {

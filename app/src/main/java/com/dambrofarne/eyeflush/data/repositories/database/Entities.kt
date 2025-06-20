@@ -118,5 +118,6 @@ data class UserAchievements(
     val likesReceived : Int,
     val picturesTaken : Int,
     val markersPhotographed : Int,
-    val mostLikedPictures : Int
+    val mostLikedPictures : Int,
+    val score : Int =  0
 )

@@ -35,6 +35,8 @@ data class AchievementUiState(
 //    val mostLikedRank: AchievementRank = AchievementRank.NONE,
 //    val mostLikedMaxPoints: Int = 0,
 //    val mostLikedBadge: ImageVector? = null
+
+    val score: Int = 0
 )
 
 class GamificationViewModel(
@@ -57,7 +59,8 @@ class GamificationViewModel(
                 likesReceived = userAchievements.likesReceived,
                 picturesTaken = userAchievements.picturesTaken,
                 markersVisited = userAchievements.markersPhotographed,
-                mostLikedPictures = userAchievements.mostLikedPictures
+                mostLikedPictures = userAchievements.mostLikedPictures,
+                score = userAchievements.score
             )
         }
     }

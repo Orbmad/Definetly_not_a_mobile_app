@@ -73,18 +73,5 @@ interface DatabaseRepository {
      */
     suspend fun getUserAchievements(uId : String) : Result<UserAchievements>
 
-    /**
-     * @param uId
-     * @param darkTheme Sets the user preference regarding the dark theme
-     */
-    suspend fun changeThemePreferenceString(userId: String, pref: String)
-
-    /**
-     * @param uId
-     *
-     * @return "SYSTEM"/"LIGHT"/"DARK"
-     */
-    suspend fun getThemePreferenceString(userId: String): String?
-
     suspend fun deleteNotification(uId: String, notificationId: String): Result<Boolean>
 }
