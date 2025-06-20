@@ -72,8 +72,8 @@ fun CustomStandardButton(
 fun SignUpText(onClick: () -> Unit) {
     Text(
         text = "Don't have an account ? Sign up",
-        color = MaterialTheme.colorScheme.primary,
-        fontSize = 14.sp,
+        color = MaterialTheme.colorScheme.onBackground,
+        style = MaterialTheme.typography.bodyMedium,
         modifier = Modifier
             .padding(top = 16.dp)
             .clickable(onClick = onClick)
@@ -85,19 +85,7 @@ fun SignInText(onClick: () -> Unit) {
     Text(
         text = "Already have an account ? Sign in",
         color = MaterialTheme.colorScheme.onBackground ,
-        fontSize = 14.sp,
-        modifier = Modifier
-            .padding(top = 16.dp)
-            .clickable(onClick = onClick)
-    )
-}
-
-@Composable
-fun SignOutText(onClick: () -> Unit) {
-    Text(
-        text = "Log out ...",
-        color = MaterialTheme.colorScheme.onBackground ,
-        fontSize = 14.sp,
+        style = MaterialTheme.typography.bodyMedium,
         modifier = Modifier
             .padding(top = 16.dp)
             .clickable(onClick = onClick)
