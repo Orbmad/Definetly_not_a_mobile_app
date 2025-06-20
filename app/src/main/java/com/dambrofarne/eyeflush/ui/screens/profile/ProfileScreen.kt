@@ -80,7 +80,7 @@ fun ProfileScreen(
                             timestamp = uiState.timestampOverlay,
                             likeCount = uiState.likeCountOverlay,
                             onDismiss = viewModel::hideOverlay,
-                            uId = uiState.uIdvOverlay,
+                            uId = uiState.uIdOverlay,
                             userImage = uiState.userImageOverlay,
                             onUserClick = { userId ->
                                 navController.navigate(EyeFlushRoute.UserOverview(userId))

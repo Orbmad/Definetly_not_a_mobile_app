@@ -24,7 +24,7 @@ data class ProfileUiState(
 
     val showOverlay : Boolean = false,
     val imageUrlOverlay: String = "",
-    val uIdvOverlay : String = "",
+    val uIdOverlay : String = "",
     val usernameOverlay : String = "",
     val userImageOverlay : String = "",
     val markerNameOverlay : String = "",
@@ -121,11 +121,10 @@ class ProfileViewModel(
             if (result.isSuccess) {
                 val picture = result.getOrNull()!!
 
-
                 _uiState.update {
                     it.copy(
                         imageUrlOverlay = picture.url,
-                        uIdvOverlay = picture.uId,
+                        uIdOverlay = picture.uId,
                         usernameOverlay = picture.authorUsername,
                         userImageOverlay = picture.authorImageUrl,
                         markerNameOverlay = picture.markerName,
