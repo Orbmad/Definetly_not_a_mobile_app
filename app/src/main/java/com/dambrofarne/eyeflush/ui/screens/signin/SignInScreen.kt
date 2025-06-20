@@ -18,10 +18,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
-import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
 import com.dambrofarne.eyeflush.ui.composables.CustomStandardButton
+import com.dambrofarne.eyeflush.ui.composables.ErrorMessage
 import com.dambrofarne.eyeflush.ui.composables.EyeFlushTextField
 import com.dambrofarne.eyeflush.ui.composables.SignUpText
+import com.dambrofarne.eyeflush.ui.composables.UpdatingMessage
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -39,10 +40,7 @@ fun SignInScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        if (uiState.isLoading) {
-            AuthenticationError("Loading ...")
-        }
-
+        UpdatingMessage(uiState.isLoading, text = "Loading...")
         Text("Welcome back ! ", style = MaterialTheme.typography.titleLarge)
 
         Spacer(Modifier.height(16.dp))
@@ -53,11 +51,7 @@ fun SignInScreen(
             label = "Email",
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
-        uiState.emailError?.let {
-            if (it.isNotEmpty()) {
-                AuthenticationError(it)
-            }
-        }
+        ErrorMessage(uiState.emailError)
 
         Spacer(Modifier.height(8.dp))
 
@@ -69,11 +63,7 @@ fun SignInScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             //visualTransformation = PasswordVisualTransformation()
         )
-        uiState.passwordError?.let {
-            if (it.isNotEmpty()) {
-                AuthenticationError(it)
-            }
-        }
+        ErrorMessage(uiState.passwordError)
 
 
         Spacer(Modifier.height(16.dp))
@@ -91,10 +81,6 @@ fun SignInScreen(
             navController.navigate(EyeFlushRoute.SignUp)
         }
 
-        uiState.connectionError?.let {
-            if (it.isNotEmpty()) {
-                AuthenticationError(it)
-            }
-        }
+        ErrorMessage(uiState.connectionError)
     }
 }

@@ -27,15 +27,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
-import com.dambrofarne.eyeflush.ui.composables.AuthenticationError
 import com.dambrofarne.eyeflush.ui.composables.ChoiceProfileImage
 import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
 import com.dambrofarne.eyeflush.ui.composables.CustomStandardButton
+import com.dambrofarne.eyeflush.ui.composables.ErrorMessage
 import com.dambrofarne.eyeflush.ui.composables.EyeFlushTextField
 import com.dambrofarne.eyeflush.ui.composables.IconButton
 import com.dambrofarne.eyeflush.ui.composables.ImagePickerDialog
 import com.dambrofarne.eyeflush.ui.composables.NavScreen
 import com.dambrofarne.eyeflush.ui.composables.ThemePreferenceSelector
+import com.dambrofarne.eyeflush.ui.composables.UpdatingMessage
 import com.dambrofarne.eyeflush.ui.theme.ThemeViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -94,9 +95,8 @@ fun ProfileConfigScreen(
                     .padding(start = 16.dp)
                 ) {
 
-                if (uiState.isLoading) {
-                    AuthenticationError("Loading ...")
-                }
+                UpdatingMessage(uiState.isLoading, text = "Loading...")
+
                 val boxPadding = 8.dp
 
                 Box(
@@ -156,17 +156,8 @@ fun ProfileConfigScreen(
                         }
                     }
 
-                    uiState.connectionError?.let {
-                        if (it.isNotEmpty()) {
-                            AuthenticationError(it)
-                        }
-                    }
-
-                    uiState.usernameError?.let {
-                        if (it.isNotEmpty()) {
-                            AuthenticationError(it)
-                        }
-                    }
+                    ErrorMessage(uiState.connectionError)
+                    ErrorMessage(uiState.usernameError)
                 }
 
                 if(!isFirstConfig){
