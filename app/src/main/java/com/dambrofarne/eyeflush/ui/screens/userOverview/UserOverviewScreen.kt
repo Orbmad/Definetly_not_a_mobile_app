@@ -113,7 +113,7 @@ fun UserOverviewScreen(
                             HorizontalDivider(
                                 modifier = Modifier.padding(vertical = 8.dp),
                                 thickness = 1.dp,
-                                color = MaterialTheme.colorScheme.outline
+                                color = MaterialTheme.colorScheme.primary
                             )
 
                             ImageGrid(
