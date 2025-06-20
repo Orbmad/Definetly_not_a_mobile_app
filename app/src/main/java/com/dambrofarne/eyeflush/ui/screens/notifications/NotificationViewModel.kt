@@ -28,19 +28,18 @@ class NotificationViewModel(
     val uiState: StateFlow<NotificationUiState> = _uiState
 
     suspend fun loadNotifications() {
+        loadDummyNotifications() // For debug
+
 //        val userId = auth.getCurrentUserId()
 //        if (userId != null) {
 //            val loaded = db.getNotifications(userId)
-//            //Log.w("Notifications", "loaded notifications: $loaded")
 //            _uiState.update {
 //                it.copy(
 //                    isLoading = false,
 //                    notificationsList = loaded
 //                )
 //            }
-//            //Log.w("Notifications", "notifications list: ${_uiState.value.notificationsList}")
 //        }
-        loadDummyNotifications()
     }
 
     private suspend fun loadDummyNotifications() {
@@ -51,7 +50,7 @@ class NotificationViewModel(
                         "1",
                         "LIKE",
                         "Your photo received a like",
-                        "-Utente- ha messo like alla tua foto",
+                        "-User- liked your photo",
                         time = LocalDateTime.now().toString(),
                         isRead = false,
                         referredMarkerId = null
@@ -74,22 +73,37 @@ class NotificationViewModel(
     suspend fun markAsRead(notificationId: String) {
         val index = _uiState.value.notificationsList.indexOfFirst { it.id == notificationId }
         if (index != -1) {
-            val newList: MutableList<NotificationItem> = _uiState.value.notificationsList.toMutableList()
+            val newList = _uiState.value.notificationsList.toMutableList()
             val updated = newList[index].copy(isRead = true)
             newList[index] = updated
+
             _uiState.update {
-                it.copy(
-                    notificationsList = newList
-                )
+                it.copy(notificationsList = newList)
             }
-            updateNotificationState(notificationId)
+
+            val userId = auth.getCurrentUserId()
+            if (userId != null) {
+                db.readNotification(userId, notificationId)
+            }
         }
     }
 
-    private suspend fun updateNotificationState(notificationId: String) {
+    suspend fun deleteNotification(notificationId: String) {
+        // Local notification removal
+        val newList = _uiState.value.notificationsList.filterNot { it.id == notificationId }
+        _uiState.update {
+            it.copy(notificationsList = newList)
+        }
+
+        // Asynchronous deletion from DB
         val userId = auth.getCurrentUserId()
         if (userId != null) {
-            db.readNotification(userId, notificationId)
+            try {
+                db.deleteNotification(userId, notificationId)
+            } catch (e: Exception) {
+                Log.e("NotificationViewModel", "Error: error during notification delete", e)
+                // (optional) error SnackBar
+            }
         }
     }
 }

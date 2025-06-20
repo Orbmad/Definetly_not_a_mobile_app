@@ -85,7 +85,7 @@ fun CustomScaffold(
         },
         bottomBar = {
             NavigationBar(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                containerColor = MaterialTheme.colorScheme.background,
                 modifier = Modifier
                     .height(104.dp)
                     .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
@@ -160,7 +160,7 @@ fun CenteredTitleTopAppBar(
     showBackButton: Boolean = true,
     onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
     contentColor: Color = MaterialTheme.colorScheme.primary,
     height: Dp = 48.dp
 ) {

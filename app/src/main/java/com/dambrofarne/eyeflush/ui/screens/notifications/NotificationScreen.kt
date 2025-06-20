@@ -3,6 +3,7 @@ package com.dambrofarne.eyeflush.ui.screens.notifications
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -36,12 +37,15 @@ import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
 import com.dambrofarne.eyeflush.ui.composables.NavScreen
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.draw.clip
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -51,6 +55,8 @@ fun NotificationScreen(
     viewModel: NotificationViewModel = koinViewModel<NotificationViewModel>()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    val readNotifications = remember { mutableStateListOf<String>() }
 
     LaunchedEffect(Unit) {
         viewModel.loadNotifications()
@@ -84,17 +90,28 @@ fun NotificationScreen(
                                 )
                         }
                     } else {
-                        LazyColumn {
-                            items(uiState.notificationsList,
-                                key = { it.id }
-                            ) { notification ->
+                        HorizontalDivider(
+                            thickness = 1.dp,
+                            color = MaterialTheme.colorScheme.primaryContainer
+                        )
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(1.dp),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                        ) {
+                            items(uiState.notificationsList, key = { it.id }) { notification ->
                                 val dismissState = rememberDismissState()
 
                                 LaunchedEffect(dismissState.currentValue) {
                                     if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
-                                        viewModel.markAsRead(notification.id)
-                                        // Reset state
-                                        dismissState.reset()
+                                        if (!notification.isRead && !readNotifications.contains(notification.id)) {
+                                            viewModel.markAsRead(notification.id)
+                                            readNotifications.add(notification.id)
+                                            dismissState.reset()
+                                        } else {
+                                            viewModel.deleteNotification(notification.id)
+                                        }
                                     }
                                 }
 
@@ -102,7 +119,9 @@ fun NotificationScreen(
                                     state = dismissState,
                                     directions = setOf(DismissDirection.StartToEnd),
                                     background = {
-                                        SwipeBackground(isRead = notification.isRead)
+                                        SwipeBackground(
+                                            isRead = notification.isRead || readNotifications.contains(notification.id)
+                                        )
                                     },
                                     dismissContent = {
                                         NotificationCard(
@@ -112,10 +131,18 @@ fun NotificationScreen(
                                                 if (markerId != null) {
                                                     navController.navigate(EyeFlushRoute.MarkerOverview(markerId))
                                                 }
-                                            })
+                                            }
+                                        )
                                     }
                                 )
+
+//                                HorizontalDivider(
+//                                    thickness = 1.dp,
+//                                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+//                                    modifier = Modifier.padding(start = 16.dp)
+//                                )
                             }
+
                         }
                     }
 
@@ -132,9 +159,15 @@ fun NotificationCard(
     onClick: () -> Unit
 ) {
     Card(
+        shape = RoundedCornerShape(
+            topStart = 16.dp,
+            bottomStart = 16.dp,
+            topEnd = 0.dp,
+            bottomEnd = 0.dp
+        ),
         modifier = Modifier
             .fillMaxWidth()
-            //.padding(8.dp)
+            .padding(start = 4.dp)
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
@@ -162,11 +195,13 @@ fun NotificationCard(
 @Composable
 fun SwipeBackground(isRead: Boolean) {
     val backgroundColor by animateColorAsState(
-        targetValue = if (isRead) MaterialTheme.colorScheme.onTertiaryContainer else MaterialTheme.colorScheme.tertiary,
+        targetValue = if (isRead) Color(0xFFE53935) else MaterialTheme.colorScheme.primary,
         label = "SwipeBackgroundColor"
     )
 
-    // Bin Icon
+    val icon = if (isRead) Icons.Default.Delete else Icons.Default.Check
+    val description = if (isRead) "Delete" else "Mark as Read"
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -175,8 +210,8 @@ fun SwipeBackground(isRead: Boolean) {
         contentAlignment = Alignment.CenterStart
     ) {
         Icon(
-            imageVector = Icons.Default.Delete,
-            contentDescription = "read",
+            imageVector = icon,
+            contentDescription = description,
             tint = MaterialTheme.colorScheme.onTertiaryContainer
         )
     }

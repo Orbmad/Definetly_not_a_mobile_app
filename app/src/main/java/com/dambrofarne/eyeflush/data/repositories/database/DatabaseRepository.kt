@@ -85,4 +85,6 @@ interface DatabaseRepository {
      * @return "SYSTEM"/"LIGHT"/"DARK"
      */
     suspend fun getThemePreferenceString(userId: String): String?
+
+    suspend fun deleteNotification(uID: String, notificationId: String): Result<Boolean>
 }

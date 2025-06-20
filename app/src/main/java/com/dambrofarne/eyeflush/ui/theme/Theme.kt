@@ -7,7 +7,6 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
@@ -17,7 +16,7 @@ private val DarkColorScheme = darkColorScheme(
     background = MainBlack,
     onBackground = White,
 
-    primaryContainer = MainBlack,
+    primaryContainer = OnBlackBlack,
     onPrimaryContainer = White,
     secondaryContainer = OnBlackBlack,
     onSecondaryContainer = White,
@@ -39,6 +38,8 @@ private val LightColorScheme = lightColorScheme(
     onPrimaryContainer = EerieBlack, // Text on container
     secondaryContainer = Platinum,
     onSecondaryContainer = EerieBlack,
+
+    onTertiaryContainer = Platinum,
 
     secondary = Link, // Darker app color
     tertiary = Danger // Error color

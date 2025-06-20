@@ -747,4 +747,18 @@ class FirestoreDatabaseRepository(
             emptyList()
         }
     }
+
+    override suspend fun deleteNotification(uId: String, notificationId: String): Result<Boolean> {
+        return try {
+            val notificationRef = db.collection("users")
+                .document(uId)
+                .collection("notifications")
+                .document(notificationId)
+
+            notificationRef.delete().await()
+            Result.success(true)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
