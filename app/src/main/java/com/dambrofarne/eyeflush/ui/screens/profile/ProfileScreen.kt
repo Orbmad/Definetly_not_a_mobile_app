@@ -16,9 +16,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cyclone
+import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -140,15 +143,65 @@ fun ProfileScreen(
                                         style = MaterialTheme.typography.bodyLarge,
                                         modifier = Modifier
                                             .align(Alignment.Start)
-                                            .padding(start = 16.dp, bottom = 12.dp)
+                                            .padding(start = 10.dp, bottom = 6.dp)
                                     )
+
+                                    val iconSize = 20.dp
+
+                                    //Score
+                                    Row(
+                                        modifier = Modifier
+                                            .align(Alignment.Start)
+                                            .padding(start = 10.dp, bottom = 6.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+
+                                        Icon(
+                                            imageVector = Icons.Default.Cyclone,
+                                            contentDescription = "Achievements",
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(iconSize)
+                                        )
+
+                                        Text(
+                                            text = uiState.score.toString(),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            modifier = Modifier
+                                                .padding(start = 6.dp),
+                                        )
+                                    }
+
+                                    //ImagesCount
+                                    Row(
+                                        modifier = Modifier
+                                            .align(Alignment.Start)
+                                            .padding(start = 10.dp, bottom = 6.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+
+                                        Icon(
+                                            imageVector = Icons.Default.PhotoLibrary,
+                                            contentDescription = "Achievements",
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(iconSize)
+                                        )
+
+                                        //Score
+                                        Text(
+                                            text = uiState.imagesCount.toString(),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            modifier = Modifier
+                                                .padding(start = 6.dp),
+                                        )
+                                    }
+
 
                                     // Badges
                                     BadgesRow(
                                         photoTaken = uiState.photoTaken,
                                         likes = uiState.likes,
                                         firstPlace = uiState.firstPlace,
-                                        locations = uiState.locations
+                                        locations = uiState.locations,
                                     )
                                 }
                             }
@@ -201,7 +254,7 @@ fun BadgesRow(
     modifier: Modifier = Modifier
         .fillMaxWidth()
         .height(48.dp)
-        .padding(horizontal = 8.dp)
+        .padding(horizontal = 10.dp)
         .border(0.dp, MaterialTheme.colorScheme.onTertiaryContainer, RoundedCornerShape(24.dp))
         .clip(RoundedCornerShape(24.dp))
         .background(MaterialTheme.colorScheme.primaryContainer)
