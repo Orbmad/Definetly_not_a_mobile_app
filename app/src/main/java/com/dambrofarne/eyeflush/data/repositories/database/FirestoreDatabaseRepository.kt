@@ -563,7 +563,7 @@ class FirestoreDatabaseRepository(
             }
 
             val id = snapshot.id?:""
-            val uId = snapshot.getString("uId")?:""
+            val uId = snapshot.getString("uid")?:""
             val markerId = snapshot.getString("markerId")?:""
             val url = snapshot.getString("url")?:""
             val timeStamp = snapshot.getTimestamp("timeStamp")?.let { getFormattedImageDate(it) }?:""
