@@ -118,7 +118,18 @@ class MarkerOverviewViewModel(
 
     fun showOverlay(picId : String) {
         _uiState.update { it.copy(showOverlay = true) }
-        val picture = _uiState.value.picturesTaken.find { it.picId == picId }
+        val picture: PicQuickRef? = if (picId == _uiState.value.mostLikedPicId) {
+            PicQuickRef(
+                userId = _uiState.value.mostLikedPicUserId!!,
+                url = _uiState.value.mostLikedPicURL!!,
+                username = _uiState.value.mostLikedPicUsername!!,
+                userImageUrl = _uiState.value.mostLikedPicUserImage!!,
+                timeStamp = _uiState.value.mostLikedPicTimeStamp!!,
+                likes = _uiState.value.mostLikedPicLikes
+            )
+        } else {
+            _uiState.value.picturesTaken.find { it.picId == picId }
+        }
         if (picture != null) {
               _uiState.update {
                 it.copy(
