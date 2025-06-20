@@ -1,7 +1,6 @@
 package com.dambrofarne.eyeflush.ui.composables
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -42,15 +41,13 @@ fun PageTitle(text: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(colors.primary.copy(alpha = 0.1f))
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(top = 12.dp)
     ) {
         Text(
             text = text,
             style = typography.headlineMedium,
-            color = colors.primary
+            color = colors.primary,
+            modifier = Modifier.align(Alignment.Center)
         )
     }
 }

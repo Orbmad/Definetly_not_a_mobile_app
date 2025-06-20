@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,9 +41,7 @@ import com.dambrofarne.eyeflush.data.repositories.database.PicQuickRef
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 import com.dambrofarne.eyeflush.ui.composables.CustomScaffold
 import com.dambrofarne.eyeflush.ui.composables.ErrorMessage
-import com.dambrofarne.eyeflush.ui.composables.ImageCardSimple
 import com.dambrofarne.eyeflush.ui.composables.ImageCardSimplified
-import com.dambrofarne.eyeflush.ui.composables.ImageLabel
 import com.dambrofarne.eyeflush.ui.composables.PageTitle
 import com.dambrofarne.eyeflush.ui.composables.PolaroidOverlayCard
 import com.dambrofarne.eyeflush.ui.composables.UpdatingMessage
@@ -118,6 +117,7 @@ fun MarkerOverviewScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                // Likes
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(start = 4.dp)
@@ -125,7 +125,7 @@ fun MarkerOverviewScreen(
                     Icon(
                         imageVector = if (localLike) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                         contentDescription = "likes",
-                        tint = if (localLike) Color.Red else Color.White,
+                        tint = if (localLike) Color.Red else MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier
                             .size(36.dp)
                             .padding(end = 12.dp)
@@ -189,15 +189,16 @@ fun MarkerOverviewScreen(
                                 .padding(16.dp)
                         ) {
                             // Top section with most liked image
-                            val markerTitle = uiState.name ?: "[%.6f, %.6f]".format(
+                            val markerTitle = uiState.name ?: "[ %.6f, %.6f ]".format(
                                 uiState.coordinates.latitude,
                                 uiState.coordinates.longitude
                             )
                             PageTitle(markerTitle)
                             //StandardText("Pics taken here: " + uiState.imagesCount.toString())
 
-                            Spacer(modifier = Modifier.height(20.dp))
+                            UpdatingMessage(uiState.isUpdating)
 
+                            // Most Liked Pic
                             uiState.mostLikedPicURL?.let {
                                 Row(
                                     modifier = Modifier
@@ -205,32 +206,46 @@ fun MarkerOverviewScreen(
                                         .padding(bottom = 16.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    if (uiState.mostLikedPicId != null) {
-                                        ImageCardSimple(
-                                            picId = uiState.mostLikedPicId!!,
-                                            url = uiState.mostLikedPicURL!!,
-                                            likes = uiState.mostLikedPicLikes,
-                                            liked = uiState.userLikesMostLiked,
-                                            onClick = { clickedPicId ->
-                                                viewModel.showOverlay(clickedPicId)
-                                            },
-                                            onToggleLike = viewModel::toggleLike,
-                                            modifier = Modifier
-                                                .width(200.dp)
-                                                .height(250.dp),
-                                            enabled = !uiState.isUpdating
-                                        )
-                                    }
+                                    val mostLikedPic = PicQuickRef(
+                                        picId = uiState.mostLikedPicId!!, // check
+                                        url = uiState.mostLikedPicURL!!, // check
+                                        liked = uiState.userLikesMostLiked,
+                                        likes = uiState.mostLikedPicLikes,
+                                        userId = uiState.mostLikedPicUserId!!, // check
+                                        username = uiState.mostLikedPicUsername!!, //check
+                                        userImageUrl = uiState.mostLikedPicUserImage!!, // check
+                                        timeStamp = uiState.mostLikedPicTimeStamp!! // check
+                                    )
+                                    var localLike by remember(mostLikedPic.liked) { mutableStateOf(mostLikedPic.liked) }
+                                    var localLikeCount by remember(mostLikedPic.likes, mostLikedPic.liked) { mutableIntStateOf(mostLikedPic.likes) }
+
+                                    ImageCardSimplified(
+                                        picture = mostLikedPic,
+                                        onClick = { viewModel.showOverlay(mostLikedPic.picId) },
+                                        modifier = Modifier
+                                            .width(200.dp)
+                                            .height(250.dp),
+                                        enabled = !uiState.isUpdating
+                                    )
+
 
                                     Spacer(modifier = Modifier.width(16.dp))
 
+                                    // Photo info
                                     Column(
                                         modifier = Modifier
-                                            .weight(1f)
-                                            .padding(top = 4.dp),
-                                        verticalArrangement = Arrangement.Top,
-                                        horizontalAlignment = Alignment.Start
+                                            .align(Alignment.Top)
                                     ) {
+                                        // Ranking
+                                        Text(
+                                            text = "1#",
+                                            style = MaterialTheme.typography.titleLarge,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier
+                                                .padding(top = 16.dp, bottom = 12.dp)
+                                                .align(Alignment.CenterHorizontally)
+                                        )
+
                                         UserProfileRow(
                                             userId = uiState.mostLikedPicUserId,
                                             username = uiState.mostLikedPicUsername,
@@ -239,18 +254,67 @@ fun MarkerOverviewScreen(
                                                 navController.navigate(EyeFlushRoute.UserOverview(userId))
                                             }
                                         )
-                                        Spacer(modifier = Modifier.height(20.dp))
-                                        ImageLabel("🕒 ${uiState.mostLikedPicTimeStamp}")
-                                        ImageLabel("❤️ ${uiState.mostLikedPicLikes}")
+
+                                        Spacer(modifier = Modifier.height(12.dp))
+
+                                        // Timestamp
+                                        Row(
+                                            modifier = Modifier
+                                                .padding(start = 6.dp, bottom = 8.dp),
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.CalendarToday,
+                                                contentDescription = "timestamp",
+                                                tint = MaterialTheme.colorScheme.onBackground,
+                                                modifier = Modifier
+                                                    .size(32.dp)
+                                                    .padding(end = 12.dp)
+                                            )
+                                            Text(
+                                                text = mostLikedPic.timeStamp,
+                                                color = MaterialTheme.colorScheme.onBackground,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                modifier = Modifier.align(Alignment.CenterVertically)
+                                            )
+                                        }
+
+                                        // Likes
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.padding(start = 4.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = if (localLike) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                                contentDescription = "likes",
+                                                tint = if (localLike) Color.Red else MaterialTheme.colorScheme.onBackground,
+                                                modifier = Modifier
+                                                    .size(36.dp)
+                                                    .padding(end = 12.dp)
+                                                    .clickable {
+                                                        viewModel.toggleLike(mostLikedPic.picId)
+                                                        localLike = !localLike
+                                                        if (localLike) {
+                                                            localLikeCount += 1
+                                                        } else {
+                                                            localLikeCount -= 1
+                                                        }
+                                                    }
+                                            )
+
+                                            Text(
+                                                text = "$localLikeCount",
+                                                color = MaterialTheme.colorScheme.onBackground,
+                                                style = MaterialTheme.typography.bodyLarge
+                                            )
+                                        }
                                     }
                                 }
+
                                 HorizontalDivider(
                                     modifier = Modifier.padding(vertical = 8.dp),
                                     thickness = 1.dp,
                                     color = MaterialTheme.colorScheme.primary
                                 )
-
-                                UpdatingMessage(uiState.isUpdating)
                             }
 
                             // Rest of the ranking
