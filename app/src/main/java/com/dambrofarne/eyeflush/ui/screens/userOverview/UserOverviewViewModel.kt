@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
 import com.dambrofarne.eyeflush.data.repositories.database.DatabaseRepository
 import com.dambrofarne.eyeflush.data.repositories.database.PicQuickRef
+import com.dambrofarne.eyeflush.utils.AchievementRank
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -28,7 +29,12 @@ data class UserOverviewUiState(
     val userImageOverlay : String = "",
     val markerNameOverlay : String = "",
     val timestampOverlay: String = "",
-    val likeCountOverlay : Int = 0
+    val likeCountOverlay : Int = 0,
+
+    val photoTaken: AchievementRank = AchievementRank.NONE,
+    val likes: AchievementRank = AchievementRank.NONE,
+    val firstPlace: AchievementRank = AchievementRank.NONE,
+    val locations: AchievementRank = AchievementRank.NONE,
 )
 
 
@@ -62,7 +68,14 @@ class UserOverviewViewModel(
                     profileImagePath = user.profileImagePath,
                     imagesCount = user.imagesCount,
                     picturesTaken = user.picturesTaken,
-                    isLoading = false
+                    isLoading = false,
+
+                    photoTaken = user.picturesTakenLvl ?: AchievementRank.NONE,
+                    likes = user.likesReceivedLvl ?: AchievementRank.NONE,
+                    firstPlace = user.mostLikedPicturesLvl ?: AchievementRank.NONE,
+                    locations = user.markersPhotographedLvl ?: AchievementRank.NONE
+
+
                 )
             }
         } else {

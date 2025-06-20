@@ -86,5 +86,5 @@ interface DatabaseRepository {
      */
     suspend fun getThemePreferenceString(userId: String): String?
 
-    suspend fun deleteNotification(uID: String, notificationId: String): Result<Boolean>
+    suspend fun deleteNotification(uId: String, notificationId: String): Result<Boolean>
 }

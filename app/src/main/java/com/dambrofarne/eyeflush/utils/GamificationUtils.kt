@@ -142,3 +142,7 @@ fun mapRankToLevel(achievementRank: AchievementRank): String {
         AchievementRank.GOLD -> "MAX"
     }
 }
+
+fun calcScore(likesCount : Int, picturesTaken: Int): Int{
+    return (likesCount * 15 + picturesTaken * 10).coerceIn(minimumValue = 0, maximumValue = 700000)
+}
