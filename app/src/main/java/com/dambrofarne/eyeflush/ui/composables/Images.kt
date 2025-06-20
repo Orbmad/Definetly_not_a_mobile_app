@@ -288,20 +288,28 @@ fun ImageGrid(
     onToggleLike: (String) -> Unit,
     enabled : Boolean = true
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 120.dp),
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(pictures) { picture ->
-            ImageCard(
-                picture = picture,
-                onClick = onImageClick,
-                onToggleLike = onToggleLike,
-                enabled = enabled
-            )
+    if(pictures.isNotEmpty()){
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 120.dp),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(pictures) { picture ->
+                ImageCard(
+                    picture = picture,
+                    onClick = onImageClick,
+                    onToggleLike = onToggleLike,
+                    enabled = enabled
+                )
+            }
         }
+    }else{
+        Text(
+            text = "No pictures published yet...",
+            modifier = Modifier.padding(8.dp),
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
 

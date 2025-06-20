@@ -57,8 +57,9 @@ fun GamificationScreen(
     when {
         uiState.isLoading -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
+                contentAlignment = Alignment.Center,
             ) {
                 CircularProgressIndicator()
             }
