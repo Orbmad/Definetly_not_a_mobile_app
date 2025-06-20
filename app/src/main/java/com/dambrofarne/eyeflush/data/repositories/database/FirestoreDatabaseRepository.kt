@@ -3,6 +3,7 @@ package com.dambrofarne.eyeflush.data.repositories.database
 import android.util.Log
 import com.dambrofarne.eyeflush.utils.AchievementType
 import com.dambrofarne.eyeflush.utils.calcAchievementRank
+import com.dambrofarne.eyeflush.utils.calcScore
 import com.dambrofarne.eyeflush.utils.getBoundingBox
 import com.dambrofarne.eyeflush.utils.isWithinRange
 import com.google.firebase.Timestamp
@@ -33,9 +34,9 @@ class FirestoreDatabaseRepository(
                 .document(uId)
                 .set(user, SetOptions.merge())
                 .await()
-            Result.success("Username aggiornato correttamente.")
+            Result.success("Username successfully updated")
         } catch (e: Exception) {
-            Log.e("Firestore", "Errore aggiornando username per $uId", e)
+            Log.e("Firestore", "Error while updating r $uId", e)
             Result.failure(e)
         }
     }
@@ -54,9 +55,9 @@ class FirestoreDatabaseRepository(
                 .set(initialUserData)
                 .await()
 
-            Result.success("Utente creato correttamente.")
+            Result.success("User not correctly update")
         } catch (e: Exception) {
-            Log.e("Firestore", "Errore creando documento utente per $uId", e)
+            Log.e("Firestore", "Error while creating user $uId", e)
             Result.failure(e)
         }
     }
@@ -77,10 +78,10 @@ class FirestoreDatabaseRepository(
                 .document(uId)
                 .update("profileImagePath", imagePath)
                 .await()
-            return Result.success("");
+            return Result.success("")
         } catch (e: Exception) {
-            Log.e("UserRepo", "Errore aggiornando immagine profilo per $uId", e)
-            return Result.success(e.message ?: "");
+            Log.e("UserRepo", "Error while updating profile image for $uId", e)
+            return Result.success(e.message ?: "")
         }
     }
 
@@ -93,7 +94,7 @@ class FirestoreDatabaseRepository(
 
             snapshot.getString("profileImagePath") ?: ""
         } catch (e: Exception) {
-            Log.e("UserRepo", "Errore recuperando immagine profilo per $uId", e)
+            Log.e("UserRepo", "Error while getting profile image for $uId", e)
             ""
         }
     }
@@ -107,8 +108,8 @@ class FirestoreDatabaseRepository(
 
             !querySnapshot.isEmpty
         } catch (e: Exception) {
-            Log.e("UserRepo", "Errore controllando se username è già preso: $username", e)
-            false // oppure true se vuoi bloccare in caso di errore
+            Log.e("UserRepo", "Error while checking username usage: $username", e)
+            false
         }
     }
 
@@ -121,7 +122,7 @@ class FirestoreDatabaseRepository(
 
             snapshot.getString("username") ?: ""
         } catch (e: Exception) {
-            Log.e("UserRepo", "Errore recuperando username del profilo per $uId", e)
+            Log.e("UserRepo", "Error while getting profile username for $uId", e)
             ""
         }
     }
@@ -134,7 +135,7 @@ class FirestoreDatabaseRepository(
                 .await()
 
             if (!snapshot.exists()) {
-                return Result.failure(Exception("User con id $uId non trovato"))
+                return Result.failure(Exception("User with id $uId not found"))
             }
 
             val id = snapshot.id
@@ -177,6 +178,10 @@ class FirestoreDatabaseRepository(
                     mostLikedPicturesLvl = userAchievements?.let {
                         calcAchievementRank(AchievementType.FIRST_PLACE, it.mostLikedPictures)
                     },
+                    likesReceived = userAchievements?.mostLikedPictures ?: 0,
+                    score = userAchievements?.let {
+                        calcScore(it.likesReceived, it.picturesTaken)
+                    }?:0
                 )
             )
         } catch (e: Exception) {
@@ -188,7 +193,6 @@ class FirestoreDatabaseRepository(
         return try {
             val db = FirebaseFirestore.getInstance()
 
-            // Calcolo bounding box (min/max lat/lng)
             val boundingBox = getBoundingBox(point.latitude, point.longitude, rangeMeters)
 
             val querySnapshot = db.collection("markers")
@@ -213,7 +217,7 @@ class FirestoreDatabaseRepository(
                 }
             }
         } catch (e: Exception) {
-            Log.e("dbRepo", "Errore recuperando i marker", e)
+            Log.e("dbRepo", "Error while getting markers", e)
             emptyList()
         }
     }
@@ -239,7 +243,7 @@ class FirestoreDatabaseRepository(
             docRef.id
 
         } catch (e: Exception) {
-            Log.e("dbRepo", "Errore aggiungendo marker", e)
+            Log.e("dbRepo", "Error while adding the marker", e)
             ""
         }
     }
@@ -255,7 +259,7 @@ class FirestoreDatabaseRepository(
                 .await()
 
             if (!snapshot.exists()) {
-                return Result.failure(Exception("Marker con id $markerId non trovato"))
+                return Result.failure(Exception("Marker with id $markerId not found"))
             }
 
             val id = snapshot.id
@@ -271,7 +275,7 @@ class FirestoreDatabaseRepository(
             val imagesCount = snapshot.getLong("imagesCount")?.toInt() ?: 0
             val mostLikedPicTimeStamp = snapshot
                 .getTimestamp("mostLikedPicTimeStamp")
-                ?.let { getFormattedImageDate(it) } ?: "Data sconosciuta"
+                ?.let { getFormattedImageDate(it) } ?: "Unknown "
 
             val rawList = snapshot.get("picturesTaken") as? List<*>
             val pictureRefs = rawList?.mapNotNull { item ->
@@ -328,7 +332,6 @@ class FirestoreDatabaseRepository(
             val markerRef = db.collection("markers").document(markerId)
 
             db.runTransaction { transaction ->
-                // Letture
                 val userSnap = transaction.get(userRef)
                 val markerSnap = transaction.get(markerRef)
 
@@ -361,7 +364,6 @@ class FirestoreDatabaseRepository(
 
                 val existingPics = markerSnap.get("picturesTaken") as? List<*>
 
-                // Scritture
                 transaction.set(pictureRef, newPicture)
                 transaction.update(userRef, "picsCount", FieldValue.increment(1))
                 transaction.update(userRef, "picturesTaken", FieldValue.arrayUnion(pictureData))
@@ -390,7 +392,7 @@ class FirestoreDatabaseRepository(
             pictureRef.id
 
         } catch (e: Exception) {
-            Log.e("dbRepo", "Errore nella transazione per aggiungere immagine", e)
+            Log.e("dbRepo", "Error while updating the image", e)
             ""
         }
     }
@@ -404,17 +406,16 @@ class FirestoreDatabaseRepository(
             val imageDocRef = db.collection("pictures").document(picId)
             val imageSnap = imageDocRef.get().await()
 
-            val markerId = imageSnap.getString("markerId") ?: return Result.failure(Exception("Marker ID mancante"))
+            val markerId = imageSnap.getString("markerId") ?: return Result.failure(Exception("Marker ID missing"))
             val markerDocRef = db.collection("markers").document(markerId)
 
-            var liked = false
+            val liked : Boolean
 
             if (snapshot.exists()) {
                 val rawLikes = snapshot.get("likes") as? List<*>
                 val likes = rawLikes?.filterIsInstance<String>()?.toMutableList() ?: mutableListOf()
 
                 if (likes.contains(picId)) {
-                    // Rimuovi like
                     likes.remove(picId)
                     userDocRef.update("likes", likes).await()
                     imageDocRef.update("likes", FieldValue.increment(-1)).await()
@@ -539,15 +540,15 @@ class FirestoreDatabaseRepository(
         }
     }
 
-    private suspend fun getFormattedImageDate(timestamp: Timestamp): String {
+    private fun getFormattedImageDate(timestamp: Timestamp): String {
         return try {
             timestamp.toDate().toInstant()?.let { instant ->
                 val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
                 val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")
                 localDateTime.format(formatter)
-            } ?: "Data non disponibile"
+            } ?: "Unknown"
         } catch (e: Exception) {
-            "Data non disponibile"
+            "Unknown"
         }
     }
 
@@ -562,7 +563,7 @@ class FirestoreDatabaseRepository(
                 return Result.failure(Exception("Picture with id $picId  picId"))
             }
 
-            val id = snapshot.id?:""
+            val id = snapshot.id
             val uId = snapshot.getString("uid")?:""
             val markerId = snapshot.getString("markerId")?:""
             val url = snapshot.getString("url")?:""
@@ -658,11 +659,6 @@ class FirestoreDatabaseRepository(
             val userSnap = userRef.get().await()
 
             val picsCount = userSnap.getLong("picsCount")?.toInt() ?: 0
-
-            val markersSnap = db.collection("markers")
-                .whereEqualTo("mostLikedPicUserId", uId)
-                .get()
-                .await()
 
             val picsSnap = db.collection("pictures")
                 .whereEqualTo("uid", uId)

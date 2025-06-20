@@ -95,7 +95,9 @@ data class User (
     val likesReceivedLvl : AchievementRank? = null,
     val picturesTakenLvl : AchievementRank? = null,
     val markersPhotographedLvl : AchievementRank? = null,
-    val mostLikedPicturesLvl : AchievementRank? = null
+    val mostLikedPicturesLvl : AchievementRank? = null,
+    val likesReceived: Int = 0,
+    val score: Int = 0
 )
 
 data class NotificationItem(
