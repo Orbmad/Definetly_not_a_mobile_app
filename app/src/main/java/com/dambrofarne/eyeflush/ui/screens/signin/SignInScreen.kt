@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -39,8 +40,6 @@ fun SignInScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        UpdatingMessage(uiState.isLoading, text = "Loading...")
         Text("Welcome back ! ", style = MaterialTheme.typography.titleLarge)
 
         Spacer(Modifier.height(16.dp))
@@ -53,7 +52,7 @@ fun SignInScreen(
         )
         ErrorMessage(uiState.emailError)
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(4.dp))
 
         EyeFlushTextField(
             value = uiState.password,
@@ -64,18 +63,19 @@ fun SignInScreen(
             //visualTransformation = PasswordVisualTransformation()
         )
         ErrorMessage(uiState.passwordError)
+        UpdatingMessage(uiState.isLoading, text = "Loading...",  modifier = Modifier.fillMaxWidth() )
 
 
         Spacer(Modifier.height(16.dp))
 
-        CustomStandardButton("Sign In") {
+        CustomStandardButton("SIGN IN") {
             viewModel.signIn(
                 navToHome =  {navController.navigate(EyeFlushRoute.Home) },
                 navToProfileConfig = {navController.navigate((EyeFlushRoute.ProfileConfig()))}
             )
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(8.dp))
 
         SignUpText {
             navController.navigate(EyeFlushRoute.SignUp)

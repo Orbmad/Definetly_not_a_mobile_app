@@ -140,14 +140,14 @@ fun ProfileConfigScreen(
 
                         if(!isFirstConfig){
                             CustomStandardButton(
-                                text = "Edit") {
+                                text = "EDIT") {
                                 viewModel.setUsername {
                                     navController.popBackStack()
                                 }
                             }
                         }else{
                             CustomStandardButton(
-                                text = "Confirm") {
+                                text = "CONFIRM") {
                                 viewModel.setUsername {
                                     navController.navigate(EyeFlushRoute.Home) {
                                     }

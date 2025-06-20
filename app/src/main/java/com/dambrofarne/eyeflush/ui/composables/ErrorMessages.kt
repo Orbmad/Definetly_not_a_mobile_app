@@ -30,7 +30,7 @@ fun ErrorMessage(
             Text(
                 text = message!!,
                 color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
@@ -59,7 +59,7 @@ fun UpdatingMessage(
 
             Text(
                 text = text,
-                style = MaterialTheme.typography.labelMedium
+                style = MaterialTheme.typography.bodyMedium
             )
 
         }
