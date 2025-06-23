@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.zIndex
+// import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.dambrofarne.eyeflush.R
@@ -104,7 +104,7 @@ fun HomeMapScreen(
             // Retrieve initial position
             val initialLocation = viewModel.locationManager.getCurrentLocation()
             initialLocation?.let {
-                Log.w("HomeMapScreen", "Initial location acquired")
+                //Log.w("HomeMapScreen", "Initial location acquired")
                 viewModel.updateCurrentLocation(it)
                 lastLocation = it
                 mapView?.controller?.animateTo(it)
@@ -115,7 +115,7 @@ fun HomeMapScreen(
             viewModel.locationManager.startLocationUpdates { geoPoint ->
                 viewModel.updateCurrentLocation(geoPoint)
                 mapView?.invalidate()
-                Log.w("HomeMapScreen", "Routine location update")
+                //Log.w("HomeMapScreen", "Routine location update")
             }
         }
     }
@@ -211,14 +211,14 @@ fun HomeMapScreen(
                                 override fun onScroll(event: ScrollEvent?): Boolean {
                                     userHasMovedMap = true
                                     lastUserInteractionTime = System.currentTimeMillis()
-                                    Log.d("HomeMapScreen", "User scrolled map")
+                                    //Log.d("HomeMapScreen", "User scrolled map")
                                     return false
                                 }
 
                                 override fun onZoom(event: ZoomEvent?): Boolean {
                                     userHasMovedMap = true
                                     lastUserInteractionTime = System.currentTimeMillis()
-                                    Log.d("HomeMapScreen", "User zoomed map")
+                                    //Log.d("HomeMapScreen", "User zoomed map")
                                     return false
                                 }
                             })
@@ -229,16 +229,16 @@ fun HomeMapScreen(
                     mapView = map
                 }
 
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .align(Alignment.TopCenter)
-                        .zIndex(1f),
-                    text = currentLocation?.let {
-                        "Lat: ${it.latitude}\nLong: ${it.longitude}"
-                    } ?: "Position unavailable"
-                )
+//                Text(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(16.dp)
+//                        .align(Alignment.TopCenter)
+//                        .zIndex(1f),
+//                    text = currentLocation?.let {
+//                        "Lat: ${it.latitude}\nLong: ${it.longitude}"
+//                    } ?: "Position unavailable"
+//                )
 
                 // Reposition Button
                 FloatingActionButton(

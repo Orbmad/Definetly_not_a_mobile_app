@@ -47,9 +47,9 @@ class HomeMapViewModel(
         viewModelScope.launch {
             currentLocation
                 .filterNotNull()
-                .sample(2000L) // throttle: max una posizione ogni 2 secondi
+                .sample(2000L) // throttle: max every 2 seconds
                 .distinctUntilChanged { old, new ->
-                    old.distanceToAsFloat(new) < 4f // considera "uguali" se distanti meno di 4m
+                    old.distanceToAsFloat(new) < 4f // equal if less
                 }
                 .flowOn(Dispatchers.Default)
                 .collect { location ->
@@ -68,28 +68,28 @@ class HomeMapViewModel(
         }
     }
 
-    fun createDummyMarkers() {
-        viewModelScope.launch {
-            val dummyMarkers = listOf(
-                PolaroidMarker(
-                    id = "1",
-                    position = GeoPoint(44.1482, 12.2356),
-                    photoFrame = createDummyDrawable(Color.RED)
-                ),
-                PolaroidMarker(
-                    id = "2",
-                    position = GeoPoint(44.1464, 12.2374),
-                    photoFrame = createDummyDrawable(Color.BLUE)
-                ),
-                PolaroidMarker(
-                    id = "3",
-                    position = GeoPoint(44.1480, 12.2330),
-                    photoFrame = createDummyDrawable(Color.GREEN)
-                )
-            )
-            _polaroidMarkers.value = dummyMarkers
-        }
-    }
+//    fun createDummyMarkers() {
+//        viewModelScope.launch {
+//            val dummyMarkers = listOf(
+//                PolaroidMarker(
+//                    id = "1",
+//                    position = GeoPoint(44.1482, 12.2356),
+//                    photoFrame = createDummyDrawable(Color.RED)
+//                ),
+//                PolaroidMarker(
+//                    id = "2",
+//                    position = GeoPoint(44.1464, 12.2374),
+//                    photoFrame = createDummyDrawable(Color.BLUE)
+//                ),
+//                PolaroidMarker(
+//                    id = "3",
+//                    position = GeoPoint(44.1480, 12.2330),
+//                    photoFrame = createDummyDrawable(Color.GREEN)
+//                )
+//            )
+//            _polaroidMarkers.value = dummyMarkers
+//        }
+//    }
 
     private suspend fun createPolaroidMarkersFromMarkers(markerList: List<Marker>): List<PolaroidMarker> {
         return markerList.map { marker ->
@@ -98,8 +98,6 @@ class HomeMapViewModel(
                 position = marker.coordinates,
                 photoFrame = createPhotoFrame(marker.mostLikedPicURL),
                 photoCount = marker.imagesCount,
-                name = marker.name,
-                mostLikedPicID = marker.mostLikedPicId
             )
         }
     }
