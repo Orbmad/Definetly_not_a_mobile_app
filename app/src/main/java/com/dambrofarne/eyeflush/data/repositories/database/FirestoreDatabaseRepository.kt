@@ -66,7 +66,8 @@ class FirestoreDatabaseRepository(
     override suspend fun isUser(uId: String): Boolean {
         return try {
             val doc = db.collection("users").document(uId).get().await()
-            doc.exists()
+            val username = doc.getString("username")
+            doc.exists() && !username.isNullOrBlank()
         } catch (e: Exception) {
             false
         }
