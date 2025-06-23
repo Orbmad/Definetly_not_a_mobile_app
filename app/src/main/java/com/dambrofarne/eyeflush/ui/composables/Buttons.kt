@@ -68,8 +68,8 @@ fun CustomStandardButton(
 fun SignUpText(onClick: () -> Unit) {
     Text(
         text = "Don't have an account ? Sign up",
-        color = MaterialTheme.colorScheme.primary,
-        fontSize = 14.sp,
+        color = MaterialTheme.colorScheme.onBackground,
+        style = MaterialTheme.typography.bodyMedium,
         modifier = Modifier
             .padding(top = 16.dp)
             .clickable(onClick = onClick)
@@ -81,24 +81,12 @@ fun SignInText(onClick: () -> Unit) {
     Text(
         text = "Already have an account ? Sign in",
         color = MaterialTheme.colorScheme.onBackground ,
-        fontSize = 14.sp,
+        style = MaterialTheme.typography.bodyMedium,
         modifier = Modifier
             .padding(top = 16.dp)
             .clickable(onClick = onClick)
     )
 }
-
-//@Composable
-//fun SignOutText(onClick: () -> Unit) {
-//    Text(
-//        text = "Log out ...",
-//        color = MaterialTheme.colorScheme.onBackground ,
-//        fontSize = 14.sp,
-//        modifier = Modifier
-//            .padding(top = 16.dp)
-//            .clickable(onClick = onClick)
-//    )
-//}
 
 // Camera button
 @Composable
@@ -120,45 +108,6 @@ fun CameraButton(
         )
     }
 }
-
-//@Composable
-//fun ProfileIcon(onClick: () -> Unit, modifier: Modifier = Modifier) {
-//    IconButton(
-//        onClick = onClick,
-//        colors = IconButtonDefaults.iconButtonColors(
-//            containerColor = MaterialTheme.colorScheme.primaryContainer,
-//            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-//        ),
-//        modifier = modifier
-//    ) {
-//        IconImage(
-//            image = ACCOUNT_ICON
-//        )
-//    }
-//}
-
-
-
-//@Composable
-//fun SettingsButton(
-//    onClick: () -> Unit,
-//    modifier: Modifier = Modifier
-//) {
-//    IconButton(
-//        onClick = onClick,
-//        modifier = modifier,
-//        colors = IconButtonDefaults.iconButtonColors(
-//            containerColor = MaterialTheme.colorScheme.primaryContainer,
-//            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-//        )
-//    ) {
-//        Icon(
-//            Icons.Filled.Settings,
-//            contentDescription = "Back",
-//            tint = MaterialTheme.colorScheme.onPrimaryContainer
-//        )
-//    }
-//}
 
 val radioButtonRowHeight = 24.dp
 @Composable
@@ -272,7 +221,7 @@ fun IconButton(
                 tint = iconTint,
                 modifier = Modifier
                     .padding(8.dp)
-                    .fillMaxSize()
+                    .fillMaxSize(),
             )
         }
     }

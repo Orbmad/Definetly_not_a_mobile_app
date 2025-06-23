@@ -52,14 +52,15 @@ fun UpdatingMessage(
         if (isUpdating) {
             CircularProgressIndicator(
                 modifier = Modifier
-                    .size(16.dp)
+                    .size(24.dp)
                     .padding(end = 8.dp),
                 strokeWidth = 2.dp
             )
 
             Text(
                 text = text,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground,
             )
 
         }
