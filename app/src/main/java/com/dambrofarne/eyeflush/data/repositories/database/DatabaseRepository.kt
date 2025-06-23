@@ -1,7 +1,5 @@
 package com.dambrofarne.eyeflush.data.repositories.database
 
-import com.dambrofarne.eyeflush.ui.EyeFlushRoute
-import com.google.firebase.Timestamp
 import org.osmdroid.util.GeoPoint
 import java.time.LocalDateTime
 

@@ -57,7 +57,7 @@ class CameraViewModel (
 
     private fun associateMarkerToPhoto(photoLocation: GeoPoint?): String? {
         if (photoLocation != null) {
-            val radiusRangeInMeters = 50
+            val radiusRangeInMeters = 25 // Markers distance
             val markersList = runBlocking {
                 db.getMarkersInRange(photoLocation, radiusRangeInMeters)
             }

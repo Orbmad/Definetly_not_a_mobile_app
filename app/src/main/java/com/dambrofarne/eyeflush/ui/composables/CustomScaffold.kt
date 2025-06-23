@@ -2,12 +2,8 @@ package com.dambrofarne.eyeflush.ui.composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
@@ -19,13 +15,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cyclone
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
@@ -38,7 +31,6 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -46,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -199,7 +190,7 @@ fun CenteredTitleTopAppBar(
         // Back arrow
         if (showBackButton) {
             Icon(
-                imageVector = Icons.Default.ArrowBack,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
                 tint = contentColor,
                 modifier = Modifier
@@ -255,71 +246,6 @@ fun BackButton(
                 contentDescription = "Back",
                 tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
-        }
-    }
-}
-
-@Composable
-fun CustomTopBar(
-    title: String = "",
-    modifier: Modifier = Modifier,
-    navigationIcon: (@Composable () -> Unit)? = null,
-    actions: (@Composable RowScope.() -> Unit)? = null,
-    backgroundColor: Color = MaterialTheme.colorScheme.background,
-    contentColor: Color = MaterialTheme.colorScheme.onBackground
-) {
-    val height = 64.dp
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = backgroundColor,
-        contentColor = contentColor,
-        shadowElevation = 4.dp
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(72.dp)
-                .padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Navigation icon (es. back button)
-            Box(
-                modifier = Modifier
-                    .height(height) // touch target
-                    .width(50.dp),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                navigationIcon?.invoke() ?: Spacer(
-                    modifier = Modifier.width(48.dp)
-                )
-            }
-
-            // Centered title
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(48.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleLarge,
-                    maxLines = 1,
-                    textAlign = TextAlign.Center
-                )
-            }
-
-            // Action icons
-            Row(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .height(height), // same height of navigation icon
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.End
-            ) {
-                actions?.invoke(this)
-            }
         }
     }
 }

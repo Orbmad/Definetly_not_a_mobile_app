@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.os.Build
 import android.util.Log
-import android.util.Size
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -15,7 +14,6 @@ import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleOwner
 import com.dambrofarne.eyeflush.utils.cropRelativeToOverlay
-import com.dambrofarne.eyeflush.utils.cropToCenterAspectRatio
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,7 +38,6 @@ class CameraManagerImpl(private val context: Context) : CameraManager {
 
     companion object {
         private const val TAG = "CameraManager"
-        private const val TARGET_ASPECT_RATIO = 4f / 5f // width / height
         private const val JPEG_QUALITY = 95
     }
 
@@ -58,7 +55,7 @@ class CameraManagerImpl(private val context: Context) : CameraManager {
                 cameraProvider = cameraProviderFuture.get()
                 startCamera(previewView, lifecycleOwner)
                 _cameraState.value = CameraState.READY
-                Log.d(TAG, "Camera initialized successfully")
+                //Log.d(TAG, "Camera initialized successfully")
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to initialize camera", e)
                 _cameraState.value = CameraState.ERROR
@@ -66,6 +63,7 @@ class CameraManagerImpl(private val context: Context) : CameraManager {
         }, executor)
     }
 
+    @Suppress("DEPRECATION")
     private fun startCamera(previewView: PreviewView, lifecycleOwner: LifecycleOwner) {
         try {
             val targetRotation = previewView.display.rotation
@@ -73,7 +71,7 @@ class CameraManagerImpl(private val context: Context) : CameraManager {
             val preview = Preview.Builder()
                 .setTargetRotation(targetRotation)
                 .build()
-                .also { it.setSurfaceProvider(previewView.surfaceProvider) }
+                .also { it.surfaceProvider = previewView.surfaceProvider }
 
             imageCapture = ImageCapture.Builder()
                 .setTargetRotation(targetRotation)
@@ -175,7 +173,7 @@ class CameraManagerImpl(private val context: Context) : CameraManager {
             when {
                 isEmulator -> {
                     Log.d(TAG, "Running on emulator, applying manual 90° rotation")
-                    matrix.postRotate(90f) // oppure 270f se l'immagine è capovolta
+                    matrix.postRotate(90f)
                 }
                 orientation == ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
                 orientation == ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)

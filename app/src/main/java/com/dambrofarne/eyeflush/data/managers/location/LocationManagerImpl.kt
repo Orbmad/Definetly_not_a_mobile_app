@@ -26,7 +26,7 @@ class LocationManagerImpl(private val context: Context) : LocationManager {
     override fun startLocationUpdates(onLocationUpdate: (GeoPoint) -> Unit) {
         val provider = AndroidLocationManager.GPS_PROVIDER
         if (hasLocationPermission() && locationManager.isProviderEnabled(provider)) {
-            // Rimuovi listener precedente se presente
+
             locationListener?.let {
                 locationManager.removeUpdates(it)
             }
@@ -42,22 +42,22 @@ class LocationManagerImpl(private val context: Context) : LocationManager {
                 override fun onProviderDisabled(provider: String) {}
             }
 
-            // minTime = 2000ms, minDistance = 0f per aggiornamenti ogni 2 secondi anche senza spostamenti
+            // minTime = 2000ms, minDistance = 0f
             locationManager.requestLocationUpdates(
                 provider,
                 2000L,
-                0f,
+                0.5f,
                 locationListener!!
             )
         }
     }
 
-    fun stopLocationUpdates() {
-        locationListener?.let {
-            locationManager.removeUpdates(it)
-            locationListener = null
-        }
-    }
+//    fun stopLocationUpdates() {
+//        locationListener?.let {
+//            locationManager.removeUpdates(it)
+//            locationListener = null
+//        }
+//    }
 
     override suspend fun getCurrentLocation(): GeoPoint? {
         return withContext(Dispatchers.Main) {

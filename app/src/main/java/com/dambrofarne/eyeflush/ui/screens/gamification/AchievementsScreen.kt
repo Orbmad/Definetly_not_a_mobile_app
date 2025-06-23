@@ -54,29 +54,29 @@ fun GamificationScreen(
         viewModel.loadUserAchievements()
     }
 
-    when {
-        uiState.isLoading -> {
-            Box(
-                modifier = Modifier.fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator()
-            }
-        }
+    CustomScaffold(
+        title = "Achievements",
+        showBackButton = false,
+        navController = navController,
+        currentScreen = NavScreen.GAME,
+        content = {
+            when {
+                uiState.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
 
-        else -> {
-            CustomScaffold(
-                title = "Achievements",
-                showBackButton = false,
-                navController = navController,
-                currentScreen = NavScreen.GAME,
-                content = {
+                else -> {
                     AchievementScreen(uiState)
                 }
-            )
+            }
         }
-    }
+    )
 
 }
 
@@ -168,31 +168,13 @@ fun AchievementItem(title: String, maxPoints: Int, actualPoints: Int, iconId: In
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-//                LinearProgressIndicator(
-//                    progress = { actualPoints.toFloat() / maxPoints },
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .height(20.dp)
-//                        .clip(RoundedCornerShape(2.dp)),
-//                    strokeCap = StrokeCap.Butt
-//                )
-//                Text(
-//                    text = "$actualPoints / $maxPoints",
-//                    style = MaterialTheme.typography.bodySmall,
-//                    modifier = Modifier.align(Alignment.End)
-//                )
+
                 CustomAchievementProgressBarWithText(
                     current = actualPoints,
                     goal = maxPoints
                 )
             }
-//            Icon(
-//                imageVector = icon,
-//                contentDescription = title,
-//                modifier = Modifier
-//                    .size(46.dp)
-//                    .padding(start = 10.dp)
-//            )
+
             Image(
                 painter = painterResource(iconId),
                 contentDescription = "badge",
