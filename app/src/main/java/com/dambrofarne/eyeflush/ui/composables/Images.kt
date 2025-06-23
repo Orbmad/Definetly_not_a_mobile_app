@@ -1,6 +1,5 @@
 package com.dambrofarne.eyeflush.ui.composables
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -81,40 +80,6 @@ fun ProfileImage(
             .border(borderSize, borderColor, borderShape)
     )
 }
-
-@Composable
-fun IconImage(
-    image: Any,
-    modifier: Modifier = Modifier,
-    size: Dp = 50.dp,
-    borderSize: Dp = 1.dp,
-    borderShape: Shape = RoundedCornerShape(8.dp),
-    borderColor: Color = Color.Gray
-) {
-    val context = LocalContext.current
-    val request = when (image) {
-        is String -> ImageRequest.Builder(context)
-            .data(image)
-            .crossfade(true)
-            .build()
-        is Int -> ImageRequest.Builder(context)
-            .data(image)
-            .build()
-        else -> throw IllegalArgumentException("Unsupported image type")
-    }
-
-    AsyncImage(
-        model = request,
-        contentDescription = "Icon image",
-        contentScale = ContentScale.Fit,
-        modifier = modifier
-            .size(size)
-            .clip(borderShape)
-            .border(borderSize, borderColor, borderShape)
-    )
-}
-
-
 
 @Composable
 fun ChoiceProfileImage(
@@ -198,8 +163,6 @@ fun ImageCardSimplified(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
-    var liked by remember(picture.picId, picture.liked) { mutableStateOf(picture.liked) }
-
     Card(
         onClick = { if (enabled) onClick(picture.picId) },
         modifier = modifier
@@ -216,67 +179,6 @@ fun ImageCardSimplified(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
-        }
-    }
-}
-
-@Composable
-fun ImageCardSimple(
-    picId: String,
-    url: String,
-    likes: Int,
-    liked: Boolean,
-    onClick: (String) -> Unit,
-    onToggleLike: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true
-) {
-    var localLiked by remember(picId, liked) { mutableStateOf(liked) }
-    var localLikes by remember(picId, likes) { mutableIntStateOf(likes) }
-
-    Card(
-        onClick = { if (enabled) onClick(picId) },
-        modifier = modifier
-            .padding(8.dp)
-            .aspectRatio(0.8f)
-            .sizeIn(maxWidth = 120.dp, maxHeight = 150.dp)
-            .shadow(elevation = 8.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        shape = RectangleShape,
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            AsyncImage(
-                model = url,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-
-            Row(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .clickable(enabled = enabled) {
-                        localLiked = !localLiked
-                        localLikes += if (localLiked) 1 else -1
-                        onToggleLike(picId)
-                    }
-                    .padding(6.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    imageVector = if (localLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    contentDescription = null,
-                    tint = if (localLiked) Color.Red else Color.White,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = "$localLikes",
-                    color = Color.White,
-                    fontSize = 18.sp
-                )
-            }
         }
     }
 }

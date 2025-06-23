@@ -24,16 +24,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.dambrofarne.eyeflush.R
 
 @Composable
-fun StandardHeadline(text : String){
-    Text(text, style = MaterialTheme.typography.headlineMedium)
-}
-
-@Composable
-fun StandardText(text: String){
-    Text(text, style = MaterialTheme.typography.headlineSmall)
-}
-
-@Composable
 fun PageTitle(text: String) {
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
@@ -50,14 +40,6 @@ fun PageTitle(text: String) {
             modifier = Modifier.align(Alignment.Center)
         )
     }
-}
-
-@Composable
-fun ImageLabel(text: String){
-    Text(
-        text = text,
-        style = MaterialTheme.typography.bodyMedium
-    )
 }
 
 @Composable
