@@ -15,15 +15,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
@@ -38,7 +35,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.dambrofarne.eyeflush.data.constants.IconPaths.ACCOUNT_ICON
 import com.dambrofarne.eyeflush.ui.theme.ThemePreference
 
 @Composable
@@ -92,17 +88,17 @@ fun SignInText(onClick: () -> Unit) {
     )
 }
 
-@Composable
-fun SignOutText(onClick: () -> Unit) {
-    Text(
-        text = "Log out ...",
-        color = MaterialTheme.colorScheme.onBackground ,
-        fontSize = 14.sp,
-        modifier = Modifier
-            .padding(top = 16.dp)
-            .clickable(onClick = onClick)
-    )
-}
+//@Composable
+//fun SignOutText(onClick: () -> Unit) {
+//    Text(
+//        text = "Log out ...",
+//        color = MaterialTheme.colorScheme.onBackground ,
+//        fontSize = 14.sp,
+//        modifier = Modifier
+//            .padding(top = 16.dp)
+//            .clickable(onClick = onClick)
+//    )
+//}
 
 // Camera button
 @Composable
@@ -125,44 +121,44 @@ fun CameraButton(
     }
 }
 
-@Composable
-fun ProfileIcon(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    IconButton(
-        onClick = onClick,
-        colors = IconButtonDefaults.iconButtonColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-        ),
-        modifier = modifier
-    ) {
-        IconImage(
-            image = ACCOUNT_ICON
-        )
-    }
-}
+//@Composable
+//fun ProfileIcon(onClick: () -> Unit, modifier: Modifier = Modifier) {
+//    IconButton(
+//        onClick = onClick,
+//        colors = IconButtonDefaults.iconButtonColors(
+//            containerColor = MaterialTheme.colorScheme.primaryContainer,
+//            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+//        ),
+//        modifier = modifier
+//    ) {
+//        IconImage(
+//            image = ACCOUNT_ICON
+//        )
+//    }
+//}
 
 
 
-@Composable
-fun SettingsButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    IconButton(
-        onClick = onClick,
-        modifier = modifier,
-        colors = IconButtonDefaults.iconButtonColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-        )
-    ) {
-        Icon(
-            Icons.Filled.Settings,
-            contentDescription = "Back",
-            tint = MaterialTheme.colorScheme.onPrimaryContainer
-        )
-    }
-}
+//@Composable
+//fun SettingsButton(
+//    onClick: () -> Unit,
+//    modifier: Modifier = Modifier
+//) {
+//    IconButton(
+//        onClick = onClick,
+//        modifier = modifier,
+//        colors = IconButtonDefaults.iconButtonColors(
+//            containerColor = MaterialTheme.colorScheme.primaryContainer,
+//            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+//        )
+//    ) {
+//        Icon(
+//            Icons.Filled.Settings,
+//            contentDescription = "Back",
+//            tint = MaterialTheme.colorScheme.onPrimaryContainer
+//        )
+//    }
+//}
 
 val radioButtonRowHeight = 24.dp
 @Composable
