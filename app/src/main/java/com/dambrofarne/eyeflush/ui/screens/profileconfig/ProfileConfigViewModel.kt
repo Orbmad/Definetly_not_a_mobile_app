@@ -118,7 +118,7 @@ class ProfileConfigViewModel(
                     usernameError = "Username unavailable, somebody already has it"
                 )
             } else {
-                db.addUser(userId, username)
+                db.changeUsername(userId, username)
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,

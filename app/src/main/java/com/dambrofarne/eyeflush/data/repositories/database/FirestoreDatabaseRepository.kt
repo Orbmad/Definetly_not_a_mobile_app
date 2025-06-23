@@ -24,22 +24,35 @@ import java.util.Locale
 class FirestoreDatabaseRepository(
     private val db: FirebaseFirestore = Firebase.firestore
 ) : DatabaseRepository {
-    override suspend fun addUser(uId: String, username: String): Result<String> {
-        val user = hashMapOf(
-            "username" to username,
-            "picsCount" to 0
-        )
+    override suspend fun changeUsername(uId: String, newUsername: String): Result<String> {
+        val userUpdate = mapOf("username" to newUsername)
+
         return try {
             db.collection("users")
                 .document(uId)
-                .set(user, SetOptions.merge())
+                .set(userUpdate, SetOptions.merge())
                 .await()
-            Result.success("Username successfully updated")
+
+            val picturesQuery = db.collection("pictures")
+                .whereEqualTo("uid", uId)
+                .get()
+                .await()
+
+            for (doc in picturesQuery.documents) {
+                db.collection("pictures")
+                    .document(doc.id)
+                    .update("authorUsername", newUsername)
+                    .await()
+            }
+
+            Result.success("Username changed successfully")
+
         } catch (e: Exception) {
-            Log.e("Firestore", "Error while updating r $uId", e)
+            Log.e("Firestore", "Error changing username for user $uId", e)
             Result.failure(e)
         }
     }
+
 
 
     override suspend fun addUser(uId: String): Result<String> {
@@ -55,7 +68,7 @@ class FirestoreDatabaseRepository(
                 .set(initialUserData)
                 .await()
 
-            Result.success("User not correctly update")
+            Result.success("User not correctly updated")
         } catch (e: Exception) {
             Log.e("Firestore", "Error while creating user $uId", e)
             Result.failure(e)
