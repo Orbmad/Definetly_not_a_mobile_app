@@ -69,17 +69,24 @@ fun ProfileImage(
         .error(R.drawable.user_image_placeholder)
         .build()
 
-    AsyncImage(
-        model = request,
-        contentDescription = "Profile image",
-        contentScale = ContentScale.Crop,
+    Box(
         modifier = Modifier
             .size(size)
-            .shadow(elevation = 10.dp, shape = borderShape, clip = false)
             .clip(borderShape)
+            .background(Color.White)
+            .shadow(elevation = 10.dp, shape = borderShape, clip = true)
             .border(borderSize, borderColor, borderShape)
-    )
+    ) {
+        AsyncImage(
+            model = request,
+            contentDescription = "Profile image",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxSize()
+        )
+    }
 }
+
 
 @Composable
 fun ChoiceProfileImage(

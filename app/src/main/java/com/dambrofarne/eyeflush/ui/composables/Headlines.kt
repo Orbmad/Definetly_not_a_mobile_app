@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
@@ -72,14 +73,15 @@ fun UserProfileRow(
         Image(
             painter = painter,
             contentDescription = "User Profile",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(32.dp)
-                .clip(RoundedCornerShape(50))
                 .shadow(
                     elevation = 8.dp,
                     shape = RoundedCornerShape(50),
-                    clip = false
+                    clip = true
                 )
+                .clip(RoundedCornerShape(50))
         )
             Spacer(modifier = Modifier.width(8.dp))
 
