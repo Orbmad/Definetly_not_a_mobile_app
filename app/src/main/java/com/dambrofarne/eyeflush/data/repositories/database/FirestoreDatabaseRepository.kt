@@ -87,15 +87,28 @@ class FirestoreDatabaseRepository(
     }
 
     override suspend fun changeProfileImage(uId: String, imagePath: String): Result<String> {
-        try {
+        return try {
             db.collection("users")
                 .document(uId)
                 .update("profileImagePath", imagePath)
                 .await()
-            return Result.success("")
+
+            val pictures = db.collection("pictures")
+                .whereEqualTo("uid", uId)
+                .get()
+                .await()
+
+            for (doc in pictures.documents) {
+                db.collection("pictures")
+                    .document(doc.id)
+                    .update("authorImageUrl", imagePath)
+                    .await()
+            }
+
+            Result.success("Profile image updated successfully")
         } catch (e: Exception) {
             Log.e("UserRepo", "Error while updating profile image for $uId", e)
-            return Result.success(e.message ?: "")
+            Result.failure(e)
         }
     }
 
