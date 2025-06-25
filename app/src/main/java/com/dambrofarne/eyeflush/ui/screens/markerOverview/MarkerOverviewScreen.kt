@@ -160,6 +160,7 @@ fun MarkerOverviewScreen(
         showBackButton = true,
         navController = navController,
         currentScreen = null,
+        newNotification = viewModel.checkNotifications(),
         content = {
             when {
                 uiState.isLoading -> {

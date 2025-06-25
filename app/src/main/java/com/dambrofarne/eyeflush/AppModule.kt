@@ -46,7 +46,7 @@ val appModule = module {
     viewModel { SignUpViewModel(get(), get()) }
     viewModel { SplashViewModel(get(), get()) }
     viewModel { ProfileConfigViewModel(get(), get(), get()) }
-    viewModel { HomeMapViewModel(get(), get(), get()) }
+    viewModel { HomeMapViewModel(get(), get(), get(), get()) }
     viewModel { ProfileViewModel(get(), get()) }
     viewModel { CameraViewModel(get(), get(), get(), get(), get()) }
     viewModel { MarkerOverviewViewModel(get(), get()) }

@@ -45,7 +45,9 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -58,8 +60,11 @@ fun NotificationScreen(
 
     val readNotifications = remember { mutableStateListOf<String>() }
 
+    var newNotifications by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         viewModel.loadNotifications()
+        newNotifications = viewModel.checkNotifications()
     }
 
     CustomScaffold(
@@ -67,6 +72,7 @@ fun NotificationScreen(
         showBackButton = false,
         navController = navController,
         currentScreen = NavScreen.NOTIFICATIONS,
+        newNotification = newNotifications,
         content = {
             when {
                 uiState.isLoading -> {
@@ -113,6 +119,7 @@ fun NotificationScreen(
                                             viewModel.deleteNotification(notification.id)
                                         }
                                     }
+                                    newNotifications = viewModel.checkNotifications()
                                 }
 
                                 SwipeToDismiss(

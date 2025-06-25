@@ -7,6 +7,7 @@ import com.dambrofarne.eyeflush.data.repositories.database.UserAchievements
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.runBlocking
 
 data class AchievementUiState(
     val isLoading: Boolean = true,
@@ -45,6 +46,16 @@ class GamificationViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AchievementUiState())
     val uiState: StateFlow<AchievementUiState> = _uiState
+
+    fun checkNotifications(): Boolean {
+        val uId = auth.getCurrentUserId()
+        if (uId != null) {
+            return runBlocking {
+                db.hasUnreadNotifications(uId)
+            }
+        }
+        return false
+    }
 
     suspend fun loadUserAchievements() {
         val userId = auth.getCurrentUserId()

@@ -11,16 +11,19 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dambrofarne.eyeflush.data.managers.location.LocationManager
+import com.dambrofarne.eyeflush.data.repositories.auth.AuthRepository
 import com.dambrofarne.eyeflush.data.repositories.database.DatabaseRepository
 import com.dambrofarne.eyeflush.data.repositories.database.Marker
 import com.dambrofarne.eyeflush.data.repositories.imagestoring.ImageStoringRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.osmdroid.util.GeoPoint
 
 class HomeMapViewModel(
     private val db: DatabaseRepository,
+    private val auth: AuthRepository,
     private val imgRepo: ImageStoringRepository,
     val locationManager: LocationManager
 ) : ViewModel() {
@@ -36,6 +39,16 @@ class HomeMapViewModel(
 
     init {
         observeLocationUpdates()
+    }
+
+    fun checkNotifications(): Boolean {
+        val uId = auth.getCurrentUserId()
+        if (uId != null) {
+            return runBlocking {
+                db.hasUnreadNotifications(uId)
+            }
+        }
+        return false
     }
 
     fun updateCurrentLocation(location: GeoPoint) {

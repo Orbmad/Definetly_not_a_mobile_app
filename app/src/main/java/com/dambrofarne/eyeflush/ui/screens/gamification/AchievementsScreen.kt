@@ -59,6 +59,7 @@ fun GamificationScreen(
         showBackButton = false,
         navController = navController,
         currentScreen = NavScreen.GAME,
+        newNotification = viewModel.checkNotifications(),
         content = {
             when {
                 uiState.isLoading -> {

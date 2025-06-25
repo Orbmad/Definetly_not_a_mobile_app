@@ -193,6 +193,7 @@ fun HomeMapScreen(
         showBackButton = false,
         navController = navController,
         currentScreen = NavScreen.HOME,
+        newNotification = viewModel.checkNotifications(),
         content = {
             Box(modifier = Modifier.fillMaxSize()) {
 

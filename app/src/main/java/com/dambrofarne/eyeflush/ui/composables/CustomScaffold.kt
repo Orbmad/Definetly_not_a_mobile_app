@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cyclone
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.NotificationImportant
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
@@ -56,7 +57,8 @@ fun CustomScaffold(
     showBackButton: Boolean,
     navController: NavHostController,
     content: @Composable () -> Unit,
-    currentScreen: NavScreen?
+    currentScreen: NavScreen?,
+    newNotification: Boolean = false
 ) {
     Scaffold(
         modifier = Modifier
@@ -137,7 +139,7 @@ fun CustomScaffold(
                     NavigationBarItem(
                         icon = {
                             Icon(
-                                imageVector = Icons.Default.Notifications,
+                                imageVector = if (newNotification) Icons.Default.NotificationImportant else Icons.Default.Notifications,
                                 contentDescription = "Notifications",
                                 tint = iconColor,
                                 modifier = Modifier.size(iconSize)
