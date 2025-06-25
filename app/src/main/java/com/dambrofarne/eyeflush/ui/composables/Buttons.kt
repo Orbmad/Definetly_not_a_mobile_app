@@ -40,6 +40,7 @@ import com.dambrofarne.eyeflush.ui.theme.ThemePreference
 @Composable
 fun CustomStandardButton(
     text: String = "Sign in",
+    modifier: Modifier = Modifier,
     onClickFun: () -> Unit = {}
 ){
     Button(
@@ -48,7 +49,7 @@ fun CustomStandardButton(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
         ),
-        modifier = Modifier
+        modifier = modifier
             .height(60.dp),
         elevation = ButtonDefaults.buttonElevation(
             defaultElevation = 6.dp,

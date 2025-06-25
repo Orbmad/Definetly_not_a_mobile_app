@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -102,6 +103,7 @@ fun ProfileConfigScreen(
                 Box(
                     modifier = Modifier
                         .size(imageSize + boxPadding * 2)
+                        //.align(Alignment.CenterHorizontally)
                 ) {
                     ChoiceProfileImage(
                         url = uiState.profileImageUrl,
@@ -122,35 +124,35 @@ fun ProfileConfigScreen(
                 Column {
                     Row(
                         verticalAlignment = Alignment.Bottom,
-                        horizontalArrangement = Arrangement.Absolute.Left
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp)
                     ){
                         EyeFlushTextField(
                             value = uiState.username,
                             onValueChange = viewModel::onUsernameChange,
                             label = "Username",
-                            width = 240.dp,
                             height = 70.dp,
                             placeholder = uiState.username,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(end = 0.dp)
                         )
 
-                        Spacer(
-                            Modifier.width(16.dp)
-                        )
-
-                        if(!isFirstConfig){
-                            CustomStandardButton(
-                                text = "EDIT") {
-                                viewModel.setUsername {
+                        CustomStandardButton(
+                            text = if (!isFirstConfig) "EDIT" else "CONFIRM",
+                            modifier = Modifier
+                                .padding(horizontal = 22.dp)
+                                .fillMaxWidth()
+                                .weight(1f)
+                        ) {
+                            viewModel.setUsername {
+                                if (!isFirstConfig) {
                                     navController.popBackStack()
-                                }
-                            }
-                        }else{
-                            CustomStandardButton(
-                                text = "CONFIRM") {
-                                viewModel.setUsername {
-                                    navController.navigate(EyeFlushRoute.Home) {
-                                    }
+                                } else {
+                                    navController.navigate(EyeFlushRoute.Home)
                                 }
                             }
                         }
@@ -173,7 +175,7 @@ fun ProfileConfigScreen(
                     Spacer(Modifier.height(24.dp))
 
                     CustomStandardButton(
-                        text = "Sign out",
+                        text = "SIGN OUT",
                         onClickFun = {
                             viewModel.signOut()
                             navController.navigate(EyeFlushRoute.SignIn) {
