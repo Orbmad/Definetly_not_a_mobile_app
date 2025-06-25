@@ -1,5 +1,6 @@
 package com.dambrofarne.eyeflush.ui.screens.markerOverview
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -68,8 +69,14 @@ fun MarkerOverviewScreen(
         onImageClick: (String) -> Unit,
         enabled: Boolean
     ) {
-        var localLike by remember(picInfo.liked) { mutableStateOf(picInfo.liked) }
-        var localLikeCount by remember(picInfo.likes, picInfo.liked) { mutableIntStateOf(picInfo.likes) }
+        var localLike by remember(picInfo.picId) { mutableStateOf(picInfo.liked) }
+        var localLikeCount by remember(picInfo.picId) { mutableIntStateOf(picInfo.likes) }
+
+        // Sync with new data
+        LaunchedEffect(picInfo.liked, picInfo.likes) {
+            localLike = picInfo.liked
+            localLikeCount = picInfo.likes
+        }
 
         Row(
             modifier = Modifier
@@ -130,13 +137,9 @@ fun MarkerOverviewScreen(
                             .size(36.dp)
                             .padding(end = 12.dp)
                             .clickable {
-                                viewModel.toggleLike(picInfo.picId)
                                 localLike = !localLike
-                                if (localLike) {
-                                    localLikeCount += 1
-                                } else {
-                                    localLikeCount -= 1
-                                }
+                                localLikeCount += if (localLike) 1 else -1
+                                viewModel.toggleLike(picInfo.picId)
                             }
                     )
 
@@ -167,7 +170,6 @@ fun MarkerOverviewScreen(
                 uiState.errorMessage != null -> {
                     ErrorMessage(uiState.errorMessage!!)
                 }
-
                 else -> {
                     if (uiState.showOverlay) {
                         PolaroidOverlayCard(
@@ -216,8 +218,14 @@ fun MarkerOverviewScreen(
                                         userImageUrl = uiState.mostLikedPicUserImage!!, // check
                                         timeStamp = uiState.mostLikedPicTimeStamp!! // check
                                     )
-                                    var localLike by remember(mostLikedPic.liked) { mutableStateOf(mostLikedPic.liked) }
-                                    var localLikeCount by remember(mostLikedPic.likes, mostLikedPic.liked) { mutableIntStateOf(mostLikedPic.likes) }
+                                    var localLike by remember(mostLikedPic.picId) { mutableStateOf(mostLikedPic.liked) }
+                                    var localLikeCount by remember(mostLikedPic.picId) { mutableIntStateOf(mostLikedPic.likes) }
+
+                                    // Sync with new data
+                                    LaunchedEffect(mostLikedPic.liked, mostLikedPic.likes) {
+                                        localLike = mostLikedPic.liked
+                                        localLikeCount = mostLikedPic.likes
+                                    }
 
                                     ImageCardSimplified(
                                         picture = mostLikedPic,
@@ -291,13 +299,9 @@ fun MarkerOverviewScreen(
                                                     .size(36.dp)
                                                     .padding(end = 12.dp)
                                                     .clickable {
-                                                        viewModel.toggleLike(mostLikedPic.picId)
                                                         localLike = !localLike
-                                                        if (localLike) {
-                                                            localLikeCount += 1
-                                                        } else {
-                                                            localLikeCount -= 1
-                                                        }
+                                                        localLikeCount += if (localLike) 1 else -1
+                                                        viewModel.toggleLike(mostLikedPic.picId)
                                                     }
                                             )
 
@@ -319,6 +323,7 @@ fun MarkerOverviewScreen(
 
                             // Rest of the ranking
                             LazyColumn {
+                                Log.w("MarkerOverview", "LazyColumnLoaded")
                                 itemsIndexed(uiState.picturesTaken) { index, picInfo ->
                                     RankingRowElem(
                                         rank = index + 2,

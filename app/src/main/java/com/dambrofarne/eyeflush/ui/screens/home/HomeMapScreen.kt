@@ -71,7 +71,7 @@ fun HomeMapScreen(
 
     val polaroidMarkersRefs = remember { mutableListOf<PolaroidMarker>() }
 
-    val defaultZoom = 20.0
+    val defaultZoom = 19.0
     val movementThreshold = 4.0 // meters - move threshold
     val userInteractionTimeout = 15000L // milli-seconds - reposition timeout
 
