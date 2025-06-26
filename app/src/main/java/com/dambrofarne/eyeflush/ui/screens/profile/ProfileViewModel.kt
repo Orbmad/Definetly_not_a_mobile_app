@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 data class ProfileUiState(
     val id : String = "",
@@ -48,10 +49,12 @@ class ProfileViewModel(
     private val _newNotification = MutableStateFlow(false)
     val newNotifications: StateFlow<Boolean> = _newNotification
 
-    private suspend fun checkNotifications(): Boolean {
+    private fun checkNotifications(): Boolean {
         val uId = auth.getCurrentUserId()
         if (uId != null) {
-            return db.hasUnreadNotifications(uId)
+            return runBlocking {
+                db.hasUnreadNotifications(uId)
+            }
         }
         return false
     }
@@ -77,6 +80,7 @@ class ProfileViewModel(
         val result = db.getUserExtendedInfo(targetUId, requesterUId)
         if (result.isSuccess) {
             val user = result.getOrNull()!!
+            _newNotification.value = checkNotifications()
             _uiState.update {
                 it.copy(
                     id = user.uId,
@@ -95,7 +99,6 @@ class ProfileViewModel(
 
                 )
             }
-            _newNotification.value = checkNotifications()
         } else {
             val errorMsg = result.exceptionOrNull()?.message ?: "Unknown error"
             _uiState.update {
@@ -125,9 +128,7 @@ class ProfileViewModel(
                 _uiState.update { it.copy(errorMessage = "Error in like toggle") }
             }
 
-            _newNotification.update {
-                checkNotifications()
-            }
+            _newNotification.value = checkNotifications()
 
             _uiState.update { it.copy(isUpdating = false) }
         }

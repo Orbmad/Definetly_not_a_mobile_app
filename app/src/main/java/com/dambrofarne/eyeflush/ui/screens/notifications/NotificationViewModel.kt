@@ -26,10 +26,9 @@ class NotificationViewModel(
     private val _newNotifications = MutableStateFlow(false)
     val newNotifications: StateFlow<Boolean> = _newNotifications
 
-    private suspend fun checkNotifications(): Boolean {
-        val uId = auth.getCurrentUserId()
-        if (uId != null) {
-            return db.hasUnreadNotifications(uId)
+    private suspend fun checkNotifications(userId: String?): Boolean {
+        if (userId != null) {
+            return db.hasUnreadNotifications(userId)
         }
         return false
     }
@@ -40,6 +39,7 @@ class NotificationViewModel(
         val userId = auth.getCurrentUserId()
         if (userId != null) {
             val loaded = db.getNotifications(userId)
+            _newNotifications.value = checkNotifications(userId)
             _uiState.update {
                 it.copy(
                     isLoading = false,
@@ -91,7 +91,7 @@ class NotificationViewModel(
             val userId = auth.getCurrentUserId()
             if (userId != null) {
                 db.readNotification(userId, notificationId)
-                _newNotifications.value = checkNotifications()
+                _newNotifications.value = checkNotifications(userId)
             }
         }
     }

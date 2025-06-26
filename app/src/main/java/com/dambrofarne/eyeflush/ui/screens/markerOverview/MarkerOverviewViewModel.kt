@@ -53,7 +53,7 @@ class MarkerOverviewViewModel(
     private suspend fun checkNotifications(): Boolean {
         val uId = auth.getCurrentUserId()
         if (uId != null) {
-            db.hasUnreadNotifications(uId)
+            return db.hasUnreadNotifications(uId)
         }
         return false
     }
