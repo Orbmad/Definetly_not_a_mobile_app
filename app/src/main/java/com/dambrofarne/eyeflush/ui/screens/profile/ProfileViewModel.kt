@@ -45,6 +45,17 @@ class ProfileViewModel(
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState
 
+    private val _newNotification = MutableStateFlow(false)
+    val newNotifications: StateFlow<Boolean> = _newNotification
+
+    suspend fun checkNotifications(): Boolean {
+        val uId = auth.getCurrentUserId()
+        if (uId != null) {
+            return db.hasUnreadNotifications(uId)
+        }
+        return false
+    }
+
     suspend fun loadUserInfo(uId: String? = null, isInitialLoad: Boolean = true) {
         _uiState.update {
             it.copy(
@@ -84,6 +95,7 @@ class ProfileViewModel(
 
                 )
             }
+            _newNotification.value = checkNotifications()
         } else {
             val errorMsg = result.exceptionOrNull()?.message ?: "Unknown error"
             _uiState.update {
@@ -111,6 +123,10 @@ class ProfileViewModel(
                 )
             } else {
                 _uiState.update { it.copy(errorMessage = "Error in like toggle") }
+            }
+
+            _newNotification.update {
+                checkNotifications()
             }
 
             _uiState.update { it.copy(isUpdating = false) }

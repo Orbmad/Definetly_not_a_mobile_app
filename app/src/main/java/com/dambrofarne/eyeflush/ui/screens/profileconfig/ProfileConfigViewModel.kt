@@ -35,6 +35,14 @@ class ProfileConfigViewModel(
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
+    suspend fun checkNotifications(): Boolean {
+        val uId = auth.getCurrentUserId()
+        if (uId != null) {
+            return db.hasUnreadNotifications(uId)
+        }
+        return false
+    }
+
     fun onUsernameChange(username: String) {
         _uiState.value = _uiState.value.copy(username = username)
     }

@@ -56,6 +56,8 @@ fun ProfileScreen(
 ){
     val uiState by viewModel.uiState.collectAsState()
 
+    val newNotifications by viewModel.newNotifications.collectAsState()
+
     LaunchedEffect(Unit) {
         viewModel.loadUserInfo()
     }
@@ -65,6 +67,7 @@ fun ProfileScreen(
         showBackButton = false,
         navController = navController,
         currentScreen = NavScreen.PROFILE,
+        newNotification = newNotifications,
         content = {
 
             when {

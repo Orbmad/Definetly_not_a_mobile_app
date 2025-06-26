@@ -45,6 +45,17 @@ class UserOverviewViewModel(
     private val _uiState = MutableStateFlow(UserOverviewUiState())
     val uiState: StateFlow<UserOverviewUiState> = _uiState
 
+    private val _newNotification = MutableStateFlow(false)
+    val newNotifications: StateFlow<Boolean> = _newNotification
+
+    suspend fun checkNotifications(): Boolean {
+        val uId = auth.getCurrentUserId()
+        if (uId != null) {
+            return db.hasUnreadNotifications(uId)
+        }
+        return false
+    }
+
     suspend fun loadUserInfo(uId: String, isInitialLoad: Boolean = true) {
         _uiState.update { it.copy(
             isLoading = if (isInitialLoad) true else it.isLoading,
@@ -78,6 +89,7 @@ class UserOverviewViewModel(
                     score = user.score,
                 )
             }
+            _newNotification.value = checkNotifications()
         } else {
             val errorMsg = result.exceptionOrNull()?.message ?: "Unknown error"
             _uiState.update { it.copy(isLoading = false, errorMessage = errorMsg) }

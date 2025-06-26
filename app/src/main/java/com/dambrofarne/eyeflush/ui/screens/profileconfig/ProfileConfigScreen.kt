@@ -53,6 +53,8 @@ fun ProfileConfigScreen(
     var showDialog by remember { mutableStateOf(false) }
     val pref by themeViewModel.themePreference.collectAsState()
 
+    var newNotifications by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -65,6 +67,7 @@ fun ProfileConfigScreen(
 
     LaunchedEffect(Unit) {
         viewModel.loadUserProfileImage()
+        newNotifications = viewModel.checkNotifications()
     }
 
     CustomScaffold(

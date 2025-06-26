@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,46 +41,51 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun UserOverviewScreen(
     navController: NavHostController,
-    uId : String,
+    uId: String,
     viewModel: UserOverviewViewModel = koinViewModel<UserOverviewViewModel>()
-)  {
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val newNotifications by viewModel.newNotifications.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.loadUserInfo(uId)
     }
 
-    when {
-        uiState.isLoading -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        }
-        uiState.errorMessage != null -> {
-            ErrorMessage(uiState.errorMessage!!)
-        }
 
-        else -> {
-            if (uiState.showOverlay) {
-                PolaroidOverlayCard(
-                    imageUrl = uiState.imageUrlOverlay,
-                    username = uiState.usernameOverlay,
-                    timestamp = uiState.timestampOverlay,
-                    likeCount = uiState.likeCountOverlay,
-                    onDismiss = viewModel :: hideOverlay,
-                    uId = uiState.uIdvOverlay,
-                    userImage = uiState.userImageOverlay,
-                    onUserClick = { userId ->
-                        navController.navigate(EyeFlushRoute.UserOverview(userId))
-                    },
-                )
-            }else {
-                CustomScaffold(
-                    title = "User Overview",
-                    showBackButton = true,
-                    navController = navController,
-                    currentScreen = null,
-                    content = {
+    CustomScaffold(
+        title = "User Overview",
+        showBackButton = true,
+        navController = navController,
+        currentScreen = null,
+        newNotification = newNotifications,
+        content = {
+            when {
+                uiState.isLoading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                uiState.errorMessage != null -> {
+                    ErrorMessage(uiState.errorMessage!!)
+                }
+
+                else -> {
+                    if (uiState.showOverlay) {
+                        PolaroidOverlayCard(
+                            imageUrl = uiState.imageUrlOverlay,
+                            username = uiState.usernameOverlay,
+                            timestamp = uiState.timestampOverlay,
+                            likeCount = uiState.likeCountOverlay,
+                            onDismiss = viewModel::hideOverlay,
+                            uId = uiState.uIdvOverlay,
+                            userImage = uiState.userImageOverlay,
+                            onUserClick = { userId ->
+                                navController.navigate(EyeFlushRoute.UserOverview(userId))
+                            },
+                        )
+                    } else {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -202,8 +208,9 @@ fun UserOverviewScreen(
                                 enabled = !uiState.isUpdating
                             )
                         }
-                    })
+                    }
+                }
+
             }
-        }
-    }
+        })
 }

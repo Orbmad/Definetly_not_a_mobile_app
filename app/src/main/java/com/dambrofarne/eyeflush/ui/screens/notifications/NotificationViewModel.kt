@@ -9,11 +9,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
-import java.time.LocalDateTime
+//import java.time.LocalDateTime
 
 data class NotificationUiState(
     val isLoading: Boolean = true,
-    val notificationsList: List<NotificationItem> = emptyList<NotificationItem>()
+    val notificationsList: List<NotificationItem> = emptyList()
 )
 
 class NotificationViewModel(
@@ -24,14 +24,10 @@ class NotificationViewModel(
     private val _uiState = MutableStateFlow(NotificationUiState())
     val uiState: StateFlow<NotificationUiState> = _uiState
 
-
-
-    fun checkNotifications(): Boolean {
+    suspend fun checkNotifications(): Boolean {
         val uId = auth.getCurrentUserId()
         if (uId != null) {
-            return runBlocking {
-                db.hasUnreadNotifications(uId)
-            }
+            return db.hasUnreadNotifications(uId)
         }
         return false
     }
@@ -51,33 +47,33 @@ class NotificationViewModel(
         }
     }
 
-    private suspend fun loadDummyNotifications() {
-        _uiState.update {
-            it.copy(
-                notificationsList = listOf(
-                    NotificationItem(
-                        "1",
-                        "LIKE",
-                        "Your photo received a like",
-                        "-User- liked your photo",
-                        time = LocalDateTime.now().toString(),
-                        isRead = false,
-                        referredMarkerId = null
-                    ),
-                    NotificationItem(
-                        "2",
-                        "RANK_ONE",
-                        "Your photo got first place",
-                        "One of your photo is now first place",
-                        time = LocalDateTime.now().toString(),
-                        isRead = false,
-                        referredMarkerId = null
-                    )
-                ),
-                isLoading = false
-            )
-        }
-    }
+//    private suspend fun loadDummyNotifications() {
+//        _uiState.update {
+//            it.copy(
+//                notificationsList = listOf(
+//                    NotificationItem(
+//                        "1",
+//                        "LIKE",
+//                        "Your photo received a like",
+//                        "-User- liked your photo",
+//                        time = LocalDateTime.now().toString(),
+//                        isRead = false,
+//                        referredMarkerId = null
+//                    ),
+//                    NotificationItem(
+//                        "2",
+//                        "RANK_ONE",
+//                        "Your photo got first place",
+//                        "One of your photo is now first place",
+//                        time = LocalDateTime.now().toString(),
+//                        isRead = false,
+//                        referredMarkerId = null
+//                    )
+//                ),
+//                isLoading = false
+//            )
+//        }
+//    }
 
     suspend fun markAsRead(notificationId: String) {
         val index = _uiState.value.notificationsList.indexOfFirst { it.id == notificationId }
