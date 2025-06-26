@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.osmdroid.util.GeoPoint
 
 data class MarkerOverviewUiState(
@@ -48,12 +47,13 @@ class MarkerOverviewViewModel(
     private val _uiState = MutableStateFlow(MarkerOverviewUiState())
     val uiState: StateFlow<MarkerOverviewUiState> = _uiState
 
-    fun checkNotifications(): Boolean {
+    private val _newNotifications = MutableStateFlow(false)
+    val newNotifications: StateFlow<Boolean> = _newNotifications
+
+    private suspend fun checkNotifications(): Boolean {
         val uId = auth.getCurrentUserId()
         if (uId != null) {
-            return runBlocking {
-                db.hasUnreadNotifications(uId)
-            }
+            db.hasUnreadNotifications(uId)
         }
         return false
     }
@@ -73,6 +73,7 @@ class MarkerOverviewViewModel(
         val result = db.getMarkerExtendedInfo(markerId, userId)
         if (result.isSuccess) {
             val marker = result.getOrNull()!!
+            _newNotifications.value = checkNotifications()
             _uiState.update {
                 it.copy(
                     id = marker.id,

@@ -7,7 +7,6 @@ import com.dambrofarne.eyeflush.data.repositories.database.UserAchievements
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.runBlocking
 
 data class AchievementUiState(
     val isLoading: Boolean = true,
@@ -47,12 +46,13 @@ class GamificationViewModel(
     private val _uiState = MutableStateFlow(AchievementUiState())
     val uiState: StateFlow<AchievementUiState> = _uiState
 
-    fun checkNotifications(): Boolean {
+    private val _newNotifications = MutableStateFlow(false)
+    val newNotifications: StateFlow<Boolean> = _newNotifications
+
+    private suspend fun checkNotifications(): Boolean {
         val uId = auth.getCurrentUserId()
         if (uId != null) {
-            return runBlocking {
-                db.hasUnreadNotifications(uId)
-            }
+            db.hasUnreadNotifications(uId)
         }
         return false
     }
@@ -64,6 +64,7 @@ class GamificationViewModel(
         } else {
             UserAchievements(0,0,0,0)
         }
+        _newNotifications.value = checkNotifications()
         _uiState.update {
             it.copy(
                 isLoading = false,
@@ -76,16 +77,16 @@ class GamificationViewModel(
         }
     }
 
-    suspend fun loadDummyUserAchievements() {
-        _uiState.update {
-            it.copy(
-                isLoading = false,
-                likesReceived = 44,
-                picturesTaken = 11,
-                markersVisited = 7,
-                mostLikedPictures = 3
-            )
-        }
-    }
+//    suspend fun loadDummyUserAchievements() {
+//        _uiState.update {
+//            it.copy(
+//                isLoading = false,
+//                likesReceived = 44,
+//                picturesTaken = 11,
+//                markersVisited = 7,
+//                mostLikedPictures = 3
+//            )
+//        }
+//    }
 
 }

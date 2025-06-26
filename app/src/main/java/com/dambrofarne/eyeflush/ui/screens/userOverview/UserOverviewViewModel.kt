@@ -48,7 +48,7 @@ class UserOverviewViewModel(
     private val _newNotification = MutableStateFlow(false)
     val newNotifications: StateFlow<Boolean> = _newNotification
 
-    suspend fun checkNotifications(): Boolean {
+    private suspend fun checkNotifications(): Boolean {
         val uId = auth.getCurrentUserId()
         if (uId != null) {
             return db.hasUnreadNotifications(uId)

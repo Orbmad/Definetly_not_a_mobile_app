@@ -45,9 +45,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import com.dambrofarne.eyeflush.ui.EyeFlushRoute
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -58,13 +56,12 @@ fun NotificationScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    val readNotifications = remember { mutableStateListOf<String>() }
+    val newNotifications by viewModel.newNotifications.collectAsState()
 
-    var newNotifications by remember { mutableStateOf(false) }
+    val readNotifications = remember { mutableStateListOf<String>() }
 
     LaunchedEffect(Unit) {
         viewModel.loadNotifications()
-        newNotifications = viewModel.checkNotifications()
     }
 
     CustomScaffold(
@@ -119,7 +116,6 @@ fun NotificationScreen(
                                             viewModel.deleteNotification(notification.id)
                                         }
                                     }
-                                    newNotifications = viewModel.checkNotifications()
                                 }
 
                                 SwipeToDismiss(

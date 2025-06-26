@@ -49,6 +49,8 @@ fun GamificationScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    val newNotifications by viewModel.newNotifications.collectAsState()
+
     LaunchedEffect(Unit) {
         //viewModel.loadDummyUserAchievements()
         viewModel.loadUserAchievements()
@@ -59,7 +61,7 @@ fun GamificationScreen(
         showBackButton = false,
         navController = navController,
         currentScreen = NavScreen.GAME,
-        newNotification = viewModel.checkNotifications(),
+        newNotification = newNotifications,
         content = {
             when {
                 uiState.isLoading -> {

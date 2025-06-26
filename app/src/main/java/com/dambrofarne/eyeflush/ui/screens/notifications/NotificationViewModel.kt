@@ -8,7 +8,6 @@ import com.dambrofarne.eyeflush.data.repositories.database.NotificationItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.runBlocking
 //import java.time.LocalDateTime
 
 data class NotificationUiState(
@@ -24,7 +23,10 @@ class NotificationViewModel(
     private val _uiState = MutableStateFlow(NotificationUiState())
     val uiState: StateFlow<NotificationUiState> = _uiState
 
-    suspend fun checkNotifications(): Boolean {
+    private val _newNotifications = MutableStateFlow(false)
+    val newNotifications: StateFlow<Boolean> = _newNotifications
+
+    private suspend fun checkNotifications(): Boolean {
         val uId = auth.getCurrentUserId()
         if (uId != null) {
             return db.hasUnreadNotifications(uId)
@@ -89,6 +91,7 @@ class NotificationViewModel(
             val userId = auth.getCurrentUserId()
             if (userId != null) {
                 db.readNotification(userId, notificationId)
+                _newNotifications.value = checkNotifications()
             }
         }
     }
