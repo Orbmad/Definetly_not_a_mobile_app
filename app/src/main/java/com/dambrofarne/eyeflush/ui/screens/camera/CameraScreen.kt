@@ -112,13 +112,16 @@ fun CameraScreen(
                         if (cameraState == CameraState.PHOTO_CAPTURED && capturedImage != null) {
                             PhotoConfirmationDialog(
                                 onConfirm = {
+                                    viewModel.cameraManager.startSaving()
                                     viewModel.cameraManager.confirmPhoto()?.let { file ->
                                         viewModel.viewModelScope.launch {
                                             viewModel.savePhoto(file)
+                                            viewModel.cameraManager.endSaving()
                                             navController.navigate(EyeFlushRoute.Home)
                                         }
                                         // Decide if navigate back is inside coroutine
                                     }
+                                    //viewModel.cameraManager.endSaving()
                                 },
                                 onRetry = {
                                     viewModel.cameraManager.retryPhoto()
@@ -152,7 +155,7 @@ private fun CaptureButton(
     modifier: Modifier = Modifier
 ) {
     val isEnabled = cameraState == CameraState.READY
-    val isCapturing = cameraState == CameraState.CAPTURING
+    val isCapturing = (cameraState == CameraState.CAPTURING || cameraState == CameraState.SAVING)
 
     FloatingActionButton(
         onClick = { if (isEnabled) onCapture() },
@@ -172,7 +175,7 @@ private fun CaptureButton(
         } else {
             Icon(
                 Icons.Default.Camera,
-                contentDescription = "Scatta foto",
+                contentDescription = "Take photo",
                 modifier = Modifier.size(74.dp),
                 tint = MaterialTheme.colorScheme.onPrimary
             )
@@ -187,16 +190,16 @@ private fun CameraOverlay() {
         val canvasHeight = size.height
         val overlayColor = Color.Black.copy(alpha = 0.80f)
 
-        // Calcola le dimensioni del rettangolo 4:5
+        // Calc rectangle 4:5
         val aspectRatio = 4f / 5f
-        val rectWidth = canvasWidth * 0.8f
+        val rectWidth = canvasWidth * 0.95f
         val rectHeight = rectWidth / aspectRatio
 
-        // Centra il rettangolo
+        // Center rectangle
         val left = (canvasWidth - rectWidth) / 2
         val top = (canvasHeight - rectHeight) / 2
 
-        // Disegna l'overlay scuro
+        // Draw dark overlay
         drawRect(
             color = overlayColor,
             topLeft = Offset(0f, 0f),
@@ -226,7 +229,7 @@ private fun CameraOverlay() {
             style = Stroke(width = 4.dp.toPx())
         )
 
-        // Draws anngles
+        // Draws angles
         val cornerLength = 20.dp.toPx()
         val cornerWidth = 4.dp.toPx()
 

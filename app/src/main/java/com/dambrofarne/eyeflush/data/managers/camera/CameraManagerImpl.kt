@@ -200,7 +200,6 @@ class CameraManagerImpl(private val context: Context) : CameraManager {
 
     override fun confirmPhoto(): File? {
         val capturedFile = _capturedImage.value
-        resetCameraState()
         return capturedFile
     }
 
@@ -210,6 +209,14 @@ class CameraManagerImpl(private val context: Context) : CameraManager {
                 file.delete()
             }
         }
+        resetCameraState()
+    }
+
+    override fun startSaving() {
+        _cameraState.value = CameraState.SAVING
+    }
+
+    override fun endSaving() {
         resetCameraState()
     }
 
@@ -245,5 +252,6 @@ enum class CameraState {
     READY,
     CAPTURING,
     PHOTO_CAPTURED,
+    SAVING,
     ERROR
 }

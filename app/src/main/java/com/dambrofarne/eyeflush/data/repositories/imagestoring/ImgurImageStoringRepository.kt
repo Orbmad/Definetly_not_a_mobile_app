@@ -9,7 +9,6 @@ import android.util.Base64
 import android.util.Log
 import com.dambrofarne.eyeflush.BuildConfig
 import com.dambrofarne.eyeflush.utils.cropToCenterAspectRatio
-import com.google.api.LogProto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -21,18 +20,18 @@ import javax.net.ssl.HttpsURLConnection
 
 class ImgurImageStoringRepository(private val context: Context) : ImageStoringRepository {
 
-    private val CLIENT_ID = BuildConfig.IMGUR_CLIENT_ID;
+    private val clientId = BuildConfig.IMGUR_CLIENT_ID
 
     override suspend fun uploadImage(uri: Uri): Result<String> {
         return withContext(Dispatchers.IO) {
             try {
                 val inputStream = context.contentResolver.openInputStream(uri)
                 val bitmap = BitmapFactory.decodeStream(inputStream)
-                    ?: return@withContext Result.failure(Exception("Bitmap non valido."))
+                    ?: return@withContext Result.failure(Exception("Bitmap not valid."))
 
                 uploadImage(bitmap)
             } catch (e: Exception) {
-                Log.w("ImageUpload", e);
+                Log.w("ImageUpload", e)
                 Result.failure(e)
             }
         }
@@ -42,11 +41,11 @@ class ImgurImageStoringRepository(private val context: Context) : ImageStoringRe
         return withContext(Dispatchers.IO) {
             try {
                 val bitmap = BitmapFactory.decodeFile(file.absolutePath)
-                    ?: return@withContext Result.failure(Exception("Bitmap non valido."))
+                    ?: return@withContext Result.failure(Exception("Bitmap not valid."))
 
                 uploadImage(bitmap)
             } catch (e: Exception) {
-                Log.w("ImageUpload", e);
+                Log.w("ImageUpload", e)
                 Result.failure(e)
             }
         }
@@ -56,12 +55,12 @@ class ImgurImageStoringRepository(private val context: Context) : ImageStoringRe
         return withContext(Dispatchers.IO) {
             try {
                 val bitmap = BitmapFactory.decodeFile(file.absolutePath)
-                    ?: return@withContext Result.failure(Exception("Bitmap non valido."))
+                    ?: return@withContext Result.failure(Exception("Bitmap not valid."))
 
                 val cropped = cropToCenterAspectRatio(bitmap, 4f / 5f)
                 uploadImage(cropped)
             } catch (e: Exception) {
-                Log.w("ImageUpload", e);
+                Log.w("ImageUpload", e)
                 Result.failure(e)
             }
         }
@@ -79,10 +78,10 @@ class ImgurImageStoringRepository(private val context: Context) : ImageStoringRe
                 val inputStream = when (uri.scheme) {
                     "http", "https" -> URL(uri.toString()).openStream()
                     else -> context.contentResolver.openInputStream(uri)
-                } ?: return@withContext Result.failure(Exception("Impossibile aprire input stream per $uri"))
+                } ?: return@withContext Result.failure(Exception("Unable to open input stream for $uri"))
 
                 val drawable = Drawable.createFromStream(inputStream, uri.toString())
-                    ?: return@withContext Result.failure(Exception("Impossibile creare Drawable da $uri"))
+                    ?: return@withContext Result.failure(Exception("Unable to create drawable from $uri"))
 
                 Result.success(drawable)
 
@@ -109,7 +108,7 @@ class ImgurImageStoringRepository(private val context: Context) : ImageStoringRe
                     requestMethod = "POST"
                     doInput = true
                     doOutput = true
-                    setRequestProperty("Authorization", "Client-ID $CLIENT_ID")
+                    setRequestProperty("Authorization", "Client-ID $clientId")
                     setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
                 }
 
@@ -121,7 +120,7 @@ class ImgurImageStoringRepository(private val context: Context) : ImageStoringRe
                 val stream = if (responseCode in 200..299) {
                     connection.inputStream
                 } else {
-                    connection.errorStream ?: throw Exception("Errore sconosciuto. Nessun body di errore disponibile.")
+                    connection.errorStream ?: throw Exception("Unknown error. No further info.")
                 }
 
                 val responseText = stream.bufferedReader().use { it.readText() }
@@ -131,7 +130,7 @@ class ImgurImageStoringRepository(private val context: Context) : ImageStoringRe
                     val link = json.getJSONObject("data").getString("link")
                     Result.success(link)
                 } else {
-                    Result.failure(Exception("Errore Imgur: $responseCode\n$responseText"))
+                    Result.failure(Exception("Imgur Error: $responseCode\n$responseText"))
                 }
 
             } catch (e: Exception) {

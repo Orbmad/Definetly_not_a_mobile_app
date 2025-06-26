@@ -1,7 +1,6 @@
 package com.dambrofarne.eyeflush.utils
 
 import android.graphics.Bitmap
-import android.graphics.Matrix
 
 private const val TARGET_ASPECT_RATIO = 4f/5f
 
@@ -14,11 +13,11 @@ fun cropToCenterAspectRatio(bitmap: Bitmap, aspectRatio: Float = TARGET_ASPECT_R
     val cropHeight: Int
 
     if (originalRatio > aspectRatio) {
-        // Immagine più larga rispetto al target, tagliare i lati
+        // Image larger: cut sides
         cropHeight = originalHeight
         cropWidth = (cropHeight * aspectRatio).toInt()
     } else {
-        // Immagine più alta rispetto al target, tagliare sopra/sotto
+        // Image higher: cut top/bottom
         cropWidth = originalWidth
         cropHeight = (cropWidth / aspectRatio).toInt()
     }
@@ -30,10 +29,10 @@ fun cropToCenterAspectRatio(bitmap: Bitmap, aspectRatio: Float = TARGET_ASPECT_R
 }
 
 
-fun rotateBitmap(bitmap: Bitmap, degrees: Float): Bitmap {
-    val matrix = Matrix().apply { postRotate(degrees) }
-    return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-}
+//fun rotateBitmap(bitmap: Bitmap, degrees: Float): Bitmap {
+//    val matrix = Matrix().apply { postRotate(degrees) }
+//    return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+//}
 
 //fun fixImageOrientationAndCrop(photoFile: File, aspectRatio: Float = 4f / 5f): File {
 //    val exif = ExifInterface(photoFile.absolutePath)
@@ -52,7 +51,7 @@ fun rotateBitmap(bitmap: Bitmap, degrees: Float): Bitmap {
 //
 //    val croppedBitmap = cropToCenterAspectRatio(rotatedBitmap, aspectRatio)
 //
-//    // Salva l'immagine corretta nello stesso file
+//    // Save corrected image
 //    FileOutputStream(photoFile).use { out ->
 //        croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
 //    }
@@ -72,7 +71,7 @@ fun cropRelativeToOverlay(bitmap: Bitmap): Bitmap {
     val originalWidth = bitmap.width
     val originalHeight = bitmap.height
 
-    val overlayWidthRatio = 0.7f
+    val overlayWidthRatio = 0.6f
     val overlayAspectRatio = 4f / 5f
 
     val cropWidth = (originalWidth * overlayWidthRatio).toInt()

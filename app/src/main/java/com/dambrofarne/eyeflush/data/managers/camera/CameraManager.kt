@@ -24,6 +24,10 @@ interface CameraManager {
 
     // suspend fun savePhoto(file: File)
 
+    fun startSaving()
+
+    fun endSaving()
+
     fun resetCameraState()
 
     fun cleanup()
